@@ -1,0 +1,322 @@
+<!doctype html>
+<html class="no-js" lang="en" dir="ltr">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="x-ua-compatible" content="ie=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Damon Shaw</title>
+    <script src="js/jquery.js"></script>
+    <script src="js/animsition.js"></script>
+    <script src="js/tooltips.js"></script>
+    <script src="js/bounce.js"></script>
+    <script src="js/jquery-ui.js"></script>
+    <script src="js/shuffleLetters.js"></script>
+    <link rel="stylesheet" href="css/animsition.css">
+    <link rel="stylesheet" href="css/tooltips.css">
+    <link rel="stylesheet" href="css/magic.css">
+    <link rel="stylesheet" href="css/jquery-ui.css">
+    <link rel="stylesheet" href="css/app.css">
+  </head>
+  <body>
+    <div id="bodyWrapper">
+
+      <div id="internalPage"
+      class="animsition hasNoise" data-animsition-in-class="fade-in-down"
+      data-animsition-in-duration="1000" data-animsition-out-class="flip-out-x"
+      data-animsition-out-duration="800">
+
+        <div id="stripes"></div>
+
+        <div id="namePlate" class="animsition" data-animsition-in-class="fade-in-down"
+          data-animsition-in-duration="1500" data-animsition-out-class="flip-out-x"
+          data-animsition-out-duration="800">
+          <h1>Damon Shaw</h1>
+          <p>Computer Engineer and Programmer</p>
+        </div>
+
+        <div class="switch" id="modeSwitch">
+          <input class="switch-input" id="exampleSwitch" type="checkbox">
+          <label class="switch-paddle" for="exampleSwitch"></label>
+        </div>
+
+
+        <div id="skillsBox" class="animsition infoBox" data-animsition-in-class="fade-in-down"
+          data-animsition-in-duration="1700" data-animsition-out-class="flip-out-x"
+          data-animsition-out-duration="800">
+
+          <p class="header">Skills</p>
+
+          <div class="skillsBoxRow">
+            <div class="skillsIconContainer">
+              <a href="#" title="3-D PRINTING">
+                <img class="skillsIcon" src="images/icons/hi-hue/3d-printing.svg" />
+              </a>
+            </div>
+            <div class="skillsIconContainer">
+              <a href="#" title="JAVA">
+                <img class="skillsIcon" src="images/icons/hi-hue/java-logo.svg" />
+              </a>
+            </div>
+            <div class="skillsIconContainer">
+              <a href="#" title="PYTHON">
+                <img class="skillsIcon" src="images/icons/hi-hue/python-logo.svg" />
+              </a>
+            </div>
+            <div class="skillsIconContainer">
+              <a href="#" title="LINUX">
+                <img class="skillsIcon" src="images/icons/hi-hue/linux.svg" />
+              </a>
+            </div>
+            <div class="skillsIconContainer">
+              <a href="#" title="PENTESTING">
+                <img class="skillsIcon" src="images/icons/hi-hue/pentesting.svg" />
+              </a>
+            </div>
+          </div>
+
+          <div class="skillsBoxRow">
+            <div class="skillsIconContainer">
+              <a href="#" title="CHESS">
+                <img class="skillsIcon" src="images/icons/hi-hue/chess-knight.svg" />
+              </a>
+            </div>
+            <div class="skillsIconContainer">
+              <a href="#" title="HTML/CSS">
+                <img class="skillsIcon" src="images/icons/hi-hue/html-5.svg" />
+              </a>
+            </div>
+          </div>
+
+        </div>
+
+
+        <div id="educationBox" class="animsition infoBox" data-animsition-in-class="fade-in-down"
+          data-animsition-in-duration="1900" data-animsition-out-class="flip-out-x"
+          data-animsition-out-duration="800">
+          <p class="header">Education</p>
+          <div class="educationBoxItem"><p class="vt_maroon">Virginia</p><p> Poly</p><p class="vt_orange">Tech</p><p>nic Institute and State University (2016 - 2020)</p></div>
+          <br>
+          <div class="educationBoxItem clickable"><p>Patrick Henry High School (2012 - 2016)</p></div>
+          <br>
+          <div class="itemDetail">
+            <p class="itemDetailText">GPA: 4.3667</p>
+            <p class="itemDetailText">AP Scores:</p>
+            <p class="itemDetailText tabbed">Computer Science - 5</p>
+            <p class="itemDetailText tabbed">Physics I - 4</p>
+            <p class="itemDetailText tabbed">United States History - 4</p>
+            <p class="itemDetailText tabbed">English 11 - 4</p>
+          </div>
+        </div>
+
+        <div id="experienceBox" class="animsition infoBox" data-animsition-in-class="fade-in-down"
+        data-animsition-in-duration="2100" data-animsition-out-class="flip-out-x"
+        data-animsition-out-duration="800">
+          <p class="header">Experience</p>
+          <div class="experienceBoxItem clickable"><p>Instructor of Computer Science at CodeVA</p></div>
+          <div class="itemDetail">
+            <p class="itemDetailText">I taught kids.</p>
+          </div>
+          <div class="experienceBoxItem"><p></p></div>
+        </div>
+
+        <div id="projectsBox" class="animsition infoBox" data-animsition-in-class="fade-in-down"
+          data-animsition-in-duration="2300" data-animsition-out-class="flip-out-x"
+          data-animsition-out-duration="800">
+          <p class="header">Current and Past Projects</p>
+          <div class="projectsBoxItem clickable"><p><strong>TDAS</strong> - Target Detection and Analysis System</p></div>
+          <div class="itemDetail">
+            <div style="display: inline !important"><p class="itemDetailText">Project Status:</p><p class="itemDetailText ongoingMessage">Ongoing</p></div>
+            <br>
+            <p class="itemDetailText">TDAS is a computer vision project that allows skirmishers to better
+                                      analyze their targets in realtime. The concept is derived from my own
+                                      experiences as I found it impractical to have a spotting scope to
+                                      help in accuracy and adjustment if that scope requires that you leave your firing stance,
+                                      creating a lack of consistency in your shots. TDAS solves this by evaluating
+                                      shooting bulls for the skirmisher and displaying detected hits on a panel mounted
+                                      to the spotting scope. Using TDAS, the skirmisher may better understand their
+                                      target while also being able to remain in their firing stance.</p>
+          </div>
+        </div>
+
+        <div id="contactBox" class="animsition infoBox" data-animsition-in-class="fade-in-down"
+          data-animsition-in-duration="2300" data-animsition-out-class="flip-out-x"
+          data-animsition-out-duration="800">
+          <p class="header">Contact</p>
+          <div class="contactBoxItem"><p>Academic E-mail: <a href="mailto:admins@vt.edu">admins@vt.edu</a></p></div>
+          <div class="contactBoxItem"><p>Personal E-mail: <a href="mailto:damon.alexander.shaw@gmail.com">damon.alexander.shaw@gmail.com</a></p></div>
+        </div>
+
+      </div>
+    </div>
+
+
+    <script src="js/vendor/what-input.js"></script>
+    <script src="js/vendor/foundation.js"></script>
+    <script src="js/app.js"></script>
+    <script>
+      var baseDelay = 1700;
+      //animisition
+      $(document).ready(function() {
+        $(".skillsIcon").hide();
+        $(".animsition").animsition({
+          inClass: 'fade-in',
+          outClass: 'fade-out',
+          inDuration: 1500,
+          outDuration: 800,
+          linkElement: '.animsition-link',
+          // e.g. linkElement: 'a:not([target="_blank"]):not([href^="#"])'
+          loading: true,
+          loadingParentElement: 'body', //animsition wrapper element
+          loadingClass: 'animsition-loading',
+          loadingInner: '', // e.g '<img src="loading.svg" />'
+          timeout: false,
+          timeoutCountdown: 5000,
+          onLoadEvent: true,
+          browser: [ 'animation-duration', '-webkit-animation-duration'],
+          // "browser" option allows you to disable the "animsition" in case the css property in the array is not supported by your browser.
+          // The default setting is to disable the "animsition" in a browser that does not support "animation-duration".
+          overlay : false,
+          overlayClass : 'animsition-overlay-slide',
+          overlayParentElement : 'body',
+          transition: function(url){ window.location.href = url; }
+        });
+      });
+    </script>
+
+    <script>
+      //skillsIcon animation
+      console.log("RUNNING SKILLSICON ANIMATION");
+      $(document).ready(function() {
+        var bounces = [];
+        for(i = 0; i < $(".skillsIcon").length; i++)
+          bounces.push(new Bounce());
+        for(i = 0; i < bounces.length; i++){
+          bounces[i]
+          .translate({
+            from: { x: Math.floor(Math.random() * 750) - 500 , y: Math.floor(Math.random() * 750) - 500 },
+            to: { x: 0, y: 0 },
+            duration: 1000,
+            stiffness: 4
+          })
+          .scale({
+            from: { x: 1, y: 1 },
+            to: { x: 0.1, y: 2.3 },
+            easing: "sway",
+            duration: 800,
+            delay: 65,
+            stiffness: 2
+          })
+          .scale({
+            from: { x: 1, y: 1},
+            to: { x: 5, y: 1 },
+            easing: "sway",
+            duration: 300,
+            delay: 30,
+          })
+        }
+
+        //go through each skillsIcon element, give it a random color, and send it to its normal position from a random location
+        setTimeout(function(){
+          $(".skillsIcon").each(function(i, obj){
+            setTimeout(function(){
+              $(obj).show();
+              // $(obj).css("animation", "animation 750ms linear both");
+              console.log("hue-rotate(" + Math.floor(Math.random() * 5000) + "deg)");
+              $(obj).css("-webkit-filter", "hue-rotate(" + (Math.floor(Math.random() * 5000) + (Math.floor(Math.random() * 5000))) + "deg) saturate(" +  (Math.floor(Math.random() * 5) + 1) + ") brightness(0.6)");
+              bounces[i].applyTo(obj);
+            }, 150 * i)
+          })
+        },
+        baseDelay);
+      });
+    </script>
+
+    <script>
+      $("#namePlate h1, #namePlate p, .header, p").shuffleLetters({callback:function(){}});
+    </script>
+
+    <script>
+      //tooltips
+      $("a[title]").tooltips();
+    </script>
+
+    <script>
+      //information panel animation
+      $(document).ready(function(){
+
+        $(".itemDetail").hide();
+
+        var $elements = $(".educationBoxItem, .experienceBoxItem, .projectsBoxItem, .itemDetail");
+
+        $(".educationBoxItem, .experienceBoxItem, .projectsBoxItem").click(function(){
+          console.log($elements.eq($elements.index(this) + 1).is(":visible"));
+          if($elements.eq($elements.index(this) + 1).is(":visible")){
+            $elements.eq($elements.index(this) + 1).slideUp();
+          }
+          else{
+            $elements.eq($elements.index(this) + 1).slideDown();
+          }
+        });
+
+        $("#namePlate").click(function(){
+          $(this).css("color", '#'+(Math.random()*0xFFFFFF<<0).toString(16));
+        });
+      });
+    </script>
+
+    <script>
+      //dark/light mode animation
+
+      var $lightmode = true;
+
+      $(".switch-paddle").click(function(){
+
+        if($lightmode){
+          //go from light to dark
+          $("#namePlate, .skillsBoxItem, .educationBoxItem, .experienceBoxItem, .projectsBoxItem, .contactBoxItem").animate({
+            color: "#F8ECC2"
+          }, 500);
+          $(".header").animate({
+            color: "#A1997F"
+          }, 500);
+          $("#internalPage").css("background-image", "none");
+          $("#internalPage").animate({
+            backgroundColor: "#151515"
+          }, 500);
+          $(".tooltip").css("border", "2px solid #A1997F");
+          $(".tooltip").css("color", "#A1997F");
+
+          $(".skillsIcon").each(function(i, obj){
+            setTimeout(function(){
+              $(obj).show();
+              // $(obj).css("animation", "animation 750ms linear both");
+              console.log("hue-rotate(" + Math.floor(Math.random() * 5000) + "deg)");
+              $(obj).css("-webkit-filter", "hue-rotate(" + (Math.floor(Math.random() * 5000) + (Math.floor(Math.random() * 5000))) + "deg) saturate(" +  (Math.floor(Math.random() * 5) + 1) + ") brightness(0.6)");
+            }, 150);
+          });
+
+          $lightmode = false;
+        }
+
+        else{
+          //go from dark to light
+          $("#namePlate, .skillsBoxItem, .educationBoxItem, .experienceBoxItem, .projectsBoxItem, .contactBoxItem").animate({
+            color: "#151515"
+          }, 500);
+          $(".header").animate({
+            color: "#7C745A"
+          }, 500);
+          $("#internalPage").css("background-image", "var(--noise-image)");
+          $("#internalPage").animate({
+            backgroundColor: "#F8ECC2"
+          }, 500);
+          $(".tooltip").css("border", "2px solid #F8ECC2");
+          $(".tooltip").css("color", "#F8ECC2");
+
+          $lightmode = true;
+        }
+      });
+    </script>
+
+  </body>
+</html>

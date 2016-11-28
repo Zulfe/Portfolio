@@ -1,0 +1,122 @@
+<!doctype html>
+<html class="no-js" lang="en" dir="ltr">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="x-ua-compatible" content="ie=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Damon Shaw</title>
+    <script src="js/jquery.js"></script>
+    <script src="js/animsition.js"></script>
+    <script src="js/tooltips.js"></script>
+    <script src="js/bounce.js"></script>
+    <script src="js/jquery-ui.js"></script>
+    <script src="js/shuffleLetters.js"></script>
+    <link rel="stylesheet" href="css/animsition.css">
+    <link rel="stylesheet" href="css/jquery-ui.css">
+    <link rel="stylesheet" href="css/card.css">
+  </head>
+  <body>
+    <div id="panelContainer">
+      <div id="leftPanel" class="animsition infoPanel"
+        data-animsition-in-class="fade-in-left"
+        data-animsition-in-duration="1000"
+        data-animsition-out-class="fade-out-left"
+        data-animsition-out-duration="800">
+
+        <div class="navItem">
+          <div class="navItemImageContainer">
+            <img src="images/icons/navMenu/avatar.svg" />
+          </div>
+        </div>
+        <hr>
+        <div class="navItem">
+          <div class="navItemImageContainer">
+            <img src="images/icons/navMenu/productivity.svg" />
+          </div>
+        </div>
+        <hr>
+        <div class="navItem">
+          <div class="navItemImageContainer">
+            <img src="images/icons/navMenu/briefcase.svg" />
+          </div>
+        </div>
+
+      </div>
+
+      <div class="spacer"></div>
+
+      <div id="centerPanel" class="animsition infoPanel"
+        data-animsition-in-class="fade-in-down"
+        data-animsition-in-duration="1000"
+        data-animsition-out-class="fade-out-left"
+        data-animsition-out-duration="800">
+
+        <div id="personalInfoPanel" class="centerPanelItem">
+        </div>
+
+        <div class="centerPanelItem">
+        </div>
+
+        <div class="centerPanelItem">
+        </div>
+
+
+      </div>
+
+      <div class="spacer"></div>
+
+      <div id="rightPanel" class="animsition infoPanel"
+        data-animsition-in-class="fade-in-right"
+        data-animsition-in-duration="1000"
+        data-animsition-out-class="fade-out-left"
+        data-animsition-out-duration="800">
+
+        <div id="rightPanelImageContainer">
+          <img id="rightPanelImage" src="images/portrait.png" />
+        </div>
+
+        <p id="rightPanelNamePlate">DAMON SHAW</p>
+        <p id="rightPanelNameSubtitle">COMPUTER ENGINEER & PROGRAMMER</p>
+        <hr>
+        <p></p>
+
+      </div>
+    </div>
+
+    <script>
+
+
+
+      $(document).ready(function() {
+
+
+        $(".animsition").animsition({
+          inClass: 'fade-in-left',
+          outClass: 'fade-out-left',
+          inDuration: 1500,
+          outDuration: 800,
+          linkElement: '.animsition-link',
+          // e.g. linkElement: 'a:not([target="_blank"]):not([href^="#"])'
+          loading: false,
+          loadingParentElement: 'body', //animsition wrapper element
+          loadingClass: 'animsition-loading',
+          loadingInner: '', // e.g '<img src="loading.svg" />'
+          timeout: false,
+          timeoutCountdown: 5000,
+          onLoadEvent: true,
+          browser: [ 'animation-duration', '-webkit-animation-duration'],
+          // "browser" option allows you to disable the "animsition" in case the css property in the array is not supported by your browser.
+          // The default setting is to disable the "animsition" in a browser that does not support "animation-duration".
+          overlay : false,
+          overlayClass : 'animsition-overlay-slide',
+          overlayParentElement : 'body',
+          transition: function(url){ window.location.href = url; }
+        });
+      });
+    </script>
+
+    <script>
+    </script>
+
+  </body>
+</html>
