@@ -68,7 +68,7 @@ a {
 }
 
 #internalPage {
-  height: 1500px;
+  height: 1700px;
   width: 60em;
 
   margin: 0 auto;
@@ -116,6 +116,20 @@ a {
   margin-left: auto;
   margin-right: auto;
   padding-top: 0em;
+}
+
+#notificationBox {
+  text-align: center;
+  color: #151515;
+  font-family: 'PT Mono';
+}
+
+#okBox {
+  background-color: #ff6600;
+}
+
+#okBox:hover {
+  background-color: #660000;
 }
 
 .skillsBoxItem, .educationBoxItem, .experienceBoxItem, .projectsBoxItem, .contactBoxItem {

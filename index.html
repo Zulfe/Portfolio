@@ -39,6 +39,14 @@
           <label class="switch-paddle" for="exampleSwitch"></label>
         </div>
 
+        <div id="notificationBox" class="animsition" data-animsition-in-class="fade-in-down"
+          data-animsition-in-duration="1500" data-animsition-out-class="flip-out-x"
+          data-animsition-out-duration="800">
+          <p>Click on text items for more information!</p>
+          <div id="okBox">
+            OK!
+          </div>
+        </div>
 
         <div id="skillsBox" class="animsition infoBox" data-animsition-in-class="fade-in-down"
           data-animsition-in-duration="1700" data-animsition-out-class="flip-out-x"
@@ -173,12 +181,40 @@
           </div>
         </div>
 
+        <div id="awardsBox" class="animsition infoBox" data-animsition-in-class="fade-in-down"
+        data-animsition-in-duration="2100" data-animsition-out-class="flip-out-x"
+        data-animsition-out-duration="800">
+          <p class="header">Awards and Recognitions</p>
+          <div class="experienceBoxItem clickable"><p>Highest Honors in Mathematics</p></div>
+          <div class="itemDetail">
+            <div style="display: inline !important"><p class="itemDetailText">Award Received June 2016</p></div>
+            <p class="itemDetailText">
+              For his academic excellence in the school's most challenging
+              Mathematics courses and for his prolonged demonstration of a
+              love for Mathematics, Damon was awarded the Highest Honors in
+              Mathematics during his graduation in 2016.</p>
+          </div>
+          <div class="experienceBoxItem clickable"><p>1st and 2nd Place - GhostRed CTF</p></div>
+          <div class="itemDetail">
+            <div style="display: inline !important"><p class="itemDetailText">Award Received May 2016</p></div>
+            <p class="itemDetailText">
+              Damon has on numerous occasions competed in GE's GhostRed event.
+              High school students form teams and go head to head in a variety
+              of cybersecurity challenges, from information security to
+              cryptography. Of the three events Damon has participated in,
+              alongside fellow students from Patrick Henry High School, his
+              team has received the first place reward twice and the second
+              place reward once.</p>
+          </div>
+        </div>
+
         <div id="contactBox" class="animsition infoBox" data-animsition-in-class="fade-in-down"
           data-animsition-in-duration="2300" data-animsition-out-class="flip-out-x"
           data-animsition-out-duration="800">
           <p class="header">Contact</p>
           <div class="contactBoxItem"><p>Academic E-mail: <a href="mailto:admins@vt.edu">admins@vt.edu</a></p></div>
           <div class="contactBoxItem"><p>Personal E-mail: <a href="mailto:damon.alexander.shaw@gmail.com">damon.alexander.shaw@gmail.com</a></p></div>
+          <div class="contactBoxItem"><a target="_blank" href="https://www.linkedin.com/in/damon-shaw"><p>LinkedIn</p></a></div>
         </div>
 
       </div>
@@ -268,6 +304,12 @@
 
     <script>
       $("#namePlate h1, #namePlate p, .header, p").shuffleLetters({callback:function(){}});
+    </script>
+
+    <script>
+      $("#okBox").click(function(){
+        $("#notificationBox").slideUp();
+      });
     </script>
 
     <script>
