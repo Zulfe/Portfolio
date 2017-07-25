@@ -1,0 +1,486 @@
+<!DOCTYPE html>
+
+<html>
+    <head>
+        <link rel="stylesheet" type="text/css" href="css/route_tool.css">
+        <script src="js/jquery.min.js"></script>
+        <script src="js/jquery.csv.js"></script>
+        <title>Route Building Tool</title>
+    </head>
+
+
+    <body>
+        <div id="toolbar">
+
+            <div id="zone_1">Zone 1</div>
+            <div id="zone_2">Zone 2</div>
+            <div id="zone_3">Zone 3</div>
+            <div id="zone_4">Zone 4</div>
+            <div id="zone_5">Zone 5</div>
+            <div id="zone_6">Zone 6</div>
+            <div id="plot">Plot Route</div>
+            <div id="done">Write Route</div>
+            <div id="clear">Clear</div>
+            <div id="import">
+                <input type="file" id="files" name="files[]" style="display: none"/>
+            Import
+            </div>
+            <div id="export">Export</div>
+
+            <div class="mvt_ids" data-prev-color="#CCCCCC" id="SBL">SBL</div>
+            <div class="mvt_ids" data-prev-color="#CCCCCC" id="SBT">SBT</div>
+            <div class="mvt_ids" data-prev-color="#CCCCCC" id="SBR">SBR</div>
+            <div class="mvt_ids" data-prev-color="#CCCCCC" id="WBL">WBL</div>
+            <div class="mvt_ids" data-prev-color="#CCCCCC" id="WBT">WBT</div>
+            <div class="mvt_ids" data-prev-color="#CCCCCC" id="WBR">WBR</div>
+            <div class="mvt_ids" data-prev-color="#CCCCCC" id="NBL">NBL</div>
+            <div class="mvt_ids" data-prev-color="#CCCCCC" id="NBT">NBT</div>
+            <div class="mvt_ids" data-prev-color="#CCCCCC" id="NBR">NBR</div>
+            <div class="mvt_ids" data-prev-color="#CCCCCC" id="EBL">EBL</div>
+            <div class="mvt_ids" data-prev-color="#CCCCCC" id="EBT">EBT</div>
+            <div class="mvt_ids" data-prev-color="#CCCCCC" id="EBR">EBR</div>
+            
+            <div id="terminal">Terminal: </div>
+        </div>
+
+        <div id="canvas">
+
+        </div>
+
+    </body>
+
+    <script src="js/globals.js"></script>
+    <script>
+            /////////////////////////////////////////////////////////////////////////////////////////////
+            //
+            //
+            //  Graphical Functions
+            //
+            //
+            ////////////////////////////////////////////////////////////////////////////////////////////
+
+            /**
+            * Updates the text in the "terminal" box with the passed string.
+            */
+            var updateTerminal = function(message) {
+                timeTool = new Date();
+                $("#terminal").html("Terminal [" + timeTool.getUTCHours() + ":" + timeTool.getUTCMinutes() + ":" + timeTool.getUTCSeconds() + "]: &nbsp;&nbsp;&nbsp;" + message);
+            }
+                
+            var updateToolItemColor = function(tool_elem, color) {
+                var _this = "#" + tool_elem;
+                console.log("Updating " + $(_this).attr("id") + " and its prev-color data to " + $(_this).data("prev-color"));
+                $(_this).data("prev-color", $(_this).css("background-color"));
+                $(_this).css("background-color", color);
+            }
+
+            /**
+            *
+            *
+            */
+            var clearCanvas = function() {
+                $("#canvas").children().remove();
+                zonesDrawn = [false, false, false, false, false, false];
+                updateTerminal("The canvas has been cleared");
+                numClicks = 0;
+            }
+
+            /**
+            *
+            *
+            */
+            var flashArrow = function(arrow_elem) {
+                var int = setInterval(function() {
+                    if($(arrow_elem).css("background-color") == "rgb(255, 165, 0)") {
+                        $(arrow_elem).css("background-color", "blue");
+                    }
+                    else {
+                        $(arrow_elem).css("background-color", "orange");
+                    }
+                }, 400);
+                $(arrow_elem).data("interid", int.toString());
+                intervals.push(int);
+            }
+
+            /**
+            *
+            *
+            */
+            var resetArrow = function(arrow_elem, interid) {
+                clearInterval(interid);
+                $(arrow_elem).css("background-color", "black");
+            }
+
+            /**
+            *
+            *
+            */
+            var resetArrows = function() {
+                intervals.forEach(function(interval, index) {
+                    clearInterval(interval); 
+                });
+                intervals = [];
+                $(".zone_block img").css({
+                    "background-color" : "black",
+                    "visibility" : "visible"
+                });
+                $(".zone_block img").data("active", "0");
+                $(".zone_block").data("active-arrows", "0");
+            }
+
+
+            var drawZoneBlock = function(topval, leftval) {
+                numClicks++;
+                var UID = Math.random().toString(36).substring(2,5);
+                var zone_block_html =
+    "                        <div id='" + UID + "' class='zone_block' style='visibility: hidden;' data-zone='" + zoneDrawNumber + "' data-active-arrows='0'>" +
+    "                            <div class='top_arrows' data-dir='0'>" +
+    "                                <div class='imggrp'>" +
+    "                                    <img data-mvt='0' data-active='0' data-interid='-1' src='assets/arrow_left.svg' />" +
+    "                                    <img data-mvt='1' data-active='0' data-interid='-1' class='through' src='assets/arrow_through.svg' />" +
+    "                                    <img data-mvt='2' data-active='0' data-interid='-1' src='assets/arrow_right.svg' />" +
+    "                                </div>" +
+    "                            </div>" +
+    "                            <div class='left_arrows' data-dir='3'>" +
+    "                                <div class='imggrp'>" +
+    "                                    <img data-mvt='0' data-active='0' data-interid='-1' src='assets/arrow_left.svg' />" +
+    "                                    <img data-mvt='1' data-active='0' data-interid='-1' class='through' src='assets/arrow_through.svg' />" +
+    "                                    <img data-mvt='2' data-active='0' data-interid='-1' src='assets/arrow_right.svg' />" +
+    "                                </div>" +
+    "                            </div>" +
+    "                            <div class='bot_arrows' data-dir='2'>" +
+    "                                <div class='imggrp'>" +
+    "                                    <img data-mvt='0' data-active='0' data-interid='-1' src='assets/arrow_left.svg' />" +
+    "                                    <img data-mvt='1' data-active='0' data-interid='-1' class='through' src='assets/arrow_through.svg' />" +
+    "                                    <img data-mvt='2' data-active='0' data-interid='-1' src='assets/arrow_right.svg' />" +
+    "                                </div>" +
+    "                            </div>" +
+    "                            <div class='right_arrows' data-dir='1'>" +
+    "                                <div class='imggrp'>" +
+    "                                    <img data-mvt='0' data-active='0' data-interid='-1' src='assets/arrow_left.svg' />" +
+    "                                    <img data-mvt='1' data-active='0' data-interid='-1' class='through' src='assets/arrow_through.svg' />" +
+    "                                    <img data-mvt='2' data-active='0' data-interid='-1' src='assets/arrow_right.svg' />" +
+    "                                </div>" +
+    "                            </div>" +
+    "                            <div class='zone_num'>" +
+    "                                " + zoneDrawNumber +
+    "                            </div>" +
+    "                        </div>";
+        
+                
+
+                $("#canvas").append(zone_block_html);
+                 
+
+                if(topval === undefined || leftval === undefined) {
+                    $("#" + UID).css({
+                        position: 'relative',
+                        left: relX - 85,
+                        top: "calc(" + relY + "px - " + numClicks + " * 10.5em)"
+                    });
+                }
+                else {
+                    console.log("Placing a zone block at " + leftval + ", " + topval);
+                    $("#" + UID).css({
+                        position: 'relative',
+                        left: leftval.toString() + "px",
+                        top: topval.toString() + "px"
+                    });
+                }
+
+
+                $("#" + UID).css("visibility", "visible");
+
+                zonesDrawn[zoneDrawNumber - 1] = true;
+            }
+
+
+
+
+
+
+
+
+
+
+
+
+
+            /////////////////////////////////////////////////////////////////////////////////////
+            //
+            //
+            //  Logical Functions
+            //
+            //
+            ///////////////////////////////////////////////////////////////////////////////////
+           
+            /**
+            * Allow for the creation of zone block elements on the canvas. Prevents plotting when a user clicks an arrow image.
+            * @param {int} zone_id The identification number of the zone to be drawn. This number is between 1 and 6.
+            */
+            var enableZoneDraw = function(zone_id) {
+                plotModeEnabled = false;
+                zoneDrawEnabled = true;
+                zoneDrawNumber = zone_id;
+            }
+
+            /**
+            * Allow for the selection of arrow images for compiling route arrays. If no plotting has been done yet, initiate the
+            * plotting process.
+            *
+            */
+            var enablePlotMode = function() {
+                zoneDrawEnabled = false;
+                plotModeEnabled = true;
+
+                if(!plottingStarted) {
+                    updateToolItemColor(routeTo.ID[(0).toString()], "yellow");
+                    updateTerminal("Now recording a route that enters through the Southbound Left!");
+                    currentRoute.push([0, 0, 0]);
+                    plottingStarted = true;
+                }
+            }
+
+            /**
+            *
+            *
+            */
+            var objectKeyByValue = function(obj, val) {
+                  return Object.entries(obj).find(i => i[1] === val)[0];
+            }
+            
+            /**
+            *
+            *
+            */
+            var saveRoute = function() {
+                if(route_number < 12) {
+                    updateTerminal(routeTo.Verbal[route_number.toString()] + " has been recorded. Now recording " + routeTo.Verbal[(route_number + 1).toString()] + ".");
+                    updateToolItemColor(routeTo.ID[route_number], "#94B95B");
+                    updateToolItemColor(routeTo.ID[route_number + 1], "yellow");
+                    totalRoutes.push(currentRoute);
+                    currentRoute = [];
+                    route_number = route_number + 1;
+                    lastAtRouteNumber = lastAtRouteNumber + 1;
+                    currentRoute.push(routeTo.Address[route_number.toString()]);
+
+                    resetArrows();
+                }
+                else
+                    updateTerminal("All routes have been written. Please export!");
+
+                console.log(totalRoutes);
+
+            }
+
+            var seekAndDestroy = function(target_array) {
+                // Clone the array.
+                var route_array_minus_target = [];
+
+                // If there does not exist a route array at the route ID, the user must be editing the latest route.
+                if(totalRoutes[lastAtRouteNumber] === undefined) {
+                    currentRoute.forEach(function(entry, index) {
+                        var is_match = entry.every(function(element, index) {
+                            return element === target_array[index];
+                        });
+
+                        if(!is_match)
+                            route_array_minus_target.push(entry);
+                    });
+                    currentRoute = route_array_minus_target;
+                }
+                // If it does exist, then the user is trying to edit a previous route.
+                else {
+                    totalRoutes[lastAtRouteNumber].forEach(function(entry, index) {
+                        var is_match = entry.every(function(element, index) {
+                            return element === target_array[index];
+                        });
+                        
+                        if(!is_match)
+                            route_array_minus_target.push(entry);            
+                    });
+                    totalRoutes[route_number] = route_array_minus_target;
+                }
+            }
+
+            /**
+            *
+            *
+            */
+            var loadRoute = function(moveToRoute) {
+                if(totalRoutes.length < 2) {
+                    updateTerminal("You must first create route configurations before swapping between them.");
+                    return;
+                }
+                
+                resetArrows();
+                var route = totalRoutes[moveToRoute];
+
+                if(route === undefined)
+                    updateTerminal("No data has been written to this entrance movement yet. No movements to highlight.");
+                else
+                    route.forEach(function(mvts, index) {
+                        if(mvts[0] == 0)
+                            return;
+                        flashArrow($(".zone_block[data-zone='" + mvts[0] +"'] div[data-dir='" + mvts[1] + "'] img[data-mvt='" + mvts[2] + "']"));
+                    });
+                
+            }
+
+            var getZonePos = function(zone_num) {
+                var _this = "#canvas div[data-zone='" + zone_num + "']";
+                if($(_this).length == 0)
+                    return -1;
+                else {
+                    return {
+                        top: parseInt($(_this).css("top").substring(0, $(_this).css("top").length - 2)),
+                        left: parseInt($(_this).css("left").substring(0, $(_this).css("left").length - 2))
+                    };
+                }
+            }
+
+            /**
+            *
+            *
+            */
+            var exportToCSV = function() {
+                if(totalRoutes.length != 12) {
+                    updateTerminal("You haven't completed all twelve movements for this configuration.");
+                    return;
+                }
+                
+                var zone_pos = [-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1];
+                var x;
+                var y;
+                for(var zone = 1; zone <= 6; zone++) {
+                    x = getZonePos(zone).left;
+                    y = getZonePos(zone).top;
+                    if(!(x === undefined)) zone_pos[(zone - 1) * 2] = x;
+                    if(!(y === undefined)) zone_pos[((zone - 1) * 2) + 1] = y;
+                }
+
+                var headers = ["route", "zone", "dir", "mvt", "o_zone", "o_dir", "o_mvt"];
+                var csvContent = "data:text/csv;charset=utf-8,";
+
+                zone_pos.forEach(function(value, index) {
+                    csvContent += index < zone_pos.length - 1 ? value + ", " : value + "\n";
+                });
+                headers.forEach(function(header, index){
+                    csvContent += index < headers.length - 1  ? header + "," : header + "\n";
+                });
+               
+                for(var route = 0; route < totalRoutes.length; route++) {
+                    for(var node = 0; node < totalRoutes[route].length; node++) {
+                        csvContent += route + 1;
+                        csvContent += ", " + totalRoutes[route][node][0] + ", " + totalRoutes[route][node][1] + ", " + totalRoutes[route][node][2];
+                        if(node != 0)
+                            csvContent += ", " + totalRoutes[route][node - 1][0] + ", " + totalRoutes[route][node - 1][1] + ", " + totalRoutes[route][node - 1][2];
+                        else
+                            csvContent += ", " + -1 + ", " + -1 + ", " + -1;
+                        csvContent += "\n";
+                    }
+                }
+
+
+                var filename = prompt("Please define a filename.");
+                if(filename === undefined || filename == "null")
+                    filename = "int_X_routesconf";
+
+                var csvURI = encodeURI(csvContent);
+
+                // Create a link on the page, link the CSV to it, mark it as a possible download, then click it for the user.
+                var link = document.createElement("a");
+                link.setAttribute("href", csvURI);
+                link.setAttribute("download", filename + ".csv");
+                document.body.appendChild(link);-
+                link.click();
+            }
+
+            /**
+            *
+            *
+            */
+            var triggerUpload = function() {
+                document.getElementById("files").click();
+            }
+
+            /**
+            *
+            *
+            */
+            var importFromCSV = function(evt) {
+                console.log("Starting import!");
+                var csv_data;
+                var importFiles = evt.target.files;
+
+                var readFile = new function() {
+
+                    var def = $.Deferred();
+
+                    var file_reader = new FileReader();
+                    file_reader.addEventListener('load', function() {
+                        csv_data = this.result;
+                        def.resolve()
+                    });
+                    file_reader.readAsText(importFiles[0]);
+
+                    return def.promise();
+                }
+
+                var tempArray = new Array();
+                for(var r = 0; r < 12; r++) {
+                    tempArray = new Array();
+                    for(var e = 0; e < 6; e++)
+                        tempArray.push([-1, -1, -1]);
+                    totalRoutes.push(tempArray);
+                }
+                       
+
+                readFile.then(function() {
+                    csv_data = $.csv.toArrays(csv_data);
+
+                    var step = 1;
+                    for(var zone_pos = 0; zone_pos < 12; zone_pos = zone_pos + 2) {
+                        console.log("zone_pos = (" + csv_data[0][zone_pos] + ", " + csv_data[0][zone_pos + 1] + ")");
+                        if(!(csv_data[0][zone_pos] == -1) && !(csv_data[0][zone_pos + 1] == -1)) {
+                            zoneDrawNumber = step;
+                            // drawZoneBlock(top, left)
+                            drawZoneBlock(csv_data[0][zone_pos + 1], csv_data[0][zone_pos]);
+                        }
+                        step++;
+                    }
+
+                    var route_num = 1;
+                    var zone;
+                    var dir;
+                    var mvt;
+                    var entry_count = 0;
+                    for(var row = 2; row < csv_data.length; row++) {
+                        if(!(csv_data[row][0] == route_num.toString())) {
+                            entry_count = 0;
+                        }
+
+                        route_num = parseInt(csv_data[row][0]);
+                        zone = parseInt(csv_data[row][1]);
+                        dir = parseInt(csv_data[row][2]);
+                        mvt = parseInt(csv_data[row][3]);
+
+                        totalRoutes[route_num - 1][entry_count] = [zone, dir, mvt];
+                        entry_count = entry_count + 1;
+                    }
+                    console.log(totalRoutes);
+                });
+                
+
+        }
+
+
+
+
+        document.getElementById("files").addEventListener('change', importFromCSV, false);
+
+
+    </script>
+    <script src="js/binds.js"></script>
+
+</html>

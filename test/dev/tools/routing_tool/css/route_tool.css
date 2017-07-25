@@ -1,0 +1,152 @@
+
+:root {
+    --zone_block_height: 11em;
+    --zone_block_width:  11em;
+    --box_arrow_size_ratio: 0.242;
+}
+
+body {
+    overflow-y: hidden;
+    overflow-x: hidden;
+}
+
+* {
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    cursor: default;
+}
+
+#toolbar {
+    height: 2.2em;
+    width: 104%;
+    margin-left: -0.35em;
+    margin-top: -0.5em;
+    z-index: 10;
+}
+
+#toolbar div {
+    height: 100%;
+    width: 8.55%;
+    display: inline-block;
+    border: 2px solid black;
+    margin-left: -0.15em;
+    margin-right: -0.15em;
+    text-align: center;
+    line-height: 2em;
+}
+
+#toolbar .mvt_ids {
+    height: 100%;
+    width: 7.865%;
+    display: inline-block;
+    border: 2px solid black;
+    background-color: #cccccc;
+}
+
+#canvas {
+    height: 89%;
+    background-color: wheat;
+    position: fixed;
+    bottom: 0px;
+    left: 0px;
+    width: 100%;
+    z-index: -1 !important;
+}
+
+.zone_block {
+    height: var(--zone_block_height);
+    width: var(--zone_block_width);
+    background-color: white;
+    border: 2px solid black;
+    border-radius: 0.3em;
+    top: 0px;
+    left: 0px;
+}
+
+.zone_num {
+    position: relative;
+    left: 1.50em;
+    bottom: 2.6em;
+    font-size: 3em;
+    width: 0.5em;
+}
+
+.top_arrows {
+    width: 100%;
+    transform: rotate(180deg);
+}
+
+.left_arrows {
+    width: 100%;
+    transform: rotate(90deg);
+    position: relative;
+    top: 1.45em;
+    left: -4.05em;
+}
+
+.right_arrows {
+    width: 100%;
+    transform: rotate(-90deg);
+    position: relative;
+    bottom: 4.30em;
+    right: -4.05em;
+}
+
+.bot_arrows {
+    width: 100%;
+    position: relative;
+    top: 2.35em;
+}
+
+.through {
+    margin-left: 0.875em;
+    margin-right: 0.875em;
+    outline: 3px solid white !important;
+    outline-offset: -2px !important;
+}
+
+.imggrp {
+    text-align: center;
+}
+
+.imggrp img {
+    z-index: 1001;
+    opacity: 1.0;
+    background-color: black;
+    height: calc(var(--box_arrow_size_ratio) * var(--zone_block_height));
+    width: auto;
+    outline: 2px solid white;
+    outline-offset: -1px;
+}
+
+#zone_1, #zone_2, #zone_3, #zone_4, #zone_5, #zone_6 {
+    background-color: #FF845B;
+}
+
+#plot {
+    background-color: #FFEEAD;
+}
+
+#done {
+    background-color: #96ceb4;
+}
+
+#clear {
+    background-color: #ff6f69;
+}
+
+#export {
+    background-color: #ffcc5c;
+}
+
+#terminal {
+    background-color: #141414;
+    color: lime;
+    height: 2em !important;
+    width: 99% !important;
+    text-align: left !important;
+}

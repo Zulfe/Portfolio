@@ -1,0 +1,39 @@
+.wideInput {
+    width: 100%;
+}
+
+.appPane {
+    width: 81.77%;
+    height: 100%;
+    float: right;
+}
+
+.ui.inverted.menu {
+    background: #00325C;
+}
+
+.ui.slider.checkbox input:checked~.box:before {
+  background-color: #F47735 !important;
+}
+
+.ui.slider.checkbox label,
+.ui.slider.checkbox input:checked ~ label,
+.ui.checkbox .box:after, .ui.checkbox label:after {
+    color: white !important;
+}
+
+.header {
+    cursor: pointer;
+}
+
+.introMenu p {
+    text-align: justify;
+}
+
+#restore_from_cookies {
+    width: 100%;
+}
+
+body {
+    overflow-y: hidden !important;
+}

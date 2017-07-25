@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>functions.js - Documentation</title>
+
+    <script src="scripts/prettify/prettify.js"></script>
+    <script src="scripts/prettify/lang-css.js"></script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc.css">
+</head>
+<body>
+
+<input type="checkbox" id="nav-trigger" class="nav-trigger" />
+<label for="nav-trigger" class="navicon-button x">
+  <div class="navicon"></div>
+</label>
+
+<label for="nav-trigger" class="overlay"></label>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="Project.html">Project</a><ul class='methods'><li data-type='method'><a href="Project.html#resetConfig">resetConfig</a></li><li data-type='method'><a href="Project.html#getIntersectionByIndex">getIntersectionByIndex</a></li><li data-type='method'><a href="Project.html#getIntersectionByID">getIntersectionByID</a></li><li data-type='method'><a href="Project.html#importConfigFromMatrix">importConfigFromMatrix</a></li><li data-type='method'><a href="Project.html#exportConfigToMatrix">exportConfigToMatrix</a></li><li data-type='method'><a href="Project.html#exportConfigToCSV">exportConfigToCSV</a></li><li data-type='method'><a href="Project.html#importConfigFromCSV">importConfigFromCSV</a></li></ul></li><li><a href="Intersection.html">Intersection</a><ul class='methods'><li data-type='method'><a href="Intersection.html#setEffectiveZones">setEffectiveZones</a></li><li data-type='method'><a href="Intersection.html#getEffectiveZones">getEffectiveZones</a></li><li data-type='method'><a href="Intersection.html#decrementEffectiveZones">decrementEffectiveZones</a></li><li data-type='method'><a href="Intersection.html#getZoneArray">getZoneArray</a></li><li data-type='method'><a href="Intersection.html#getZoneByIndex">getZoneByIndex</a></li><li data-type='method'><a href="Intersection.html#isEnabled">isEnabled</a></li><li data-type='method'><a href="Intersection.html#setEnabled">setEnabled</a></li></ul></li><li><a href="Zone.html">Zone</a><ul class='methods'><li data-type='method'><a href="Zone.html#getNorthbound">getNorthbound</a></li><li data-type='method'><a href="Zone.html#getSouthbound">getSouthbound</a></li><li data-type='method'><a href="Zone.html#getEastbound">getEastbound</a></li><li data-type='method'><a href="Zone.html#getWestbound">getWestbound</a></li><li data-type='method'><a href="Zone.html#getDirectionArray">getDirectionArray</a></li><li data-type='method'><a href="Zone.html#setEnabled">setEnabled</a></li><li data-type='method'><a href="Zone.html#isEnabled">isEnabled</a></li><li data-type='method'><a href="Zone.html#getDirectionByIndex">getDirectionByIndex</a></li></ul></li><li><a href="Direction.html">Direction</a><ul class='methods'><li data-type='method'><a href="Direction.html#getEntryByIndex">getEntryByIndex</a></li><li data-type='method'><a href="Direction.html#sync">sync</a></li><li data-type='method'><a href="Direction.html#setEntryByIndex">setEntryByIndex</a></li><li data-type='method'><a href="Direction.html#setEntryArray">setEntryArray</a></li><li data-type='method'><a href="Direction.html#printEntryArray">printEntryArray</a></li><li data-type='method'><a href="Direction.html#getLeftTurn">getLeftTurn</a></li><li data-type='method'><a href="Direction.html#getRightTurn">getRightTurn</a></li><li data-type='method'><a href="Direction.html#getThrough">getThrough</a></li><li data-type='method'><a href="Direction.html#getSharedLeft">getSharedLeft</a></li><li data-type='method'><a href="Direction.html#getSharedRight">getSharedRight</a></li><li data-type='method'><a href="Direction.html#getChanneledRight">getChanneledRight</a></li><li data-type='method'><a href="Direction.html#getEntryArray">getEntryArray</a></li><li data-type='method'><a href="Direction.html#randomizeEntries">randomizeEntries</a></li></ul></li><li><a href="ModalFactory.html">ModalFactory</a><ul class='methods'><li data-type='method'><a href="ModalFactory.html#getElementID">getElementID</a></li><li data-type='method'><a href="ModalFactory.html#getHeader">getHeader</a></li><li data-type='method'><a href="ModalFactory.html#getImageURI">getImageURI</a></li><li data-type='method'><a href="ModalFactory.html#getImageSize">getImageSize</a></li><li data-type='method'><a href="ModalFactory.html#getYoutubeImportURL">getYoutubeImportURL</a></li><li data-type='method'><a href="ModalFactory.html#getDescription">getDescription</a></li><li data-type='method'><a href="ModalFactory.html#setExistingElementID">setExistingElementID</a></li><li data-type='method'><a href="ModalFactory.html#isURL">isURL</a></li><li data-type='method'><a href="ModalFactory.html#generateModalHTML">generateModalHTML</a></li><li data-type='method'><a href="ModalFactory.html#injectModalHTML">injectModalHTML</a></li></ul></li><li><a href="CookiesUtility.html">CookiesUtility</a><ul class='methods'><li data-type='method'><a href="CookiesUtility.html#TMtoCHAR">TMtoCHAR</a></li><li data-type='method'><a href="CookiesUtility.html#CHARtoTM">CHARtoTM</a></li><li data-type='method'><a href="CookiesUtility.html#getConfigId">getConfigId</a></li><li data-type='method'><a href="CookiesUtility.html#writeConfigToCookies">writeConfigToCookies</a></li><li data-type='method'><a href="CookiesUtility.html#readConfigFromCookies">readConfigFromCookies</a></li></ul></li><li><a href="GeneralVolume.html">GeneralVolume</a><ul class='methods'><li data-type='method'><a href="GeneralVolume.html#getGeneralVolume">getGeneralVolume</a></li><li data-type='method'><a href="GeneralVolume.html#getVolumeCarsIn">getVolumeCarsIn</a></li><li data-type='method'><a href="GeneralVolume.html#getVolumeCarsOut">getVolumeCarsOut</a></li><li data-type='method'><a href="GeneralVolume.html#getVolumeTrucksIn">getVolumeTrucksIn</a></li><li data-type='method'><a href="GeneralVolume.html#getVolumeTrucksOut">getVolumeTrucksOut</a></li></ul></li><li><a href="DetailedVolume.html">DetailedVolume</a><ul class='methods'><li data-type='method'><a href="DetailedVolume.html#getLeft">getLeft</a></li><li data-type='method'><a href="DetailedVolume.html#getThrough">getThrough</a></li><li data-type='method'><a href="DetailedVolume.html#getRight">getRight</a></li><li data-type='method'><a href="DetailedVolume.html#getPassengerCarEquivalent">getPassengerCarEquivalent</a></li><li data-type='method'><a href="DetailedVolume.html#setPCEState">setPCEState</a></li><li data-type='method'><a href="DetailedVolume.html#enablePCE">enablePCE</a></li><li data-type='method'><a href="DetailedVolume.html#disablePCE">disablePCE</a></li><li data-type='method'><a href="DetailedVolume.html#isPCEEnabled">isPCEEnabled</a></li></ul></li><li><a href="BoundedDetailedVolume.html">BoundedDetailedVolume</a><ul class='methods'><li data-type='method'><a href="BoundedDetailedVolume.html#getLeft">getLeft</a></li><li data-type='method'><a href="BoundedDetailedVolume.html#getThrough">getThrough</a></li><li data-type='method'><a href="BoundedDetailedVolume.html#getRight">getRight</a></li><li data-type='method'><a href="BoundedDetailedVolume.html#getPassengerCarEquivalent">getPassengerCarEquivalent</a></li><li data-type='method'><a href="BoundedDetailedVolume.html#setPCEState">setPCEState</a></li><li data-type='method'><a href="BoundedDetailedVolume.html#enablePCE">enablePCE</a></li><li data-type='method'><a href="BoundedDetailedVolume.html#disablePCE">disablePCE</a></li><li data-type='method'><a href="BoundedDetailedVolume.html#isPCEEnabled">isPCEEnabled</a></li></ul></li><li><a href="VolumetricIntersection.html">VolumetricIntersection</a><ul class='methods'><li data-type='method'><a href="VolumetricIntersection.html#getUnboundedCarVolumes">getUnboundedCarVolumes</a></li><li data-type='method'><a href="VolumetricIntersection.html#getUnboundedTruckVolumes">getUnboundedTruckVolumes</a></li><li data-type='method'><a href="VolumetricIntersection.html#getBoundedCarVolumes">getBoundedCarVolumes</a></li><li data-type='method'><a href="VolumetricIntersection.html#getBoundedTruckVolumes">getBoundedTruckVolumes</a></li></ul></li><li><a href="VolumeTool.html">VolumeTool</a><ul class='methods'><li data-type='method'><a href="VolumeTool.html#getRowTotals">getRowTotals</a></li><li data-type='method'><a href="VolumeTool.html#getColumnTotals">getColumnTotals</a></li><li data-type='method'><a href="VolumeTool.html#getDetailedVolumes">getDetailedVolumes</a></li><li data-type='method'><a href="VolumeTool.html#convergeTable">convergeTable</a></li><li data-type='method'><a href="VolumeTool.html#calculateSyntheticVolumes">calculateSyntheticVolumes</a></li></ul></li></ul><h3>Global</h3><ul><li><a href="global.html#toggleFirstVisitInputModals">toggleFirstVisitInputModals</a></li><li><a href="global.html#getImageData">getImageData</a></li><li><a href="global.html#acquireResources">acquireResources</a></li><li><a href="global.html#awakenContent">awakenContent</a></li><li><a href="global.html#killContent">killContent</a></li><li><a href="global.html#project">project</a></li><li><a href="global.html#resources">resources</a></li><li><a href="global.html#testMode">testMode</a></li></ul>
+</nav>
+
+<div id="main">
+    
+    <h1 class="page-title">functions.js</h1>
+    
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>/**
+ * @fileOverview Generally useful functions not of a greater structure or purpose. Typically used once or twice
+ * throughout the program but isolated to achieve cleaner code.
+ * @author Damon A. Shaw of VDOT &lt;Damon.Shaw@vdot.virginia.gov || admins@vt.edu>
+ * @version Alpha-0.0.1
+ */
+
+
+/**
+ * A toggle for the forced displaying of help modals when a relative text box has been clicked.
+ * @param {boolean} toggleSwitch A &lt;tt>true&lt;/tt> or &lt;tt>false&lt;/tt> value indicating if first time modals should be activated
+ */
+var toggleFirstVisitInputModals = function(toggleSwitch){
+    if(toggleSwitch){
+        $("#projNameInput").click(function(){
+            $("#projNameHelp").modal("show");
+            $(this).unbind();
+            $("#projNameHelp.button").click(function(){$("#projNameInput").focus()});
+        }); 
+        $("#interNameInput").click(function(){
+            $("#interNameHelp").modal("show");
+            $(this).unbind();
+        });
+        $("#nsRouteNameInput").click(function(){
+            $("#nsRouteNameHelp").modal("show");
+            $(this).unbind();
+        });
+        $("#ewRouteNameInput").click(function(){
+            $("#ewRouteNameHelp").modal("show");
+            $(this).unbind();
+        });
+        $("#cpOneNameInput").click(function(){
+            $("#cpOneNameHelp").modal("show");
+            $(this).unbind();
+        });
+    }
+    else{
+        $("#projNameInput, #interNameInput, #nsRouteNameInput, #ewRouteNameInput, #cpOneNameInput").unbind();
+    }
+};
+
+
+
+/**
+ * Use an image's URL to get the image and store pull its image data for local storage. This is particularly useful for this
+ * application as it aims to collect all necessary resources in case the user disconnects.
+ * @param {string} URL The URL of the image
+ * @returns {string} The image's data
+ */
+var getImageData = function(URL){
+    var image = new Image();
+    image.crossOrigin = "Anonymous";
+
+    var canvas = document.createElement("canvas");
+    var canvasContext = canvas.getContext("2d");
+
+    image.src = URL;
+
+    canvas.width = image.width;
+    canvas.height = image.height;
+
+    canvasContext.drawImage(image, 0, 0, image.width, image.height);
+
+    return canvas.toDataURL();
+};
+
+
+
+/**
+ * [WORK IN PROGRESS]
+ * Find and store locally all resources necessary in the functioning of the application. In VJuST, that means images of intersections.
+ */
+var acquireResources = function(){
+
+    var def = $.Deferred();
+
+    resources["images_intersection"].push(getImageData("http://i.imgur.com/KUuRtTc.jpg"));
+  
+    if(testMode)
+        setTimeout(function(){
+            console.log("Acquiring resources...");
+            def.resolve();
+        }, 3000);
+    else
+        def.resolve();
+
+    return $.when(def).done(function(){
+        console.log("Done loading resources!");
+    }).promise();
+}
+
+// @function killLoader
+// @purpose  Fade out the loading screen and wait for a short period to avoid clipping of
+//           content elements over the partially faded loading screen.
+var killLoader = function(){
+    var def = $.Deferred();
+
+    $("#init_loader").transition("fade");
+
+    setTimeout(function(){
+        console.log("Killed loader! Page contents should be fading in now.");
+        def.resolve();
+    }, 300);
+
+    return $.when(def).promise();
+}
+
+/**
+ * Part of the [Acquire Resources] -> [Hide Loader] -> [Show Content] sequence. 
+ *
+ */
+var awakenContent = function() {
+    var def = $.Deferred();
+
+    $("#init_loader").children().slice(1).transition({
+        animation  : "fade",
+        duration   : "1700ms",
+        onComplete : function() {
+            def.resolve();
+        }});
+
+    return def.promise();
+}
+
+/**
+ * 
+ * @returns {promise} A deferred promise.
+ */
+var killContent = function() {
+    var def = $.Deferred();
+
+    $("#init_loader").children().slice(1).transition({
+        animation: "fade",
+        duration:  "1100ms",
+        onComplete: function(){ def.resolve() }
+    }); 
+
+    return def.promise();
+}
+
+var toggleLoader = function(flag, message) {
+    if(flag) {
+        if(message === undefined) {
+            $("#init_loader").children().first()[0].innerHTML = "Doing something...";
+            killContent().done(function() {
+                $("#init_loader").transition({
+                    animation: "fade",
+                    duration:  "2000ms"
+                });
+            });
+        }
+        else {
+            $("#init_loader").children().first()[0].innerHTML = message;
+            killContent().done(function() {
+                $("#init_loader").transition({
+                    animation: "fade",
+                    duration:  "2000ms"
+                });
+            });
+        }
+    }
+    else {
+        killLoader().done(function(){
+            $("#init_loader").children().slice(1).transition("fade", 1700);
+        });
+    }
+}
+
+// Credit to StackOverflow's Pawel
+var objectKeyByValue = function(obj, val) {
+      return Object.entries(obj).find(i => i[1] === val)[0];
+}
+
+var buildImportFilelist = function(evt) {
+    importFiles = evt.target.files;
+    project.importConfigFromCSV();
+}
+
+// [END] ////////// [FUNCTIONS] ///////////////////
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.3</a> on Wed Jul 19 2017 08:14:36 GMT-0400 (EDT) using the <a href="https://github.com/clenemt/docdash">docdash</a> theme.
+</footer>
+
+<script>prettyPrint();</script>
+<script src="scripts/linenumber.js"></script>
+</body>
+</html>

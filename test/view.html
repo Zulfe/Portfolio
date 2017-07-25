@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Application</title>
+        <link rel="stylesheet" type="text/css" href="Semantic-UI-master/dist/semantic.css" />
+        <link rel="stylesheet" type="text/css" href="css/contextMenu.css" />
+        <link rel="stylesheet" type="text/css" href="css/view.css" /> 
+        <script src="js/jquery.min.js"></script>
+        <script type="text/javascript" src="js/semantic.js"></script>
+        <script src="js/vjust/functions.js"></script>
+        <script src="js/vjust/classes.js"></script>
+        <script src="js/vjust/globals.js"></script>
+        <script src="js/contextMenu.js"></script>
+        <script src="js/jquery.csv.js"></script>
+        <script src="js/freewall.js"></script>
+    </head>
+
+    <body>
+            <div id="init_loader" class="ui active dimmer">
+                <div class="ui text loader"></div>
+        <div id="infoPanel" class="ui left visible demo vertical inverted wide sidebar labeled menu darkBackground">
+            <div class="item">
+                <div id="introItemHeader" class="header">Introduction</div>
+                <div class="menu introMenu hidden">
+                    <div class="item">
+                        <p>Welcome to VJUST, a tool developed by the Virginia Department of Transportation
+                        for the analysis of intersections and safety conditions.</p>
+                        <p>Help is available for nearly every aspect of this application.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="item">
+                <div id="projInfoItem" class="header">Project Information</div>
+                <div id="piMenu" class="menu hidden">
+                </div>
+            </div>
+            <div class="item">
+                <div id="interResourcesItem" class="header">Intersection Resources</div>
+                <div id="interResourcesMenu" class="menu">
+                    <div class="item">
+                        <img class="image centered" src="http://lorempixel.com/150/150/GRAY" />
+                    </div> 
+                </div>
+            </div>
+            <div class="item">
+                <div id="appSettHeader" class="header">Application Settings</div>
+                <div id="appSettMenu" class="menu"></div>
+            </div>
+        </div>
+
+
+
+
+        <div class="appPane">
+            <!--<img class="ui centered image" src="http://via.placeholder.com/900x900" />-->
+            <div class="ui pointing secondary menu">
+                <a class="item active" data-tab="primary-view">Intersection: Conventional <i class="medium close icon"></i></a>
+                <a class="item" data-tab="info-table">Config Table<i class="medium close icon"></i></a>
+                <a class="item" data-tab="testtab">TestTab<i class="medium close icon"></i></a> 
+                
+                <a class="item" data-tab="add_tab">+</a>
+            </div>
+
+            <div class="ui bottom attached tab segment active" data-tab="primary-view">
+                <input type="file" id="files" name="files[]" />
+                <output id="list"></output>
+            </div>
+
+            <div class="ui bottom attached tab segment" data-tab="info-table">
+            This is a view of the configuration table.
+            </div>
+
+            <div class="ui bottom attached tab segment" data-tab="testtab">This is some text for the test tab.</div>
+
+            <div class="ui bottom attached tab segment" data-tab="add_tab" style="width: 98%; margin: center;">
+
+                <div style="height: 300px; width: 200px; background: blue;"></div>
+                <div style="height: 300px; width: 100px; background: red;"></div>
+                <div style="height: 300px; width: 500px; background: orange;"></div>
+                <div style="height: 400px; width: 200px; background: wheat;"></div>
+                <div style="height: 200px; width: 200px; background: black;"></div>
+                <div style="height: 800px; width: 350px; background: yellow;"></div>
+                <div style="height: 400px; width: 200px; background: gray;"></div>
+                <div style="height: 300px; width: 200px; background: lime;"></div>
+                <div style="height: 300px; width: 200px; background: green;"></div>
+                <div style="height: 300px; width: 200px; background: maroon;"></div>
+                <div style="height: 300px; width: 200px; background: brown;"></div>
+            </div>
+
+        </div>     
+        </div>
+        
+        
+        
+        <div id="modal_wrapper"> 
+        <div id="projNameHelp" class="ui modal">
+            <div class="header">Help &nbsp;&#8921;&nbsp;  Project Name</div>
+            <div class="image content">
+                <div class="ui large image">
+                    <iframe width="390" height="220" src="https://www.youtube.com/embed/RsxNyqKuAOg" frameborder="0" allowfullscreen></iframe>
+                </div>
+                <div class="description">
+                    <p>This is some text to help with the project name field. This text is also
+                       for describing the video to the left.</p>
+                </div>
+            </div>
+            <div class="actions">
+                <div class="ui positive right labeled icon button">
+                    Got it!
+                    <i class="checkmark icon"></i>
+                </div>
+            </div>
+        </div>
+        <div id="interNameHelp" class="ui modal">
+            <div class="header">Help &nbsp;&#8921;&nbsp;  Intersection Name</div>
+            <div class="content">
+                <p>This is some text to help with the intersection name field.</p>
+            </div>
+            <div class="actions">
+                <div class="ui positive right labeled icon button">
+                    Got it!
+                    <i class="checkmark icon"></i>
+                </div>
+            </div>
+        </div>
+        <div id="nsRouteNameHelp" class="ui modal">
+            <div class="header">Help &nbsp;&#8921;&nbsp;  North-South Route Name</div>
+            <div class="content">
+                <p>This is some text to help with the north-south route name field.</p>
+            </div>
+            <div class="actions">
+                <div class="ui positive right labeled icon button">
+                    Got it!
+                    <i class="checkmark icon"></i>
+                </div>
+            </div>
+        </div>
+        <div id="ewRouteNameHelp" class="ui modal">
+            <div class="header">Help &nbsp;&#8921;&nbsp;  East-West Route Name</div>
+            <div class="content">
+                <p>This is some text to help with the east-west route name field.</p>
+            </div>
+            <div class="actions">
+                <div class="ui positive right labeled icon button">
+                    Got it!
+                    <i class="checkmark icon"></i>
+                </div>
+            </div>
+        </div>
+        <div id="cpOneNameHelp" class="ui modal">
+            <div class="header">Help &nbsp;&#8921;&nbsp;  Context Point One</div>
+            <div class="content">
+                <p>This is some text to help with the project name field.</p>
+            </div>
+            <div class="actions">
+                <div class="ui positive right labeled icon button">
+                    Got it!
+                    <i class="checkmark icon"></i>
+                </div>
+            </div>
+        </div>
+        </div>
+
+
+    </body>
+
+
+    <script src="js/vjust/event_binds.js"></script>
+    <script>
+    $(document).ready(function(){
+
+        //////////////////////////////////////////////////////////////////////
+        // [BEGIN] ////////// [RIGHT CLICK MENU SETTINGS] ////////////////////
+        //////////////////////////////////////////////////////////////////////
+
+        var menuDefinition = [{
+            name: 'Left Turn',
+            title: 'Add left turn lanes to this entrance...',
+            subMenu: [{
+                name: '1',
+                fun: function() {
+                    alert("You have just added a left turn!")
+                }
+            }, {
+                name: '2'
+            }, { name: '3' }] },
+            {
+            name: 'Through',
+            title: 'Add through lanes to this entrance...',
+            subMenu: [{
+                name: '1',
+                fun: function() {
+                    alert("You have just added a through lane!")
+                }
+            }, {
+                name: '2'
+            }, { name: '3' }] },
+            {
+            name: 'Right Turn',
+            title: 'Add right turn lanes to this entrance...',
+            subMenu: [{
+                name: '1',
+                fun: function() {
+                    alert("You have just added a right turn!")
+                }
+            }, {
+                name: '2'
+            }, { name: '3' }] },
+            {
+            name: 'Clear',
+            title: 'Clear the existing configuration...',
+            }
+        ];
+
+        $(document).on("contextmenu", function(){
+            return false;
+        });
+
+        //$(document).contextMenu(menuDefinition, {
+        //    triggerOn: 'click',
+        //    mouseClick: 'right'    
+        //});
+        // [END] ////////// [Right Click Menu] ////////////////////
+
+
+
+
+
+
+
+
+
+
+        // [BEGIN] ////////// [I DON'T HAVE A NAME FOR THIS YET] /\/\/\/\/\/\/\
+
+        project = new Project("Test Project", "Damon", "Broad and 14th", "Broad", "14th", "Broad", "14th", "Hospital", "VDOT", "Gas Station", "VACU");
+        var COOKIETOOL = new CookiesUtility();
+        document.getElementById("files").addEventListener('change', buildImportFilelist, false);
+
+        // Hide all of the page's contents.
+        $("#init_loader").children().slice(1).hide();
+        // Hide the sidebar menus so they aren't open when the page loads.
+        $(".introMenu, #piMenu, #appSettMenu").hide();
+
+        // Activate tabbing in the app pane.
+        $(".appPane .menu .item").tab();
+
+        // Add content to the Project Information menu now that it is hidden.
+        $("#piMenu").prepend(
+"            <div class='ui item'>" +
+"                <div class='ui input corner labeled'>"+
+"                    <input type='text' id='projNameInput' class='wideInput' placeholder='My VJUST Project'>"+
+"                    <div id='projNameHelpClickable' class='ui corner label'>"+
+"                        <i class='help icon'></i>"+
+"                    </div>"+
+"                </div>"+
+"            </div>"+
+"            <div class='ui item'>"+
+"                <div class='ui input corner labeled'>"+
+"                    <input type='text' id='interNameInput' class='wideInput' placeholder='Intersection Name'>"+
+"                    <div id='interNameHelpClickable' class='ui corner label'>"+
+"                        <i class='help icon'></i>"+
+"                    </div>"+
+"                </div>"+
+"            </div>"+
+"            <div class='ui item'>"+
+"                <div class='ui input corner labeled'>"+
+"                    <input type='text' id='nRouteNameInput' class='wideInput' placeholder='N Route Name'>"+
+"                    <div id='northRouteNameHelpClickable' class='ui corner label'>"+
+"                        <i class='help icon'></i>"+
+"                    </div>"+
+"                </div>"+
+"            </div>"+
+"            <div class='ui item'>"+
+"                <div class='ui input corner labeled'>"+
+"                    <input type='text' id='sRouteNameInput' class='wideInput' placeholder='S Route Name'>"+
+"                    <div id='southRouteNameHelpClickable' class='ui corner label'>"+
+"                        <i class='help icon'></i>"+
+"                    </div>"+
+"                </div>"+
+"            </div>"+
+"            <div class='ui item'>"+
+"                <div class='ui input corner labeled'>"+
+"                    <input type='text' id='eRouteNameInput' class='wideInput' placeholder='E Route Name'>"+
+"                    <div id='eastRouteNameHelpClickable' class='ui corner label'>"+
+"                        <i class='help icon'></i>"+
+"                    </div>"+
+"                </div>"+
+"            </div>"+
+"            <div class='ui item'>"+
+"                <div class='ui input corner labeled'>"+
+"                    <input type='text' id='wRouteNameInput' class='wideInput' placeholder='W Route Name'>"+
+"                    <div id='westRouteNameHelpClickable', class='ui corner label'>"+
+"                        <i class='help icon'></i>"+
+"                    </div>"+
+"                </div>"+
+"            </div>"+
+"            <div class='ui item'>"+
+"                <div class='ui input corner labeled'>"+
+"                    <input type='text' id='cpOneNameInput' class='wideInput' placeholder='Context Point One'>"+
+"                    <div class='ui corner label'>"+
+"                        <i class='help icon'></i>"+
+"                    </div>"+
+"                </div>"+
+"            </div>"+
+"            <div class='ui item'>"+
+"                <div class='ui input corner labeled'>"+
+"                    <input type='text' class='wideInput' placeholder='Context Point Two'>"+
+"                    <div class='ui corner label'>"+
+"                        <i class='help icon'></i>"+
+"                    </div>"+
+"                </div>"+
+"            </div>"+
+"            <div class='ui item'>"+
+"                <div class='ui input corner labeled'>"+
+"                    <input type='text' class='wideInput' placeholder='Context Point Three'>"+
+"                    <div class='ui corner label'>"+
+"                        <i class='help icon'></i>"+
+"                    </div>"+
+"                </div>"+
+"            </div>"+
+"            <div class='ui item'>"+
+"                <div class='ui input corner labeled'>"+
+"                    <input type='text' class='wideInput' placeholder='Context Point Four'>"+
+"                    <div class='ui corner label'>"+
+"                        <i class='help icon'></i>"+
+"                    </div>"+
+"                </div>"+
+"            </div>");
+
+        // Add content to the Application Settings menu now that it is hidden.
+        $("#appSettMenu").prepend(
+"                <div class='ui item'> "+
+"                    <div class='ui slider checkbox'> "+
+"                        <input id='tooltipsToggleswitch' type='checkbox' name='tooltipsToggle'> "+
+"                        <label>Disable Tooltips</label> "+
+"                    </div> "+
+            "<div class='ui item'><div id='restore_from_cookies' class='ui button'>Restore From Cookies</div></div>" +
+"                </div>");
+
+        // Reveal the introduction to the user by sliding the content open
+        // when the page loads.
+        $(".introMenu").transition("slide down");
+
+        // When the resources have been acquired and stored locally, kill the loader
+        // and load in the page's contents.
+        acquireResources().done(function(){
+            killLoader().done(function(){
+                awakenContent().done(function(){
+                    console.log(COOKIETOOL.cookiesFoundOnStartup());
+                    if(COOKIETOOL.cookiesFoundOnStartup() && COOKIETOOL.isCookieLatestBackup())
+                        $("#cookies_found").modal("show");
+                });
+            });
+        });
+
+        //if(isFrstTimeUser())
+        toggleFirstVisitInputModals(true);
+
+        // [END] // [I DON'T HAVE A NAME FOR THIS] ////////////////////////
+
+
+
+
+
+
+        ////////////////////////////////////////////////////
+        // [BEGIN] ////////// [TESTING] ////////////////////
+        ////////////////////////////////////////////////////
+
+
+        toggleLoader(true, "Testing some code!");
+
+        var curdir = project.getIntersectionByIndex(0).getZoneByIndex(0).getDirectionByIndex(0);
+        curdir.setEntryArray([0, 1, 0, 1, 1, 0]);
+        curdir.getVolumes().setRight(500);
+        curdir.getVolumes().setLeft(200);
+        curdir.getVolumes().setThrough(800);
+
+
+        console.log("RIGHT VOL: " + curdir.getVolumes().getRight());
+        console.log("THROUGH VOL: " + curdir.getVolumes().getThrough());
+
+
+
+    });
+    </script>
+
+
+
+</html>

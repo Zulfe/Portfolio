@@ -1,0 +1,43 @@
+
+
+
+
+
+@keyframes zippy {
+    1% {-webkit-transform: skewX(1deg); transform: translate(1px);}
+    2% {-webkit-transform: skewX(8deg); transform: translate(4px);}
+    3% {-webkit-transform: skewX(16deg); transform: translate(8px);}
+    4% {-webkit-transform: skewX(32deg); transform: translate(12px);}
+    5% {-webkit-transform: skewX(36deg); transform: translate(22px);}
+    6% {-webkit-transform: skewX(37deg); transform: translate(34px);}
+    7% {-webkit-transform: skewX(38deg); transform: translate(48px);}
+    8% {-webkit-transform: skewX(39deg); transform: translate(62px);}
+    9% {-webkit-transform: skewX(40deg); transform: translate(82px);}
+    10% {-webkit-transform: skewX(41deg); transform: translate(102px);}
+    11% {-webkit-transform: skewX(42deg); transform: translate(122px);}
+    12% {-webkit-transform: skewX(42deg); transform: translate(142px);}
+    13% {-webkit-transform: skewX(42deg); transform: translate(162px);}
+    14% {-webkit-transform: skewX(42deg); transform: translate(182px);}
+    15% {-webkit-transform: skewX(42deg); transform: translate(8px);}
+    16% {-webkit-transform: skewX(42deg); transform: translate(12px);}
+    17% {-webkit-transform: skewX(1deg); transform: translate(1px);}
+    18% {-webkit-transform: skewX(8deg); transform: translate(4px);}
+    19% {-webkit-transform: skewX(16deg); transform: translate(8px);}
+    20% {-webkit-transform: skewX(32deg); transform: translate(12px);}
+    21% {-webkit-transform: skewX(1deg); transform: translate(1px);}
+    22% {-webkit-transform: skewX(8deg); transform: translate(4px);}
+    23% {-webkit-transform: skewX(16deg); transform: translate(8px);}
+    24% {-webkit-transform: skewX(32deg); transform: translate(12px);}
+    25% {-webkit-transform: skewX(1deg); transform: translate(1px);}
+    26% {-webkit-transform: skewX(8deg); transform: translate(4px);}
+    27% {-webkit-transform: skewX(16deg); transform: translate(8px);}
+    28% {-webkit-transform: skewX(32deg); transform: translate(12px);}
+    
+}
+
+
+#logo {
+    animation-name: zippy;
+    animation-duration: 3s;
+    animation-iteration-count: infinite;
+}
