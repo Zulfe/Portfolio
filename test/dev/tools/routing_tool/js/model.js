@@ -46,17 +46,42 @@ var objectKeyByValue = function(obj, val) {
 *
 */
 var saveRoute = function() {
-    if(route_number < 12) {
-        updateTerminal(routeTo.Verbal[route_number.toString()] + " has been recorded. Now recording " + routeTo.Verbal[(route_number + 1).toString()] + ".");
-        updateToolItemColor(routeTo.ID[route_number], "#94B95B");
-        updateToolItemColor(routeTo.ID[route_number + 1], "yellow");
-        totalRoutes.push(currentRoute);
-        currentRoute = [];
-        route_number = route_number + 1;
-        lastAtRouteNumber = lastAtRouteNumber + 1;
-        currentRoute.push(routeTo.Address[route_number.toString()]);
+    if(route_number < 11) {
+        if(lastAtRouteNumber == route_number) {
+            updateTerminal(routeTo.Verbal[route_number.toString()] + " has been recorded. Now recording " + routeTo.Verbal[(route_number + 1).toString()] + ".");
+            
+            updateToolItemColor(routeTo.ID[route_number], "#94B95B");
+            updateToolItemColor(routeTo.ID[route_number + 1], "yellow");
+            
+            // Add the route configured for this entrance to the list of total routes.
+            totalRoutes.push(currentRoute);
+            // Reset the array reserved for the current route so that new movements may be added.
+            currentRoute = [];
 
-        resetArrows();
+            route_number = route_number + 1;
+            lastAtRouteNumber = lastAtRouteNumber + 1;
+
+            // Add to the newly cleared current route variable the volume table origin for the route to now be configured.
+            currentRoute.push(routeTo.Address[route_number.toString()]);
+
+            // Clear the blinking from all arrows.
+            resetArrows();
+        }
+        else {
+            updateTerminal(routeTo.Verbal[lastAtRouteNumber] + " has been updated. Now recording " + routeTo.Verbal[route_number] + ".");
+
+            updateToolItemColor(routeTo.ID[lastAtRouteNumber], "#94B95B");
+            updateToolItemColor(routeTo.ID[route_number], "yellow");
+
+            totalRoutes[lastAtRouteNumber] = currentRoute;
+            currentRoute = [];
+
+            lastAtRouteNumber = route_number;
+
+            currentRoute.push(routeTo.Address[route_number]);
+
+            resetArrows();
+        }
     }
     else
         updateTerminal("All routes have been written. Please export!");
@@ -75,7 +100,7 @@ var seekAndDestroy = function(target_array) {
     var route_array_minus_target = [];
 
     // If there does not exist a route array at the route ID, the user must be editing the latest route.
-    if(totalRoutes[lastAtRouteNumber] === undefined) {
+    //if(totalRoutes[lastAtRouteNumber] === undefined) {
         currentRoute.forEach(function(entry, index) {
             var is_match = entry.every(function(element, index) {
                 return element === target_array[index];
@@ -85,7 +110,8 @@ var seekAndDestroy = function(target_array) {
                 route_array_minus_target.push(entry);
         });
         currentRoute = route_array_minus_target;
-    }
+    //}
+    /*
     // If it does exist, then the user is trying to edit a previous route.
     else {
         totalRoutes[lastAtRouteNumber].forEach(function(entry, index) {
@@ -98,6 +124,7 @@ var seekAndDestroy = function(target_array) {
         });
         totalRoutes[route_number] = route_array_minus_target;
     }
+    */
 }
 
 /**
@@ -115,23 +142,39 @@ var loadRoute = function(moveToRoute) {
     // Disabling blink on all of the currently active arrows.
     resetArrows();
     // Define a temporary variable to read the desired route's configuration from.
-    var route = totalRoutes[moveToRoute];
+    currentRoute = totalRoutes[moveToRoute];
 
     // If the route the user requested does not contain any data, notify that there's nothing to show them.
     // This only happens when the user has begun a new route, has not highlighted any of the arrows,  goes
     // back to a previous route, then returns to the new route.
-    if(route === undefined)
+    if(currentRoute === undefined)
         updateTerminal("No data has been written to this entrance movement yet. No movements to highlight.");
     // If the route the user requested does contain information about the
     else
-        route.forEach(function(mvts, index) {
+        currentRoute.forEach(function(mvts, index) {
             if(mvts[0] == 0)
                 return;
             flashArrow($(".zone_block[data-zone='" + mvts[0] +"'] div[data-dir='" + mvts[1] + "'] img[data-mvt='" + mvts[2] + "']"));
         });
-    
 }
 
+/**
+ *
+ *
+ *
+ */
+var clearRoute = function() {
+    totalRoutes[lastAtRouteNumber] = [];
+    currentRoute = [];
+    currentRoute.push(routeTo.Address[lastAtRouteNumber]);
+    resetArrows();
+}
+
+/**
+ *
+ *
+ *
+ */
 var getZonePos = function(zone_num) {
     var _this = "#canvas div[data-zone='" + zone_num + "']";
     if($(_this).length == 0)

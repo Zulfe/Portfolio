@@ -13,6 +13,7 @@ var updateToolItemColor = function(tool_elem, color) {
     $(_this).css("background-color", color);
 }
 
+
 /**
 *
 *
@@ -38,6 +39,8 @@ var flashArrow = function(arrow_elem) {
         }
     }, 400);
     $(arrow_elem).data("interid", int.toString());
+    $(arrow_elem).data("active", "1");
+    $(arrow_elem).parent().parent().data("active-arrows", "1");
     intervals.push(int);
 }
 
@@ -45,8 +48,11 @@ var flashArrow = function(arrow_elem) {
 *
 *
 */
-var resetArrow = function(arrow_elem, interid) {
-    clearInterval(interid);
+var resetArrow = function(arrow_elem, approach_elem) {
+    $(arrow_elem).data("active", "0");
+    // approach_elem is a jQuery object already.
+    $(approach_elem).data("active-arrows", "0");
+    clearInterval($(arrow_elem).data("interid"));
     $(arrow_elem).css("background-color", "black");
 }
 
@@ -64,7 +70,7 @@ var resetArrows = function() {
         "visibility" : "visible"
     });
     $(".zone_block img").data("active", "0");
-    $(".zone_block").data("active-arrows", "0");
+    $(".approach").data("active-arrows", "0");
 }
 
 

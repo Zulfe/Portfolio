@@ -29,6 +29,9 @@ $("#toolbar div").click(function(){
     if(button_id == "done")
         saveRoute();
 
+    if(button_id == "clear_route")
+        clearRoute();
+
     if(button_id == "clear")
         clearCanvas();
 
@@ -53,7 +56,7 @@ $(".mvt_ids").click(function() {
     var num_id = parseInt(objectKeyByValue(routeTo.ID, elem_id));
 
     if(num_id > route_number) {
-        updateTerminal("You cannot edit this route without first writing all previous routes.");
+        updateTerminal("You cannot edit this route without first completing all previous routes.");
         return;
     }
     else
@@ -86,11 +89,6 @@ $(document).on("click", "img", function() {
     if(!plotModeEnabled)
         return;
 
-    /*
-    * NEED TO REMOVE ENTRY FROM ARRY WHEN AN ARROW IS DISABLED!!!!!!!!!!!!!!!!!!!!!!!!!!!
-    *
-    ************************************************/
-
     var zone_elem = $(this).parent().parent().parent();
     var approach_elem = $(this).parent().parent();
     var zone = zone_elem.data("zone");
@@ -100,9 +98,7 @@ $(document).on("click", "img", function() {
     // If there is an arrow already active in this zone, don't allow another arrow to become activated.
     if(approach_elem.data("active-arrows") == "1") {
         if($(this).data("active") == "1") {
-            $(this).data("active", "0");
-            approach_elem.data("active-arrows", "0");
-            resetArrow(this, $(this).data("interid"));
+            resetArrow(this, approach_elem);
             console.log("Deleting ["  + zone + ", " + dir + ", " + mvt + "] from the list of current route nodes.");
             seekAndDestroy([zone, dir, mvt]);
         }
@@ -113,9 +109,6 @@ $(document).on("click", "img", function() {
     }
     // If there isn't one active, increment the number of active arrows.
     else {
-        approach_elem.data("active-arrows", "1");
-        $(this).data("active", "1");
-
         flashArrow($(this));
 
         console.log("Adding ["  + zone + ", " + dir + ", " + mvt + "] to list of current route nodes.");
@@ -128,10 +121,6 @@ $(document).on("click", "img", function() {
 *
 */
 $("#canvas").click(function(e) {
-   /* if(!volumesEntered) {
-        updateTerminal("You haven't entered any input volumes yet.");
-        return;
-    }*/
     if(!zoneDrawEnabled)
         return;
     // If a zone to draw has been clicked, allow a zone to be drawn.
@@ -143,4 +132,15 @@ $("#canvas").click(function(e) {
     }
     else
         updateTerminal("No zone has been selected to draw.");
+});
+
+
+/////////////////////////////////////////////////////////////////////////////////////////
+
+/**
+ * Clicking on the terminal is reserved for testing and experimentation.
+ */
+$("#terminal").click(function() {
+    console.log(totalRoutes);
+    console.log(currentRoute);
 });
