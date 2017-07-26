@@ -15,7 +15,7 @@ var updateToolItemColor = function(tool_elem, color) {
 
 var updateMovementBlocks = function(color) {
     jQuery.each($(".mvt_ids"), function(index, object) {
-        updateToolItemColor($(object).attr("id"), "#94B95B");
+        updateToolItemColor($(object).attr("id"), color);
     });
 }
 
@@ -29,10 +29,17 @@ var overwriteMovementBlockPrevColor = function(color) {
 *
 */
 var clearCanvas = function() {
-    $("#canvas").children().remove();
+    numClicks = numClicks - zonesDrawn.filter(v => v).length;
+    route_number, lastAtRouteNumber = 0;
+    zoneDrawEnabled, plotModeEnabled, plottingStarted = false;
+    
     zonesDrawn = [false, false, false, false, false, false];
+    totalRoutes = [];
+    currentRoute = [];
+
+    $("#canvas").children().remove();
+    updateMovementBlocks("#CCCCCC");
     updateTerminal("The canvas has been cleared");
-    numClicks = 0;
 }
 
 /**

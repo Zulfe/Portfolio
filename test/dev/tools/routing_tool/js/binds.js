@@ -5,9 +5,11 @@
 $("#toolbar div").click(function(){
     var button_id = $(this).attr("id");
 
-    if(button_id == "zone_1")
+    if(button_id == "zone_1") {
         enableZoneDraw(1);
-    
+        updateTerminal("Zone draw enabled for Zone 1.");
+    }
+
     if(button_id == "zone_2")
         enableZoneDraw(2);
     
