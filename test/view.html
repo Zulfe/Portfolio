@@ -17,7 +17,7 @@
 
     <body>
             <div id="init_loader" class="ui active dimmer">
-                <div class="ui text loader"></div>
+                <div class="ui text loader">Loading Resources...</div>
         <div id="infoPanel" class="ui left visible demo vertical inverted wide sidebar labeled menu darkBackground">
             <div class="item">
                 <div id="introItemHeader" class="header">Introduction</div>
@@ -368,8 +368,6 @@
         // [BEGIN] ////////// [TESTING] ////////////////////
         ////////////////////////////////////////////////////
 
-
-        toggleLoader(true, "Testing some code!");
 
         var curdir = project.getIntersectionByIndex(0).getZoneByIndex(0).getDirectionByIndex(0);
         curdir.setEntryArray([0, 1, 0, 1, 1, 0]);

@@ -92,33 +92,30 @@ $(document).on("click", "img", function() {
     ************************************************/
 
     var zone_elem = $(this).parent().parent().parent();
-    var mvt = $(this).data("mvt");
-    var dir = $(this).parent().parent().data("dir");
+    var approach_elem = $(this).parent().parent();
     var zone = zone_elem.data("zone");
-
+    var dir = approach_elem.data("dir");
+    var mvt = $(this).data("mvt");
+    
     // If there is an arrow already active in this zone, don't allow another arrow to become activated.
-    if(zone_elem.data("active-arrows") == "1") {
+    if(approach_elem.data("active-arrows") == "1") {
         if($(this).data("active") == "1") {
             $(this).data("active", "0");
-            zone_elem.data("active-arrows", "0");
+            approach_elem.data("active-arrows", "0");
             resetArrow(this, $(this).data("interid"));
             console.log("Deleting ["  + zone + ", " + dir + ", " + mvt + "] from the list of current route nodes.");
             seekAndDestroy([zone, dir, mvt]);
         }
         else {
-            updateTerminal("A movement arrow for this zone is already active.");
+            updateTerminal("A movement arrow for this approach is already active.");
             return;
         }
     }
     // If there isn't one active, increment the number of active arrows.
     else {
-        zone_elem.data("active-arrows", "1");
+        approach_elem.data("active-arrows", "1");
         $(this).data("active", "1");
 
-        var mvt = $(this).data("mvt");
-        var dir = $(this).parent().parent().data("dir");
-        var zone = zone_elem.data("zone");
-      
         flashArrow($(this));
 
         console.log("Adding ["  + zone + ", " + dir + ", " + mvt + "] to list of current route nodes.");

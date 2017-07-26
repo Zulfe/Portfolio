@@ -14840,26 +14840,6 @@ ol.ui.horizontal.list li:before,
   content: url(../../assets/vdot.svg);
 }
 
-
-
-
-
-
-
-.animation-target {
-  -webkit-animation: animation 2800ms linear infinite both;
-  animation: animation 2800ms linear infinite both;
-}
-
-/* Generated with Bounce.js. Edit at https://goo.gl/B1bNzi */
-
-
-
-.animation-target {
-  -webkit-animation: animation 3300ms linear infinite both;
-  animation: animation 3300ms linear infinite both;
-}
-
 /* Generated with Bounce.js. Edit at https://goo.gl/jLQUMp */
 
 @-webkit-keyframes zippy { 
@@ -14967,19 +14947,6 @@ ol.ui.horizontal.list li:before,
   92.72% { -webkit-transform: matrix3d(1, 0, 0, 0, 0.839, 1, 0, 0, 0, 0, 1, 0, 999.972, 0, 0, 1); transform: matrix3d(1, 0, 0, 0, 0.839, 1, 0, 0, 0, 0, 1, 0, 999.972, 0, 0, 1); }
   100% { -webkit-transform: matrix3d(1, 0, 0, 0, 0.839, 1, 0, 0, 0, 0, 1, 0, 1000, 0, 0, 1); transform: matrix3d(1, 0, 0, 0, 0.839, 1, 0, 0, 0, 0, 1, 0, 1000, 0, 0, 1); } 
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 @-webkit-keyframes loader {
