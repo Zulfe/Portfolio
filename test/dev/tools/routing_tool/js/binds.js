@@ -35,8 +35,10 @@ $("#toolbar div").click(function(){
     if(button_id == "clear")
         clearCanvas();
 
-    if(button_id == "import")
-        triggerUpload();
+    if(button_id == "import") {
+        overwriteMovementBlockPrevColor("#94B95B");
+        triggerUpload(); 
+    }
 
     if(button_id == "export")
         exportToCSV();
@@ -100,7 +102,7 @@ $(document).on("click", "img", function() {
         if($(this).data("active") == "1") {
             resetArrow(this, approach_elem);
             console.log("Deleting ["  + zone + ", " + dir + ", " + mvt + "] from the list of current route nodes.");
-            seekAndDestroy([zone, dir, mvt]);
+            seekAndAwaitReplace([zone, dir, mvt]);
         }
         else {
             updateTerminal("A movement arrow for this approach is already active.");
@@ -111,8 +113,17 @@ $(document).on("click", "img", function() {
     else {
         flashArrow($(this));
 
-        console.log("Adding ["  + zone + ", " + dir + ", " + mvt + "] to list of current route nodes.");
-        currentRoute.push([zone, dir, mvt]);
+        var address = [zone, dir, mvt];
+        console.log(zone);
+        console.log(seekAndAwaitReplaceAddress[0]);
+        if(seekAndAwaitReplaceIndex == -1 && seekAndAwaitReplaceAddress[0] != zone) {
+            currentRoute.push(address);
+            console.log("Adding ["  + zone + ", " + dir + ", " + mvt + "] to list of current route nodes.");
+        }
+        else {
+            console.log("Replacing index " + seekAndAwaitReplaceIndex + " with [" + zone + ", " + dir + ", " + mvt + "]");
+            executeReplacement(address);
+        }
     }
 });
 

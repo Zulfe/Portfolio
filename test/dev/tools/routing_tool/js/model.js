@@ -99,6 +99,11 @@ var seekAndDestroy = function(target_array) {
     // Clone the array.
     var route_array_minus_target = [];
 
+    /*
+     * Since focus in route editing has been moved to overwriting, editing, and using currentRoute to write to
+     * totalRoutes, the else in this block causes issues. It has been left for future 
+     */
+
     // If there does not exist a route array at the route ID, the user must be editing the latest route.
     //if(totalRoutes[lastAtRouteNumber] === undefined) {
         currentRoute.forEach(function(entry, index) {
@@ -126,6 +131,39 @@ var seekAndDestroy = function(target_array) {
     }
     */
 }
+
+/**
+ *
+ *
+ *
+ */
+var seekAndAwaitReplace = function(target_array) {
+    currentRoute.forEach(function(entry, index) {
+        var is_match = entry.every(function(element, index) {
+            return element === target_array[index];
+        });
+
+        if(is_match) {
+            seekAndAwaitReplaceIndex = index;
+            seekAndAwaitReplaceAddress = entry;
+            console.log("Located match of " + entry + " at index " + index);
+        }
+    });
+}
+
+/**
+ *
+ *
+ */
+var executeReplacement = function(replacement_array) {
+    currentRoute[seekAndAwaitReplaceIndex] = replacement_array;
+    seekAndAwaitReplaceIndex = -1;
+    seekAndAwaitReplaceAddress = [-1, -1, -1];
+}
+
+
+
+
 
 /**
 *
@@ -166,6 +204,7 @@ var loadRoute = function(moveToRoute) {
 var clearRoute = function() {
     totalRoutes[lastAtRouteNumber] = [];
     currentRoute = [];
+    // Add the Zone 0 table connection to the new route configuration.
     currentRoute.push(routeTo.Address[lastAtRouteNumber]);
     resetArrows();
 }
@@ -317,7 +356,10 @@ var importFromCSV = function(evt) {
             entry_count = entry_count + 1;
         }
         console.log(totalRoutes);
+
+        plottingStarted = true;
+        route_number = 12;
+        updateMovementBlocks("#94B95B");
     });
-    
 
 }

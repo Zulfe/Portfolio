@@ -9,10 +9,20 @@ var updateTerminal = function(message) {
 var updateToolItemColor = function(tool_elem, color) {
     var _this = "#" + tool_elem;
     console.log("Updating " + $(_this).attr("id") + " and its prev-color data to " + $(_this).data("prev-color"));
-    $(_this).data("prev-color", $(_this).css("background-color"));
+    $(_this).attr("data-prev-color", $(_this).css("background-color"));
     $(_this).css("background-color", color);
 }
 
+var updateMovementBlocks = function(color) {
+    jQuery.each($(".mvt_ids"), function(index, object) {
+        updateToolItemColor($(object).attr("id"), "#94B95B");
+    });
+}
+
+var overwriteMovementBlockPrevColor = function(color) {
+    for(var i = 0; i < 12; i++)
+        $("#" + routeTo.ID[i]).attr("data-prev-color", color);
+}
 
 /**
 *

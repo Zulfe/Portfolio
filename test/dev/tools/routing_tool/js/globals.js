@@ -75,4 +75,7 @@ routeTo.Verbal = {
 var currentRoute = [];
 var totalRoutes = [];
 
+var seekAndAwaitReplaceIndex = -1;
+var seekAndAwaitReplaceAddress = [-1, -1, -1];
+
 var timeTool = new Date();
