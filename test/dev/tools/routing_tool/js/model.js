@@ -81,13 +81,14 @@ var saveRoute = function() {
 
             resetArrows();
             
-            // Sequence complete
-            route_number = 100;
         }
     }
     else {
         updateToolItemColor(routeTo.ID[11], "#94B95B");
         updateTerminal("All routes have been written. Please export!");
+   
+        // Sequence complete
+        route_number = 100;
     }
 
     console.log(totalRoutes);
