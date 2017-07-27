@@ -80,6 +80,9 @@ var saveRoute = function() {
             currentRoute.push(routeTo.Address[route_number]);
 
             resetArrows();
+            
+            // Sequence complete
+            route_number = 100;
         }
     }
     else {
@@ -249,7 +252,7 @@ var getZonePos = function(zone_num) {
 *
 */
 var exportToCSV = function() {
-    if(route_number <= 11) {
+    if(route_number != 100) {
         console.log(route_number);
         updateTerminal("You haven't completed all twelve movements for this intersection.");
         return;
