@@ -249,8 +249,8 @@ var getZonePos = function(zone_num) {
 *
 */
 var exportToCSV = function() {
-    if(totalRoutes.length != 12) {
-        updateTerminal("You haven't completed all twelve movements for this configuration.");
+    if(totalRoutes.length != 11) {
+        updateTerminal("You haven't completed all twelve movements for this intersection.");
         return;
     }
     

@@ -604,30 +604,6 @@ class Direction {
 
 
 
-/**
- *
- *
- */
-class VolumeDistributionHandler {
-
-}
-
-class MovementRoute {
-    /**
-     * A class for organizing the addresses of movements contributing to the movement of focus. These objects are instantiated by Direction objects who
-     * pass along Intersection type, Zone, and cardinal direction.
-     *
-     * @constructor
-     */
-    constructor(address) {
-        
-    }
-}
-
-
-
-
-
 class ModalFactory {
     /** 
      * This is a class that helps with the creation of help modals on the application view. This tool will automatically
@@ -1360,6 +1336,159 @@ class BoundedDetailedVolume {
         return this._pce_enabled;
     }
 }
+
+class DetailedPercentage {
+    constructor(direction, left_perc, through_perc, right_perc) {
+        this._direction = direction;
+        this._left_perc = left_perc;
+        this._through_perc = through_perc;
+        this._right_perc = right_perc;
+    }
+
+    getLeft() {
+        return this._left_perc;
+    }
+
+    getThrough() {
+        return this._through_perc;
+    }
+
+    getRight() {
+        reutnr this._right_perc;
+    }
+}
+
+
+class UserVolumeDefinitions {
+    /**
+     * A class to store and organize the user-defined data pulled from the initial volume table. Supports the storage of Fratar data alongside
+     * user data.
+     * @param {DetailedVolume} north_detvol
+     * @param {DetailedVolume} east_detvol
+     * @param {DetailedVolume} south_detvol
+     * @param {DetailedVolume} west_detvol
+     * @param {double} north_truckperc 
+     * @param {double} east_truckperc
+     * @param {double} south_truckperc
+     * @param {double} west_truckperc
+     */
+    constructor(north_detvol, east_detvol, south_detvol, west_detvol, north_truckperc, east_truckperc, south_truckperc, west_truckperc) {
+        this._user_defined_north_volumes = north_detvol;
+        this._user_defined_east_volumes = east_detvol;
+        this._user_defined_south_volumes = south_detvol;
+        this._user_defined_west_volumes = west_detvol;
+
+        this._user_defined_general_north_truck_perc = north_truckperc;
+        this._user_defined_general_east_truck_perc = east_truckperc;
+        this._user_defined_general_south_truck_perc = south_truckperc;
+        this._user_defined_general_west_truck_perc = west_truckperc;
+
+        this._using_fratar = false;
+        this._specific_truck_percs_defined = false;
+    }
+
+    /**
+     * Add to this object variables storing user-defined per-lane truck percentages. This will also enable the flag for specific percentages.
+     * @param {DetailedPercentage} north_detperc
+     * @param {DetailedPercentage} east_detperc
+     * @param {DetailedPercentage} south_detperc
+     * @param {DetailedPercetnage} west_detperc
+     */
+    defineUserSpecificTruckPercentages(north_detperc, east_detperc, south_detperc, west_detperc) {
+        this._user_defined_specific_north_truck_perc = north_detperc;
+        this._user_defined_specific_east_truck_perc = east_detperc;
+        this._user_defined_specific_south_truck_perc = south_detperc;
+        this._user_defined_specific_west_truck_perc = west_detperc;
+        
+        this._specific_truck_percs_defined = true;
+    }
+
+    /**
+     * Add to this object variables storing Fratar-defined per-lane truck percentages. This will also enable the flag for specific percentages.
+     * @param {DetailedPercentage} north_detperc
+     * @param {DetailedPercentage} east_detperc
+     * @param {DetailedPercentage} south_detperc
+     * @param {DetailedPercetnage} west_detperc
+     */
+    defineFratarSpecificTruckPercentages(north_detperc, east_detperc, south_detperc, west_detperc) {
+        this._fratar_defined_specific_north_truck_perc = north_detperc;
+        this._fratar_defined_specific_east_truck_perc = east_detperc;
+        this._fratar_defined_specific_south_truck_perc = south_detperc;
+        this._fratar_defined_specific_west_truck_perc = west_detperc;
+        
+        this._specific_truck_percs_defined = true;
+    }
+
+    /**
+     * Return the percentage of trucks to this object's most specific knowledge. If specific values have been defined, those will
+     * be returned. If not, the general percentages will
+     *
+     */
+    getUserDefinedTruckPercentages() {
+        if(this.isUsingFratar()) {
+            if(this.isSpecificTruckPercsDefined()) {
+                // return fratar-defined specific truck percentages
+                return [this._fratar_defined_specific_north_truck_perc,
+                        this._fratar_defined_specific_east_truck_perc,
+                        this._fratar_defined_specific_south_truck_perc,
+                        this._fratar_defined_specific_west_truck_perc
+                ];
+            }
+            else {
+                // return fratar-defined general truck percentages
+                return [this._fratar_defined_general_north_truck_perc,
+                        this._fratar_defined_general_east_truck_perc,
+                        this._fratar_defined_general_south_truck_perc,
+                        this._fratar_defined_general_west_truck_perc
+                ];
+            }
+        }
+        else {
+            if(this.isSpecificTruckPercsDefined()) {
+                // return user-defined specific truck percentages
+                return [this._user_defined_specific_north_truck_perc,
+                        this._user_defined_specific_east_truck_perc,
+                        this._user_defined_specific_south_truck_perc,
+                        this._user_defined_specific_west_truck_perc
+                ];
+            }
+            else {
+                // return user-defined general truck percentages
+                return [this._user_defined_general_north_truck_perc,
+                        this._user_defined_general_east_truck_perc,
+                        this._user_defined_general_south_truck_perc,
+                        this._user_defined_general_west_truck_perc
+                ];
+            }
+        }
+    }
+
+    setUsingFratarVolumes(state) {
+        this._using_fratar = false;
+    }
+
+    setFratarParameters(north_detvol, east_detvol, south_detvol, west_detvol, north_truckperc, east_truckperc, south_truckperc, west_truckperc) {
+        this._fratar_defined_north_volumes = north_detvol;
+        this._fratar_defined_east_volumes  = east_detvol;
+        this._fratar_defined_south_volumes = south_detvol;
+        this._fratar_defined_west_volumes  = west_detvol;
+
+        this._fratar_defined_general_north_truck_perc = north_truckperc;
+        this._fratar_defined_general_east_truck_perc = east_truckperc;
+        this._fratar_defined_general_south_truck_perc = south_truckperc;
+        this._fratar_defined_general_west_truck_perc = west_truckperc;
+    }
+
+    isUsingFratar() {
+        return this._using_fratar;
+    }
+
+    isSpecificTruckPercsDefined() {
+        return this._specific_truck_percs_defined;
+    }
+}
+
+
 
 class VolumetricIntersection {
     /**
