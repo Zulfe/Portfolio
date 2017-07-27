@@ -155,8 +155,39 @@ $(".appPane .secondary a[data-tab='add_tab'").click(function() {
 //////////////////////////////////////////////
 
 
+var arrows = [
+    {
+        name: "Left",
+        subMenu: [{
+            name: "",
+            img: "assets/arrows/arrow_left.svg",
+            fun: function() { alert("You just clicked the left arrow!"); }
+        }]
+    },
+    {
+        name: "Through",
+        subMenu: [{
+            name: "",
+            img: "assets/arrows/arrow_through.svg",
+            fun: function() { alert("You just clicked the through arrow!"); }
+        }]
+    },
+    {
+        name: "Right",
+        subMenu: [{
+            name: "",
+            img: "assets/arrows/arrow_right.svg",
+            fun: function() { alert("You just clicked the right arrow!"); }
+        }]
+    }
+];
 
 
+$(".segment").contextMenu(arrows, {
+    "triggerOn" : "click",
+    "mouseClick" : "right",
+    "centerAround" : "cursor"
+});
 
 
 

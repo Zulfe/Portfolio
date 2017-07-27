@@ -34,8 +34,7 @@ var enablePlotMode = function() {
 }
 
 /**
-*
-*
+* Given an enumeration, return the key associated with the given value.
 */
 var objectKeyByValue = function(obj, val) {
       return Object.entries(obj).find(i => i[1] === val)[0];
@@ -83,8 +82,10 @@ var saveRoute = function() {
             resetArrows();
         }
     }
-    else
+    else {
+        updateToolItemColor(routeTo.ID[11], "#94B95B");
         updateTerminal("All routes have been written. Please export!");
+    }
 
     console.log(totalRoutes);
 
@@ -130,6 +131,23 @@ var seekAndDestroy = function(target_array) {
         totalRoutes[route_number] = route_array_minus_target;
     }
     */
+}
+
+var destroyAllOfTargetInArray = function(target, source) {
+    var source_minus_target = [];
+
+    console.log(source);
+
+    source.forEach(function(entry, index) {
+        var is_match = entry.every(function(element, index) {
+            return element === target[index];
+        });
+
+        if(!is_match)
+            source_minus_target.push(entry);
+    });
+
+    return source_minus_target;
 }
 
 /**
@@ -355,11 +373,20 @@ var importFromCSV = function(evt) {
             totalRoutes[route_num - 1][entry_count] = [zone, dir, mvt];
             entry_count = entry_count + 1;
         }
+
+
+        for(var i = 0; i < totalRoutes.length; i++) {
+            totalRoutes[i] = destroyAllOfTargetInArray([-1, -1, -1], totalRoutes[i]); 
+        }
+
         console.log(totalRoutes);
+
 
         plottingStarted = true;
         route_number = 12;
-        updateMovementBlocks("#94B95B");
+
+        updateMovementBlocksPrevColor("#94B95B");
+        updateMovementBlocksColor("#94B95B");
     });
 
 }

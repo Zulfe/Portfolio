@@ -1452,6 +1452,68 @@ class VolumetricIntersection {
     getBoundedTruckVolumes() {
         return [this._north_truckvol_bounded, this._east_truckvol_bounded, this._south_truckvol_bounded, this._west_truckvol_bounded];
     }
+
+    /**
+     * Calculate and return the percentage of trucks for each direction using the general volume from said direction. The general volume
+     * is equal to the sum of the left, through, and right volumes. The returned array contains percentages in the order north, east, south
+     * and west. Note that the percentages correspond to unbounded directions, meaning southbound traffic contains the percentage of trucks
+     * equal to the first (north) value returned from this function.
+     * @returns {double[]} An array of decimal numbers between 0 and 1 representing percentages
+     */
+    getGeneralTruckPercentages() {
+        var carvols = this.getUnboundedCarVolumes();
+        var truckvols = this.getUnboundedTruckVolumes();
+
+        var north_genperc = (truckvols[0].getLeft() + truckvols[0].getThrough() + truckvols[0].getRight()) / (truckvols[0].getLeft() + truckvols[0].getThrough() + truckvols[0].getRight() +
+                                                                                                              carvols[0].getLeft() + carvols[0].getThrough() + carvols[0].getRight());
+
+        var east_genperc = (truckvols[1].getLeft() + truckvols[1].getThrough() + truckvols[1].getRight()) / (truckvols[1].getLeft() + truckvols[1].getThrough() + truckvols[1].getRight() +
+                                                                                                              carvols[1].getLeft() + carvols[1].getThrough() + carvols[1].getRight());
+        
+        var south_genperc = (truckvols[2].getLeft() + truckvols[2].getThrough() + truckvols[2].getRight()) / (truckvols[2].getLeft() + truckvols[2].getThrough() + truckvols[2].getRight() +
+                                                                                                              carvols[2].getLeft() + carvols[2].getThrough() + carvols[2].getRight());
+        
+        var west_genperc = (truckvols[3].getLeft() + truckvols[3].getThrough() + truckvols[3].getRight()) / (truckvols[3].getLeft() + truckvols[3].getThrough() + truckvols[3].getRight() +
+                                                                                                              carvols[3].getLeft() + carvols[3].getThrough() + carvols[3].getRight());
+
+        return [north_genperc, east_genperc, south_genperc, west_genperc];
+    }
+
+    /**
+     * Calculate and return the percentage of trucks for each movement for each direction. This will return a two dimensional array
+     * where the first row is truck percentages for the movements left, through, and right (in that order) north of the intersection.
+     * The second row corresponds to eastern movements, the third to southern movements, and the fourth to western movements.
+     * @returns {double[][]} A two-dimensional array of decimal numbers between 0 and 1 representing percentages
+     *
+     */
+    getSpecificTruckPercentages() {
+        var carvols = this.getUnboundedCarVolumes();
+        var truckvols = this.getUnboundedTruckVolumes();
+
+        var north_specperc_left = (truckvols[0].getLeft()) / (truckvols[0].getLeft() + carvols[0].getLeft());
+        var north_specperc_through = (truckvols[0].getThrough()) / (truckvols[0].getThrough() + carvols[0].getThrough());
+        var north_specperc_right = (truckvols[0].getRight()) / (truckvols[0].getRight() + carvols[0].getRight());
+
+        var east_specperc_left = (truckvols[1].getLeft()) / (truckvols[1].getLeft() + carvols[1].getLeft());
+        var east_specperc_through = (truckvols[1].getThrough()) / (truckvols[1].getThrough() + carvols[1].getThrough());
+        var east_specperc_right = (truckvols[1].getRight()) / (truckvols[1].getRight() + carvols[1].getRight());
+
+        var south_specperc_left = (truckvols[2].getLeft()) / (truckvols[2].getLeft() + carvols[2].getLeft());
+        var south_specperc_through = (truckvols[2].getThrough()) / (truckvols[2].getThrough() + carvols[2].getThrough());
+        var south_specperc_right = (truckvols[2].getRight()) / (truckvols[2].getRight() + carvols[2].getRight());
+        
+        var west_specperc_left = (truckvols[3].getLeft()) / (truckvols[3].getLeft() + carvols[3].getLeft());
+        var west_specperc_through = (truckvols[3].getThrough()) / (truckvols[3].getThrough() + carvols[3].getThrough());
+        var west_specperc_right = (truckvols[3].getRight()) / (truckvols[3].getRight() + carvols[3].getRight());
+    
+        return [
+            [north_specperc_left, north_specperc_through, north_specperc_right],
+            [east_specperc_left, east_specperc_through, east_specperc_right],
+            [south_specperc_left, south_specperc_through, south_specperc_right],
+            [west_specperc_left, west_specperc_through, west_specperc_right]
+        ];
+    
+    }
 }
 
 class VolumeTool {

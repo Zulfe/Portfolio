@@ -39,6 +39,30 @@ body {
     line-height: 2em;
 }
 
+.dimmed_zone {
+    background-color: #A25034 !important;
+}
+
+.dimmed_plot {
+    background-color: #B0A373 !important;    
+}
+
+.dimmed_write {
+    background-color: #608775 !important;
+}
+
+.dimmed_clearroute {
+    background-color: #9E9E9E !important;
+}
+
+.dimmed_clear {
+    background-color: #B0514D !important;
+}
+
+.dimmed_export {
+    background-color: #B08D41 !important;
+}
+
 #toolbar .mvt_ids {
     height: 100%;
     width: 7.865%;

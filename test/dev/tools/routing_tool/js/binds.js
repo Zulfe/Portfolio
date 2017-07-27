@@ -1,4 +1,41 @@
 /**
+ * Handles application hotkeys.
+ */
+$(window).keypress(function(event) {
+    // Enter --> [Write Route]
+    if(event.which == 13)
+        $("#done").click();
+    
+    // 1 --> [Zone 1]
+    else if(event.which == 49)
+        $("#zone_1").click();
+    
+    // 2 --> [Zone 2]
+    else if(event.which == 50)
+        $("#zone_2").click();
+    
+    // 3 --> [Zone 3]
+    else if(event.which == 51)
+        $("#zone_3").click();
+
+    // 4 --> [Zone 4]
+    else if(event.which == 52)
+        $("#zone_4").click();
+
+    // 5 --> [Zone 5]
+    else if(event.which == 53)
+        $("#zone_5").click();
+
+    // 6 --> [Zone 6]
+    else if(event.which == 54)
+        $("#zone_6").click();
+
+    // p --> [Plot Route]
+    else if(event.which == 112)
+        $("#plot").click();
+});
+
+/**
 * Handles the clicking of toolbar buttons by detecting the button clicked and calling its associated function.
 * This particularly handles elements on the toolbar that are not entrance movement identification elements.
 */
@@ -7,26 +44,45 @@ $("#toolbar div").click(function(){
 
     if(button_id == "zone_1") {
         enableZoneDraw(1);
+        dimPlotModeButtons();
         updateTerminal("Zone draw enabled for Zone 1.");
     }
 
-    if(button_id == "zone_2")
+    if(button_id == "zone_2") {
         enableZoneDraw(2);
+        dimPlotModeButtons();
+        updateTerminal("Zone draw enabled for Zone 2.");
+    }
     
-    if(button_id == "zone_3")
+    if(button_id == "zone_3") {
         enableZoneDraw(3);
+        dimPlotModeButtons();
+        updateTerminal("Zone draw enabled for Zone 3.");
+    }
     
-    if(button_id == "zone_4")
+    if(button_id == "zone_4") {
         enableZoneDraw(4); 
+        dimPlotModeButtons();
+        updateTerminal("Zone draw enabled for Zone 4.");
+    }
 
-    if(button_id == "zone_5")
+    if(button_id == "zone_5") {
         enableZoneDraw(5);
+        dimPlotModeButtons();
+        updateTerminal("Zone draw enabled for Zone 5.");
+    }
     
-    if(button_id == "zone_6")
+    if(button_id == "zone_6") {
         enableZoneDraw(6);
+        dimPlotModeButtons();
+        updateTerminal("Zone draw enabled for Zone 6.");
+    }
    
-    if(button_id == "plot")
+    if(button_id == "plot") {
         enablePlotMode();
+        dimDrawModeButtons();
+        updateTerminal("Plot mode enabled.");
+    }
 
     if(button_id == "done")
         saveRoute();
@@ -38,13 +94,11 @@ $("#toolbar div").click(function(){
         clearCanvas();
 
     if(button_id == "import") {
-        overwriteMovementBlockPrevColor("#94B95B");
         triggerUpload(); 
     }
 
     if(button_id == "export")
         exportToCSV();
-
 
     if($(this).attr("id") == "terminal")
         return;
@@ -73,13 +127,6 @@ $(".mvt_ids").click(function() {
     lastAtRouteNumber = num_id;
 });
 
-/**
-* Every time the mouse moves in the canvas, store its position as to be most accurate when drawing in zones.
-*/
-$("#canvas").mousemove(function(mouseevent) {
-    relX = mouseevent.pageX;
-    relY = mouseevent.pageY;
-});
 
 /**
 *
@@ -147,13 +194,17 @@ $("#canvas").click(function(e) {
         updateTerminal("No zone has been selected to draw.");
 });
 
+/**
+* Every time the mouse moves in the canvas, store its position as to be most accurate when drawing in zones.
+*/
+$("#canvas").mousemove(function(mouseevent) {
+    relX = mouseevent.pageX;
+    relY = mouseevent.pageY;
+});
 
 /////////////////////////////////////////////////////////////////////////////////////////
 
-/**
- * Clicking on the terminal is reserved for testing and experimentation.
- */
-$("#terminal").click(function() {
-    console.log(totalRoutes);
-    console.log(currentRoute);
+
+$(window).keypress(function(event) {
+    console.log(event.which);
 });
