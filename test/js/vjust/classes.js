@@ -438,10 +438,10 @@ class Direction {
         this._TCU_vols             = new DetailedVolume(this._cardinal_direction, -1, -1, -1);
         this._address              = [intersection_id, zone_id, direction_id];
 
-        this._route                = new Object();
-        this._route.left           = new MovementRoute(this._address.push(0));
-        this._route.through        = new MovementRoute(this._address.push(1));
-        this._route.right          = new MovementRoute(this._address.push(2));
+        //this._route                = new Object();
+        //this._route.left           = new MovementRoute(this._address.push(0));
+        //this._route.through        = new MovementRoute(this._address.push(1));
+        //this._route.right          = new MovementRoute(this._address.push(2));
         // experimentation
         //this.randomizeEntries();
     }
@@ -675,7 +675,7 @@ class ModalFactory {
 
     /**
      * Returns the image size descriptior to be used in the generation of the modal.
-     * @retunrs {string} The stored image size
+     * @returns {string} The stored image size
      */
     getImageSize() {
         return this._image_size;
@@ -1354,7 +1354,7 @@ class DetailedPercentage {
     }
 
     getRight() {
-        reutnr this._right_perc;
+        return this._right_perc;
     }
 }
 
