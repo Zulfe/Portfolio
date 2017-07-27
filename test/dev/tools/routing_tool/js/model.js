@@ -250,6 +250,7 @@ var getZonePos = function(zone_num) {
 */
 var exportToCSV = function() {
     if(route_number < 11) {
+        console.log(route_number);
         updateTerminal("You haven't completed all twelve movements for this intersection.");
         return;
     }
