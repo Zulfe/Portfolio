@@ -1,0 +1,472 @@
+<head>
+    <link rel="stylesheet" type="text/css" href="Semantic-UI-master/dist/semantic.css">
+    <script type="text/javascript" src="js/semantic.js"></script>
+</head>
+
+<style>
+    .input.tab.content.container {
+        border: 2px solid orange;
+        height: 100%;
+        width: 100%;
+        position: relative;
+    }
+    .input.tab.content.table {
+        height: 40%;
+        width: 30%;
+
+        display: inline-block;
+
+        position: absolute;
+        left: 2%;
+        top: 3%;
+    }
+    .input.tab.content.table table, .input.tab.content.table-extended table {
+        background-color: #DDDDDD;
+        height: 100%;
+        width: 100%;
+        text-align: center;
+    }
+
+    .input.tab.content.table > table,
+    .input.tab.content.table-extended > table
+    {
+        border: 2px solid #005DAA;
+    }
+
+    .input.tab.content.table th {
+        text-align: center;
+    }
+
+    .input.tab.content.table td:not(:last-child),
+    .input.tab.content.table-extended td:not(:last-child)
+    {
+        border-right: 1px solid black;
+    }
+
+    .input.tab.content.table tr:not(:last-child),
+    .input.tab.content.table-extended tr:not(:last-child)
+    {
+        border-bottom: 1px solid black;
+    }
+
+    .input.tab.content.table > table > thead,
+    .input.tab.content.table-extended > table > thead
+    {
+        background-color: #005DAA;
+        height: 8%;
+        
+        color: white;
+        font-family: monospace;
+        font-size: 1.15em;
+    }
+
+    .input.tab.content.table .perc-input {
+        width: 13%;
+    }
+
+
+    /*
+    * Nested Tables
+    */
+
+    .input.tab.content.nested-table-container {
+        width: 65%;
+    }
+
+    .input.tab.content.nested-table > thead {
+        border-bottom: 1px solid black;
+    }
+
+    .input.tab.content.nested-table td {
+        width: 33.3333%;
+    }
+
+    .input.tab.content.directional.nested-table td {
+        height: inherit;
+    }
+
+    .input.tab.content.directional.nested-table td img { 
+        height: 5em;
+        width: auto;
+
+        margin-top: -13%;
+        margin-bottom: -13%;
+    }
+
+    .input.tab.content.directional.nested-table tr:last-child {
+        height: 80%;
+    }
+
+    .input.tab.content.directional.nested-table tr:first-child {
+        border-bottom: none !important;
+    }
+
+    /*
+    * Extended Table
+    */
+
+    .input.tab.content.intersection.table-extended {
+        height: 20%;
+        width: 30%;
+
+        top: 45%;
+        left: 2%;
+
+        position: absolute;
+    }
+
+    .input.tab.content.intersection.table-extended table td:not(:first-child):not(:last-child) {
+        width: 21.6667%;
+    }
+
+    .input.tab.content.intersection.table-extended > table td:last-child {
+        width: 13%;
+    }
+
+    .input.tab.content.nested-table-extended td {
+        width: 50% !important;
+    }
+
+
+
+
+    /*
+    * Intersection View
+    */
+
+    .input.tab.content.intersection.view {
+        height: 90%;
+        width: 65%;
+
+        top: 3%;
+        right: 2%;
+
+        display: inline-block;
+
+        position: absolute;
+
+        border: 1px solid red;
+    }
+
+    .input.tab.content.intersection.internal.container {
+        height: 100%;
+        width: 100%;
+
+        position: relative;
+    }
+
+    .input.tab.content.intersection.internal.background {
+        height: 100%;
+        width: 100%;
+    }
+
+    .input.tab.content.intersection.internal.context-point-one {
+        position: absolute;
+        top: 5.4%;
+        left: 0.8%;
+
+        height: 27.2%;
+        width: 32.5%;
+    }
+
+    .input.tab.content.intersection.internal.context-point-two {
+        position: absolute;
+        top: 5.4%;
+        right: 0.7%;
+
+        height: 27%;
+        width: 32.5%;
+    }
+
+    .input.tab.content.intersection.internal.context-point-three {
+        position: absolute;
+        bottom: 9.5%;
+        left: 0.7%;
+
+        height: 27%;
+        width: 32.8%;
+    }
+
+    .input.tab.content.intersection.internal.context-point-four {
+        position: absolute;
+        bottom: 9%;
+        right: 0.7%;
+
+        height: 28%;
+        width: 32.5%;
+    }
+
+    .input.tab.content.intersection.internal.vertflex {
+        position: relative;
+        height: 100%;
+        width: 100%;
+    }
+
+    .input.tab.content.intersection.internal.vertflex span {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+
+        font-size: 1.5vw;
+    }
+
+    /*
+    * Approach Containers
+    */
+    .input.tab.content.intersection.internal.approach.southbound {
+        position: absolute;
+        transform: rotate(180deg);
+        
+        top: 25%;
+        left: 39%;
+
+        height: 12%;
+        width: 22%;
+    }
+
+    .input.tab.content.intersection.internal.approach.westbound {
+        position: absolute;
+        transform: rotate(-90deg);
+
+        top: 45%;
+        left: 59%;
+
+        height: 12%;
+        width: 19%;
+    }
+
+    .input.tab.content.intersection.internal.approach.northbound {
+        position: absolute;
+
+        bottom: 26%;
+        left: 39.3%;
+
+        height: 11%;
+        width: 21%;
+    }
+
+    .input.tab.content.intersection.internal.approach.eastbound {
+        position: absolute;
+        transform: rotate(90deg);
+
+        top: 45.5%;
+        left: 22.5%;
+
+        height: 11%;
+        width: 19%;
+    }
+
+</style>
+
+<div class="input tab content container">
+    <div class="input tab content table">
+        <table>
+            <thead>
+                <tr>
+                    <th colspan="3">Traffic Volume Demand</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Direction</td>
+                    <td class="input tab content nested-table-container">
+                        <table class="input tab content directional nested-table">
+                            <thead>
+                                <tr>
+                                    <th colspan="3">Volume (vehicles per hour)</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>Left</td>
+                                    <td>Through</td>
+                                    <td>Right</td>
+                                </tr>
+                                <tr>
+                                    <td><img src="assets/arrows/arrow_left.svg"></td>
+                                    <td><img src="assets/arrows/arrow_through.svg"</td>
+                                    <td><img src="assets/arrows/arrow_right.svg"</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </td>
+                    <td>Truck Percent (%)</td>
+                </tr>
+                <tr>
+                    <td>Eastbound</td>
+                    <td class="input tab content nested-table-container">
+                        <table class="input tab content nested-table">
+                            <tr>
+                                <td>0</td>
+                                <td>0</td>
+                                <td>0</td>
+                            </tr>
+                        </table>
+                    </td>
+                    <td class="perc-input">0.00%</td>
+                </tr>
+                <tr>
+                    <td>Westbound</td>
+                    <td class="input tab content nested-table-container">
+                        <table class="input tab content nested-table">
+                            <tr>
+                                <td>0</td>
+                                <td>0</td>
+                                <td>0</td>
+                            </tr>
+                        </table>
+                    </td>
+                    <td class="perc-input">0.00%</td>
+                </tr>
+                <tr>
+                    <td>Southbound</td>
+                    <td class="input tab content nested-table-container">
+                        <table class="input tab content nested-table">
+                            <tr>
+                                <td>0</td>
+                                <td>0</td>
+                                <td>0</td>
+                            </tr>
+                        </table>
+                    </td>
+                    <td class="perc-input">0.00%</td>
+                </tr>
+                <tr>
+                    <td>Northbound</td>
+                    <td class="input tab content nested-table-container">
+                        <table class="input tab content nested-table">
+                            <tr>
+                                <td>0</td>
+                                <td>0</td>
+                                <td>0</td>
+                            </tr>
+                        </table>
+                    </td>
+                    <td class="perc-input">0.00%</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div class="input tab content intersection table-extended">
+        <table>
+            <thead>
+                <tr>
+                    <th colspan="5">Extended Details</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                <tr>
+                    <td>Adjustment Factor</td>
+                    <td>
+                        <table class="input tab content nested-table-extended">
+                            <tr>
+                                <td>0.80</td>
+                                <td>0.95</td>
+                            </tr>
+                        </table>
+                    </td>
+                    <td>
+                        X
+                    </td>
+                    <td>
+                        0.85
+                    </td>
+                    <td>
+                        X
+                    </td>
+                </tr>
+                <tr>
+                    <td>Suggested Value</td>
+                    <td>
+                        <table class="input tab content nested-table-extended">
+                            <tr>
+                                <td>0.80</td>
+                                <td>0.95</td>
+                            </tr>
+                        </table>
+                    </td>
+                    <td>
+                        X
+                    </td>
+                    <td>
+                        0.85
+                    </td>
+                    <td>
+                        X
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="2">Truck to PCE Factor</td>
+                    <td colspan="2">Suggested is 2.00</td>
+                    <td>2.00</td>
+                </tr>
+                <tr>
+                    <td colspan="2">Critical Lane Volume</td>
+                    <td colspan="3">1600</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div class="input tab content intersection view">
+        <div class="input tab content intersection internal container">
+            <img class="input tab content intersection internal background" src="assets/intersections/aerial_basic.svg" >
+            
+            <div class="input tab content intersection internal context-point-one">
+                <div class="input tab content intersection internal vertflex">
+                    <span>VCU Hospital</span>
+                </div>
+            </div>
+
+            <div class="input tab content intersection internal context-point-two">
+                <div class="input tab content intersection internal vertflex">
+                    <span></span>
+                </div>
+            </div>
+
+            <div class="input tab content intersection internal context-point-three">
+                <div class="input tab content intersection internal vertflex">
+                    <span>COV Annex</span>
+                </div>
+            </div>
+
+            <div class="input tab content intersection internal context-point-four">
+                <div class="input tab content intersection internal vertflex">
+                    <span>Monroe Building</span>
+                </div>
+            </div>
+
+            <div class="input tab content intersection internal approach southbound">
+
+            </div>
+
+            <div class="input tab content intersection internal approach westbound">
+
+            </div>
+
+            <div class="input tab content intersection internal approach northbound">
+
+            </div>
+
+            <div class="input tab content intersection internal approach eastbound">
+
+            </div>
+
+        
+        </div>
+    </div>
+
+
+
+
+</div>
+
+<script>
+    var southbound_approach = new ArrowLayout($(".input.tab.content.intersection.internal.approach.southbound"), "input-tab-viewer-southbound");
+    var westbound_approach  = new ArrowLayout($(".input.tab.content.intersection.internal.approach.westbound"), "input-tab-viewer-westbound");
+    var nortbound_approach  = new ArrowLayout($(".input.tab.content.intersection.internal.approach.northbound"), "input-tab-viewer-northbound");
+    var eastbound_approach  = new ArrowLayout($(".input.tab.content.intersection.internal.approach.eastbound"), "input-tab-viewer-eastbound");
+</script>

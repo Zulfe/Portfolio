@@ -1363,58 +1363,63 @@ class UserVolumeDefinitions {
     /**
      * A class to store and organize the user-defined data pulled from the initial volume table. Supports the storage of Fratar data alongside
      * user data.
-     * @param {DetailedVolume} north_detvol
-     * @param {DetailedVolume} east_detvol
-     * @param {DetailedVolume} south_detvol
-     * @param {DetailedVolume} west_detvol
-     * @param {double} north_truckperc 
-     * @param {double} east_truckperc
-     * @param {double} south_truckperc
-     * @param {double} west_truckperc
+     * @param {DetailedVolume} north_detvol A DetailedVolume object containing volumes for movements north of the intersection
+     * @param {DetailedVolume} east_detvol A DetailedVolume object containing volumes for movements east of the intersection
+     * @param {DetailedVolume} south_detvol A DetailedVolume object containing volumes for movements south of the intersection
+     * @param {DetailedVolume} west_detvol A DetailedVolume object containing volumes for movements west of the intersection.
+     * @param {double} north_truckperc A number between 0 and 1 representing the percentage of trucks for all movements north of the intersection
+     * @param {double} east_truckperc A number between 0 and 1 representing the percentage of trucks for all movements east of the intersection
+     * @param {double} south_truckperc A number between 0 and 1 representing the percentage of trucks for all omvements south of the intersection
+     * @param {double} west_truckperc A number between 0 and 1 representing the percentage of trucks for all movements west of the intersection
      */
     constructor(north_detvol, east_detvol, south_detvol, west_detvol, north_truckperc, east_truckperc, south_truckperc, west_truckperc) {
         this._user_defined_north_volumes = north_detvol;
-        this._user_defined_east_volumes = east_detvol;
+        this._user_defined_east_volumes  = east_detvol;
         this._user_defined_south_volumes = south_detvol;
-        this._user_defined_west_volumes = west_detvol;
+        this._user_defined_west_volumes  = west_detvol;
 
         this._user_defined_general_north_truck_perc = north_truckperc;
-        this._user_defined_general_east_truck_perc = east_truckperc;
+        this._user_defined_general_east_truck_perc  = east_truckperc;
         this._user_defined_general_south_truck_perc = south_truckperc;
-        this._user_defined_general_west_truck_perc = west_truckperc;
+        this._user_defined_general_west_truck_perc  = west_truckperc;
 
+        // A flag that, when true, signifies that Fratar volumes should be provided when getting object data. This is set to true whenever
+        // Fratar volumes are defined.
         this._using_fratar = false;
+        // A flag that, when true, signifies that DetailedPercentage objects have been provided, either from the user or from Fratar. This
+        // dictates whether detailed or general percentages should be provided. This is set to true whenever specific volumes, from the user
+        // or from Fratar, are defined.
         this._specific_truck_percs_defined = false;
     }
 
     /**
      * Add to this object variables storing user-defined per-lane truck percentages. This will also enable the flag for specific percentages.
-     * @param {DetailedPercentage} north_detperc
-     * @param {DetailedPercentage} east_detperc
-     * @param {DetailedPercentage} south_detperc
-     * @param {DetailedPercetnage} west_detperc
+     * @param {DetailedPercentage} north_detperc The DetailedPercentage object containing percentages for movements north of the intersection
+     * @param {DetailedPercentage} east_detperc The DetailedPercentage object containing percentages for movements east of the intersection
+     * @param {DetailedPercentage} south_detperc The DetailedPercentage object containing percentages for movements south of the intersection
+     * @param {DetailedPercetnage} west_detperc The DetailedPercentage object containing percentages for movements west of the intersection
      */
     defineUserSpecificTruckPercentages(north_detperc, east_detperc, south_detperc, west_detperc) {
         this._user_defined_specific_north_truck_perc = north_detperc;
-        this._user_defined_specific_east_truck_perc = east_detperc;
+        this._user_defined_specific_east_truck_perc  = east_detperc;
         this._user_defined_specific_south_truck_perc = south_detperc;
-        this._user_defined_specific_west_truck_perc = west_detperc;
+        this._user_defined_specific_west_truck_perc  = west_detperc;
         
         this._specific_truck_percs_defined = true;
     }
 
     /**
      * Add to this object variables storing Fratar-defined per-lane truck percentages. This will also enable the flag for specific percentages.
-     * @param {DetailedPercentage} north_detperc
-     * @param {DetailedPercentage} east_detperc
-     * @param {DetailedPercentage} south_detperc
-     * @param {DetailedPercetnage} west_detperc
+     * @param {DetailedPercentage} north_detperc The DetailedPercentage object containing percentages for movements north of the intersection
+     * @param {DetailedPercentage} east_detperc The DetailedPercentage object containing percentages for movements east of the intersection
+     * @param {DetailedPercentage} south_detperc The DetailedPercentage object containing percentages for movements south of the intersection
+     * @param {DetailedPercetnage} west_detperc The DetailedPercentage object containing percentages for movements west of the intersection
      */
     defineFratarSpecificTruckPercentages(north_detperc, east_detperc, south_detperc, west_detperc) {
         this._fratar_defined_specific_north_truck_perc = north_detperc;
-        this._fratar_defined_specific_east_truck_perc = east_detperc;
+        this._fratar_defined_specific_east_truck_perc  = east_detperc;
         this._fratar_defined_specific_south_truck_perc = south_detperc;
-        this._fratar_defined_specific_west_truck_perc = west_detperc;
+        this._fratar_defined_specific_west_truck_perc  = west_detperc;
         
         this._specific_truck_percs_defined = true;
     }
@@ -1424,7 +1429,7 @@ class UserVolumeDefinitions {
      * be returned. If not, the general percentages will
      *
      */
-    getUserDefinedTruckPercentages() {
+    getTruckPercentages() {
         if(this.isUsingFratar()) {
             if(this.isSpecificTruckPercsDefined()) {
                 // return fratar-defined specific truck percentages
@@ -1463,10 +1468,20 @@ class UserVolumeDefinitions {
         }
     }
 
+    /**
+     * Enable or disable the use of Fratar volumes.
+     * @param {boolean} state <tt>true</tt> for using Fratar volumes; <tt>false</tt> for using user-defined volumes
+     * Note: This function currently does not have any support for undefined variable error control. If no Fratar volumes have been defined
+     * and this is set to true, this object will attempt to return an undefined variable. Error control needs to be added!
+     */
     setUsingFratarVolumes(state) {
-        this._using_fratar = false;
+        this._using_fratar = state;
     }
 
+    /**
+     *
+     *
+     */
     setFratarParameters(north_detvol, east_detvol, south_detvol, west_detvol, north_truckperc, east_truckperc, south_truckperc, west_truckperc) {
         this._fratar_defined_north_volumes = north_detvol;
         this._fratar_defined_east_volumes  = east_detvol;
@@ -1474,11 +1489,15 @@ class UserVolumeDefinitions {
         this._fratar_defined_west_volumes  = west_detvol;
 
         this._fratar_defined_general_north_truck_perc = north_truckperc;
-        this._fratar_defined_general_east_truck_perc = east_truckperc;
+        this._fratar_defined_general_east_truck_perc  = east_truckperc;
         this._fratar_defined_general_south_truck_perc = south_truckperc;
-        this._fratar_defined_general_west_truck_perc = west_truckperc;
+        this._fratar_defined_general_west_truck_perc  = west_truckperc;
     }
 
+    /**
+     * Return a state value stating if Fratar values are the current focus of the 
+     *
+     */
     isUsingFratar() {
         return this._using_fratar;
     }

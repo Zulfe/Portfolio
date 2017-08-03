@@ -14,14 +14,15 @@ var dimPlotModeButtons = function() {
 
     $("#zone_1, #zone_2, #zone_3, #zone_4, #zone_5, #zone_6").removeClass("dimmed_zone");
     $("#clear").removeClass("dimmed_clear");
+    $("#plot").removeClass("dimmed_plot");
 }
 
 var dimDrawModeButtons = function() {
+    $("#plot").addClass("dimmed_plot");
     $("#done").removeClass("dimmed_write");
     $("#clear_route").removeClass("dimmed_clearroute");
 
     $("#zone_1, #zone_2, #zone_3, #zone_4, #zone_5, #zone_6").addClass("dimmed_zone");
-    $("#clear").addClass("dimmed_clear");
 }
 
 // !!! THIS FUNCTION CAN BUT SHOULDN'T APPLY TO ALL TOOLBAR ACTION BUTTONS. THIS SHOULD ONLY WORK FOR ROUTE CONFIGURATION BUTTONS !!!
@@ -70,7 +71,8 @@ var clearCanvas = function() {
     // Set the latest incomplete route and latest accessed route numbers to SBL.
     route_number, lastAtRouteNumber = 0;
     // Set the application's mode to nothing. Clicks to the canvas are ignored.
-    zoneDrawEnabled, plotModeEnabled, plottingStarted = false;
+    plotModeEnabled, plottingStarted = false;
+    zoneDrawEnabled = true;
     
     // Set the draw state of all zones to false. None of the zones are drawn now.
     zonesDrawn = [false, false, false, false, false, false];
@@ -82,8 +84,9 @@ var clearCanvas = function() {
     // Remove all zone blocks and their contents from the canvas.
     $("#canvas").children().remove();
     // Set the background color of all entrance blocks on the toolbar to gray.
-    updateMovementBlocks("#CCCCCC");
-    updateTerminal("The canvas has been cleared");
+    updateMovementBlocksColor("#CCCCCC");
+    $("#zone_1").click();
+    updateTerminal("The canvas has been cleared. Enabling drawing for Zone 1.");
 }
 
 // !!! resetArrow() REQUIRES AN ARROW ELEMENT AND AN APPROACH 

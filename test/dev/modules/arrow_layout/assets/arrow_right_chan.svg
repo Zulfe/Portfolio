@@ -15,7 +15,7 @@
    version="1.1"
    id="svg8"
    inkscape:version="0.92.1 r15371"
-   sodipodi:docname="Arrow_Crv_Right.svg">
+   sodipodi:docname="Arrow_Chan_Crv_Right.svg">
   <defs
      id="defs2">
     <inkscape:path-effect
@@ -223,5 +223,11 @@
          d="m 101.32817,204.45428 c 7.3409,-12.62517 14.90522,-25.72394 14.89336,-25.79011 -0.008,-0.0456 -5.57715,-0.0697 -12.37549,-0.0536 -6.798335,0.0162 -14.017678,0.0326 -16.042976,0.0365 l -3.682392,0.007 c 9.699764,6.34017 15.252125,16.4008 16.047498,27.79509 z"
          style="stroke-width:0.12012127" />
     </g>
+    <path
+       style="fill:#000000;stroke:none;stroke-width:0.29773211px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       d="M 47.820785,210.43729 V 177.84584 H 94.491752 C 67.793951,184.70719 55.850198,195.8569 47.820785,210.43729 Z"
+       id="path4499"
+       inkscape:connector-curvature="0"
+       sodipodi:nodetypes="cccc" />
   </g>
 </svg>

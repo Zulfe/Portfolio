@@ -1,4 +1,4 @@
-var zoneDrawEnabled = false;
+var zoneDrawEnabled = true;
 var plotModeEnabled = false;
 var plottingStarted = false;
 

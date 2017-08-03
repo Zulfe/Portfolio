@@ -42,63 +42,69 @@ $(window).keypress(function(event) {
 $("#toolbar div").click(function(){
     var button_id = $(this).attr("id");
 
-    if(button_id == "zone_1") {
-        enableZoneDraw(1);
-        dimPlotModeButtons();
-        updateTerminal("Zone draw enabled for Zone 1.");
-    }
+    if(zoneDrawEnabled) {
+        if(button_id == "zone_1") {
+            enableZoneDraw(1);
+            dimPlotModeButtons();
+            updateTerminal("Zone draw enabled for Zone 1.");
+        }
 
-    if(button_id == "zone_2") {
-        enableZoneDraw(2);
-        dimPlotModeButtons();
-        updateTerminal("Zone draw enabled for Zone 2.");
-    }
-    
-    if(button_id == "zone_3") {
-        enableZoneDraw(3);
-        dimPlotModeButtons();
-        updateTerminal("Zone draw enabled for Zone 3.");
-    }
-    
-    if(button_id == "zone_4") {
-        enableZoneDraw(4); 
-        dimPlotModeButtons();
-        updateTerminal("Zone draw enabled for Zone 4.");
-    }
+        if(button_id == "zone_2") {
+            enableZoneDraw(2);
+            dimPlotModeButtons();
+            updateTerminal("Zone draw enabled for Zone 2.");
+        }
+        
+        if(button_id == "zone_3") {
+            enableZoneDraw(3);
+            dimPlotModeButtons();
+            updateTerminal("Zone draw enabled for Zone 3.");
+        }
+        
+        if(button_id == "zone_4") {
+            enableZoneDraw(4); 
+            dimPlotModeButtons();
+            updateTerminal("Zone draw enabled for Zone 4.");
+        }
 
-    if(button_id == "zone_5") {
-        enableZoneDraw(5);
-        dimPlotModeButtons();
-        updateTerminal("Zone draw enabled for Zone 5.");
-    }
-    
-    if(button_id == "zone_6") {
-        enableZoneDraw(6);
-        dimPlotModeButtons();
-        updateTerminal("Zone draw enabled for Zone 6.");
+        if(button_id == "zone_5") {
+            enableZoneDraw(5);
+            dimPlotModeButtons();
+            updateTerminal("Zone draw enabled for Zone 5.");
+        }
+        
+        if(button_id == "zone_6") {
+            enableZoneDraw(6);
+            dimPlotModeButtons();
+            updateTerminal("Zone draw enabled for Zone 6.");
+        }
+
+        if(button_id == "plot") {
+            enablePlotMode();
+            dimDrawModeButtons();
+            updateTerminal("Plot mode enabled.");
+        }
     }
    
-    if(button_id == "plot") {
-        enablePlotMode();
-        dimDrawModeButtons();
-        updateTerminal("Plot mode enabled.");
+    if(plotModeEnabled) {
+        if(button_id == "done")
+            saveRoute();
+
+        if(button_id == "clear_route")
+            clearRoute();
+
+        if(button_id == "clear")
+            clearCanvas();
+
+        if(button_id == "export")
+            exportToCSV();
     }
 
-    if(button_id == "done")
-        saveRoute();
-
-    if(button_id == "clear_route")
-        clearRoute();
+    if(button_id == "import")
+        triggerUpload(); 
 
     if(button_id == "clear")
         clearCanvas();
-
-    if(button_id == "import") {
-        triggerUpload(); 
-    }
-
-    if(button_id == "export")
-        exportToCSV();
 
     if($(this).attr("id") == "terminal")
         return;

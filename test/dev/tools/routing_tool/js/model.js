@@ -281,7 +281,7 @@ var exportToCSV = function() {
    
     for(var route = 0; route < totalRoutes.length; route++) {
         for(var node = 0; node < totalRoutes[route].length; node++) {
-            csvContent += route + 1;
+            csvContent += route;
             csvContent += ", " + totalRoutes[route][node][0] + ", " + totalRoutes[route][node][1] + ", " + totalRoutes[route][node][2];
             if(node != 0)
                 csvContent += ", " + totalRoutes[route][node - 1][0] + ", " + totalRoutes[route][node - 1][1] + ", " + totalRoutes[route][node - 1][2];

@@ -1,8 +1,99 @@
 
-//// [SUBSECTION] ////// [SIDEBAR >> HEADERS] ///////
+$("#piMenu").prepend(
+"<div class='ui item'>" +
+"    <div class='ui input corner labeled'>"+
+"        <input type='text' id='projNameInput' class='wideInput' placeholder='My VJUST Project'>"+
+"        <div id='projNameHelpClickable' class='ui corner label'>"+
+"            <i class='help icon'></i>"+
+"        </div>"+
+"    </div>"+
+"</div>"+
+"<div class='ui item'>"+
+"    <div class='ui input corner labeled'>"+
+"        <input type='text' id='interNameInput' class='wideInput' placeholder='Intersection Name'>"+
+"        <div id='interNameHelpClickable' class='ui corner label'>"+
+"            <i class='help icon'></i>"+
+"        </div>"+
+"    </div>"+
+"</div>"+
+"<div class='ui item'>"+
+"    <div class='ui input corner labeled'>"+
+"        <input type='text' id='nRouteNameInput' class='wideInput' placeholder='N Route Name'>"+
+"        <div id='northRouteNameHelpClickable' class='ui corner label'>"+
+"            <i class='help icon'></i>"+
+"        </div>"+
+"    </div>"+
+"</div>"+
+"<div class='ui item'>"+
+"    <div class='ui input corner labeled'>"+
+"        <input type='text' id='sRouteNameInput' class='wideInput' placeholder='S Route Name'>"+
+"        <div id='southRouteNameHelpClickable' class='ui corner label'>"+
+"            <i class='help icon'></i>"+
+"        </div>"+
+"    </div>"+
+"</div>"+
+"<div class='ui item'>"+
+"    <div class='ui input corner labeled'>"+
+"        <input type='text' id='eRouteNameInput' class='wideInput' placeholder='E Route Name'>"+
+"        <div id='eastRouteNameHelpClickable' class='ui corner label'>"+
+"            <i class='help icon'></i>"+
+"        </div>"+
+"    </div>"+
+"</div>"+
+"<div class='ui item'>"+
+"    <div class='ui input corner labeled'>"+
+"        <input type='text' id='wRouteNameInput' class='wideInput' placeholder='W Route Name'>"+
+"        <div id='westRouteNameHelpClickable', class='ui corner label'>"+
+"            <i class='help icon'></i>"+
+"        </div>"+
+"    </div>"+
+"</div>"+
+"<div class='ui item'>"+
+"    <div class='ui input corner labeled'>"+
+"        <input type='text' id='cpOneNameInput' class='wideInput' placeholder='Context Point One'>"+
+"        <div class='ui corner label'>"+
+"            <i class='help icon'></i>"+
+"        </div>"+
+"    </div>"+
+"</div>"+
+"<div class='ui item'>"+
+"    <div class='ui input corner labeled'>"+
+"        <input type='text' class='wideInput' placeholder='Context Point Two'>"+
+"        <div class='ui corner label'>"+
+"            <i class='help icon'></i>"+
+"        </div>"+
+"    </div>"+
+"</div>"+
+"<div class='ui item'>"+
+"    <div class='ui input corner labeled'>"+
+"        <input type='text' class='wideInput' placeholder='Context Point Three'>"+
+"        <div class='ui corner label'>"+
+"            <i class='help icon'></i>"+
+"        </div>"+
+"    </div>"+
+"</div>"+
+"<div class='ui item'>"+
+"    <div class='ui input corner labeled'>"+
+"        <input type='text' class='wideInput' placeholder='Context Point Four'>"+
+"        <div class='ui corner label'>"+
+"            <i class='help icon'></i>"+
+"        </div>"+
+"    </div>"+
+"</div>");
 
-// When a menu header is clicked, reveal the content inside.
-// When it is clicked when open, hide the content.
+// Add content to the Application Settings menu now that it is hidden.
+$("#appSettMenu").prepend(
+"<div class='ui item'> "+
+"    <div class='ui slider checkbox'> "+
+"        <input id='tooltipsToggleswitch' type='checkbox' name='tooltipsToggle'> "+
+"        <label>Disable Tooltips</label> "+
+"    </div> "+
+"    <div class='ui item'><div id='restore_from_cookies' class='ui button'>Restore From Cookies</div></div>" +
+"</div>");
+
+/**
+ * When a menu header is clicked, reveal the content inside. When it is clicked and already visible, hide the content.
+ */
 $("#introItemHeader").click(function(){
     $(".introMenu").transition("slide down");
 });
@@ -13,42 +104,38 @@ $("#appSettHeader").click(function(){
     $("#appSettMenu").transition("slide down");
 });
 
-//// [\SUBSECTION] ////// [SIDEBAR >> HEADERS] //////
-
-//// [SUBSECTION] ////// [HELP MODALS] //////
-
+/**
+ * Use the ModalFactory class to create a new modal ID'd cookies_found. It has no image and no YouTube URL to load a video from.
+ * Ideally all current help modals will be converted into ModalFactory objects that can be manipulated.
+ */
 var modalfac = new ModalFactory("cookies_found", "We found a backup!", "null", "null", "null", "Hooray! We found a backup. We've automatically applied the settings to your current" +
                                 " configuration!", "Hooray!");
 
-$("#projNameHelpClickable").click(function(){
+/**
+ * When a input box help clickable is clicked, open the corresponding help modal.
+ * Input box clickables are tags found in the upper right-hand corner of the box, and feature a question-mark icon.
+ */
+$("#projNameHelpClickable").click(function() {
     $("#projNameHelp").modal("show");
 });
-$("#interNameHelpClickable").click(function(){
+$("#interNameHelpClickable").click(function() {
     $("#interNameHelp").modal("show");
 });
-$("#northRouteNameHelpClickable").click(function(){
-    console.log("clicked nroutenamehelp");
+$("#northRouteNameHelpClickable").click(function() {
     $("#nsRouteNameHelp").modal("show");
 });
-
-$("#northRouteNameHelpClickable").click(function() { console.log("CLICK!"); });
-
-$("#southRouteNameHelpClickable").click(function(){
+$("#southRouteNameHelpClickable").click(function() {
     $("#nsRouteNameHelp").modal("show");
 });
-$("#eastRouteNameHelpClickable").click(function(){
+$("#eastRouteNameHelpClickable").click(function() {
     $("#ewRouteNameHelp").modal("show");
 });
-$("#westRouteNameHelpClickable").click(function(){
+$("#westRouteNameHelpClickable").click(function() {
     $("#ewRouteNameHelp").modal("show");
 });
-$("#cpOneNameHelpClickable").click(function(){
+$("#cpOneNameHelpClickable").click(function() {
     $("#cpOneNameHelp").modal("show");
 });
-
-//// [\SUBSECTION] ////// [HELP MODALS] //////
-
-//// [SUBSECTION] ////// [TABS] //////
 
 /**
  * When a child of the Add Tab tab is clicked, identify the child clicked and open a new tab
@@ -64,23 +151,23 @@ $(".appPane div[data-tab='add_tab']").children().click(function(){
 });
 
 
-
+/**
+ * Note: This should be in globals.js
+ */
 var latestActive;
+/**
+ * When the user mouses over any of the tabs, find the tab that is active and store it in latestActive.
+ * This is done to improve the functionality and fluidity of the tabflow function. If mouseenter is used instead,
+ * rapid mouse movement can result in a failed loggings of the latest active tab.
+ */
 $(".appPane .secondary").on("mouseover", "a", function(){
-    var tab_tree = $(this).parent().children();
-    $(tab_tree).each(function(index, curChild) {
-        if($(curChild).hasClass("active"))
-            latestActive = curChild;
-    });
-    console.log("JUST SET LATEST ACTIVE AS: "); console.log(latestActive);
+    latestActive = $(this).parent().children(".active");
 });
 
 var tabflow = function(tab_element) {
     var tab_tree = $(tab_element).parent();
     var num_tabs = $(tab_tree).children().length;
    
-    
-
     if(!($(tab_element)[0] == $(latestActive)[0])) {
         console.log("Tab to be closed is not active tab!");
         return latestActive;
@@ -111,33 +198,8 @@ $(".appPane .secondary").on("click", "i", function(){
     $(".appPane .menu .item").tab();
 });
 
-/**
- * When the user's mouse is over a tab, except for the Add Tab tab, identify the focused tab
- * and create a right click menu that contains a "Close Tab" button to close that tab.
- */
-/*
-$(".appPane .secondary").on("mouseover", "a.item:not([data-tab='add_tab'])", function() {
-    var focusedElem = $(this).attr("data-tab");
-    var menuDefinition = [{
-        name: 'Close Tab',
-        title: 'Close this tab...',
-        fun: function() {
-            $(".appPane a[data-tab='" + focusedElem + "']").remove();
-            $(".appPane .menu .item").tab();
-        }
-    }];
-    $(".appPane .secondary a").not("a[data-tab='add_tab']").contextMenu(menuDefinition, {
-        triggerOn:  'click',
-        mouseClick: 'right',
-        displayAround: 'cursor'
-    });
-});
-*/
-
-
 var freewall = new Freewall(".appPane div[data-tab='add_tab']");
 freewall.fitWidth();
-
 
 /**
  * When the Add Tab tab is clicked for the first time, animate the tab's content.
@@ -153,41 +215,6 @@ $(".appPane .secondary a[data-tab='add_tab'").click(function() {
 
 
 //////////////////////////////////////////////
-
-
-var arrows = [
-    {
-        name: "Left",
-        subMenu: [{
-            name: "",
-            img: "assets/arrows/arrow_left.svg",
-            fun: function() { alert("You just clicked the left arrow!"); }
-        }]
-    },
-    {
-        name: "Through",
-        subMenu: [{
-            name: "",
-            img: "assets/arrows/arrow_through.svg",
-            fun: function() { alert("You just clicked the through arrow!"); }
-        }]
-    },
-    {
-        name: "Right",
-        subMenu: [{
-            name: "",
-            img: "assets/arrows/arrow_right.svg",
-            fun: function() { alert("You just clicked the right arrow!"); }
-        }]
-    }
-];
-
-
-$(".segment").contextMenu(arrows, {
-    "triggerOn" : "click",
-    "mouseClick" : "right",
-    "centerAround" : "cursor"
-});
 
 
 

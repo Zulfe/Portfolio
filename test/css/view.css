@@ -9,7 +9,7 @@
 }
 
 .ui.inverted.menu {
-    background: #00325C;
+    background: #00325C !important;
 }
 
 .ui.slider.checkbox input:checked~.box:before {
@@ -36,4 +36,8 @@
 
 body {
     overflow-y: hidden !important;
+}
+
+.ui.bottom.attached.tab.segment {
+    padding: 0px 0px 0px 0px !important;
 }

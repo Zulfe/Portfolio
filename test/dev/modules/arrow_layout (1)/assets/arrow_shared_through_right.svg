@@ -9,13 +9,13 @@
    xmlns="http://www.w3.org/2000/svg"
    xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
    xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
-   width="51.058189mm"
+   width="65.552719mm"
    height="129.7144mm"
-   viewBox="0 0 51.058189 129.7144"
+   viewBox="0 0 65.552719 129.7144"
    version="1.1"
    id="svg8"
    inkscape:version="0.92.1 r15371"
-   sodipodi:docname="Arrow_Crv_Right.svg">
+   sodipodi:docname="Arrow_Thru_Right.svg">
   <defs
      id="defs2">
     <inkscape:path-effect
@@ -156,23 +156,23 @@
      borderopacity="1.0"
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
-     inkscape:zoom="1.0147726"
-     inkscape:cx="-237.19694"
-     inkscape:cy="237.29905"
+     inkscape:zoom="2.0295451"
+     inkscape:cx="-23.824735"
+     inkscape:cy="245.12955"
      inkscape:document-units="mm"
      inkscape:current-layer="layer1"
      showgrid="false"
      inkscape:pagecheckerboard="false"
-     inkscape:window-width="1366"
-     inkscape:window-height="706"
-     inkscape:window-x="2936"
-     inkscape:window-y="624"
+     inkscape:window-width="1920"
+     inkscape:window-height="1178"
+     inkscape:window-x="1272"
+     inkscape:window-y="-8"
      inkscape:window-maximized="1"
      inkscape:snap-bbox="true"
      inkscape:bbox-paths="false"
      inkscape:snap-bbox-midpoints="false"
      objecttolerance="10000"
-     inkscape:snap-global="false"
+     inkscape:snap-global="true"
      inkscape:object-paths="true"
      inkscape:object-nodes="true"
      inkscape:snap-smooth-nodes="false"
@@ -185,8 +185,8 @@
     <inkscape:grid
        type="xygrid"
        id="grid3815"
-       originx="-47.820786"
-       originy="0.00018935017" />
+       originx="-33.326251"
+       originy="0.00019059528" />
   </sodipodi:namedview>
   <metadata
      id="metadata5">
@@ -204,7 +204,23 @@
      inkscape:label="Layer 1"
      inkscape:groupmode="layer"
      id="layer1"
-     transform="translate(-47.820785,-167.2858)">
+     transform="translate(-33.326253,-167.2858)">
+    <g
+       id="g4811"
+       transform="translate(3.508967e-6,1.15698e-6)">
+      <path
+         sodipodi:nodetypes="scssccs"
+         inkscape:connector-curvature="0"
+         id="path3737"
+         d="m 34.478677,193.18458 c 7.293015,-12.72189 14.885698,-25.87583 14.949198,-25.89874 0.0438,-0.0158 2.860644,4.81472 6.259669,10.73449 3.399026,5.91977 7.009195,12.20577 8.022602,13.96887 l 1.842571,3.20567 c -10.382982,-5.25159 -21.918984,-5.02885 -32.226468,0 z"
+         style="stroke-width:0.12061331" />
+      <path
+         sodipodi:nodetypes="ccccccccc"
+         inkscape:connector-curvature="0"
+         id="path3741"
+         d="m 47.861265,245.41884 v -54.23815 h 1.578218 1.578218 v 54.23815 51.58136 h -1.578218 -1.578218 z"
+         style="fill:#000000;stroke-width:0.49003872" />
+    </g>
     <g
        id="g4765-1-1"
        transform="matrix(1.0040962,0,0,1.0040962,-17.818636,15.659575)">
