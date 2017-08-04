@@ -137,6 +137,9 @@ $("#cpOneNameHelpClickable").click(function() {
     $("#cpOneNameHelp").modal("show");
 });
 
+/**
+ * Input binds for context points one, two, three, and four.
+ */
 $("#cpOneNameInput").parent().on("input", function() {
     $(".input.tab.content.intersection.internal.context-point-one span").text($("#cpOneNameInput").val());
 });
@@ -150,23 +153,24 @@ $("#cpFourNameInput").parent().on("input", function() {
     $(".input.tab.content.intersection.internal.context-point-four span").text($("#cpFourNameInput").val());
 });
 
-
-$("#nRouteNameInput").parent().on("input", function() {
-    console.log("Got input from input parent.");
+/**
+ * Input binds for north, east, south, and west routes.
+ */
+$("#nRouteNameInput").on("input", function() {
+    project.setNorthRouteName($("#nRouteNameInput").val());
     $(".input.tab.content.intersection.internal.roadway.southbound p").text($("#nRouteNameInput").val());
 });
-$("#nRouteNameInput").on("input", function() {
-    console.log("Got input from input.");
+$("#eRouteNameInput").on("input", function() {
+    project.setEastRouteName($("#eRouteNameInput").val());
+    $(".input.tab.content.intersection.internal.roadway.westbound p").text($("#eRouteNameInput").val());
 });
-
-$("#wRouteNameInput").parent().on("input", function() {
-    $(".input.tab.content.intersection.internal.roadway.westbound p").text($("#wRouteNameInput").val());
+$("#sRouteNameInput").on("input", function() {
+    project.setSouthRouteName($("#sRouteNameInput").val());
+    $(".input.tab.content.intersection.internal.roadway.northbound p").text($("#sRouteNameInput").val());
 });
-$("#nRouteNameInput").parent().on("input", function() {
-    $(".input.tab.content.intersection.internal.roadway.northbound p").text($("#nRouteNameInput").val());
-});
-$("#eRouteNameInput").parent().on("input", function() {
-    $(".input.tab.content.intersection.internal.roadway.eastbound p").text($("#eRouteNameInput").val());
+$("#wRouteNameInput").on("input", function() {
+    project.setWestRouteName($("#wRouteNameInput").val());
+    $(".input.tab.content.intersection.internal.roadway.eastbound p").text($("#wRouteNameInput").val());
 });
 
 

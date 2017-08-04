@@ -73,6 +73,22 @@ class Project {
         return this._intersections;
     }
 
+    setNorthRouteName(name) {
+        this._n_route_name = name;
+    }
+
+    setEastRouteName(name) {
+        this.e_route_name = name;
+    }
+
+    setSouthRouteName(name) {
+        this.s_route_name = name;
+    }
+
+    setWestRouteName(name) {
+        this.w_route_name = name;
+    }
+
     /**
      * Use a given configuration matrix to update the configuration, from the Intersections down to the Direction(al) entries.
      * @param {int[][][][]} config_matrix A four-dimensional matrix where the first dimension represents Intersections, the second dimension

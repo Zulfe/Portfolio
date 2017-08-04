@@ -552,7 +552,14 @@
         </div>
     </div>
 
-
-
+<script>
+    $(".input.tab.content.intersection.table-extended thead").eq(0).on("click", function() {
+        var content = $(".input.tab.content.intersection.table-extended tbody");
+        if(content.is(":visible"))
+            content.transition("scale");
+        else
+            content.transition("swing down");
+    });
+</script>
 
 </div>
