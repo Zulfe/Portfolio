@@ -21953,6 +21953,7 @@ Floated Menu / Item
   margin-bottom: 0em !important;
   border-bottom: 2px solid rgba(0, 29, 54, 0.50);
   background-color: #005DAA;
+  height: 5% !important;
 }
 
 .ui.secondary.pointing.menu .item {
@@ -34830,7 +34831,7 @@ html.ios {
 .ui.tab.active,
 .ui.tab.open {
   display: block;
-  height: 100%;
+  height: 95%;
 }
 
 /*--------------------

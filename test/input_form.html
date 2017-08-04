@@ -5,7 +5,6 @@
 
 <style>
     .input.tab.content.container {
-        border: 2px solid orange;
         height: 100%;
         width: 100%;
         position: relative;
@@ -19,6 +18,8 @@
         position: absolute;
         left: 2%;
         top: 3%;
+
+        font-size: 1.15vw;
     }
     .input.tab.content.table table, .input.tab.content.table-extended table {
         background-color: #DDDDDD;
@@ -113,6 +114,8 @@
         left: 2%;
 
         position: absolute;
+
+        font-size: 1.15vw;
     }
 
     .input.tab.content.intersection.table-extended table td:not(:first-child):not(:last-child) {
@@ -128,6 +131,43 @@
     }
 
 
+    /*
+    * Button Panel
+    */
+
+    .input.tab.content.intersection.button.panel {
+        background-color: #005DAA;
+        
+        position: absolute;
+
+        height: 16.5%;
+        width: 30%;
+
+        top: 67.5%;
+        left: 2%;
+
+        font-size: 1.85vw;
+    }
+
+    .input.tab.content.intersection.button.fratar {
+        background-color: orange;
+
+        height: 46.25%;
+        width: 95%;
+
+        margin: auto;
+        margin-top: 2.5%;
+    }
+
+    .input.tab.content.intersection.button.movements {
+        background-color: orange;
+
+        height: 46.25%;
+        width: 95%;
+
+        margin: auto;
+        margin-top: 2.5%;
+    }
 
 
     /*
@@ -135,7 +175,7 @@
     */
 
     .input.tab.content.intersection.view {
-        height: 90%;
+        height: auto;
         width: 65%;
 
         top: 3%;
@@ -485,6 +525,18 @@
                 </tr>
             </tbody>
         </table>
+    </div>
+
+    <div class="input tab content intersection button panel">
+        <div class="input tab content intersection button fratar">
+            <i>"I don't have these!"</i>
+            <br>
+            <p>Use per-entry volumes instead...</p>
+        </div>
+
+        <div class="input tab content intersection button movements">
+            <p>Configure Movements</p>
+        </div>
     </div>
 
     <div class="input tab content intersection view">
