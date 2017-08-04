@@ -7,14 +7,11 @@ class ArrowLayout {
     constructor(container, UID) {
         this._UID = UID;
         this._approach_container = container;
-        console.log("CONTAINER HEIGHT: " + $(this._approach_container).css("height"));
 
         // The dimensions of the approach container. These are the dimensions that define how wide of a space
         // is allotted for the arrows to fit inside of.
-        this._APPROACH_WIDTH = 169.625;
-        console.log("Approach width is " + this._APPROACH_WIDTH);
-        this._APPROACH_HEIGHT = 76.9125;
-        console.log("Approach height is " + this._APPROACH_HEIGHT);
+        this._APPROACH_WIDTH = $(container).width();
+        this._APPROACH_HEIGHT = $(container).height();
 
         // The height of each arrow. This should equal or close to the height of the approach container.
         this._ARROW_HEIGHT = this._APPROACH_HEIGHT;
@@ -74,6 +71,10 @@ class ArrowLayout {
         this.createApproach();
     }
 
+    /**
+     * Creates the HTML elements for the approach container, the left, through, and right containers, and proper CSS styling. Appends the code
+     * to the container passed at instantiation. Creates a context menu for the approach allowing selection of movement types.
+     */
     createApproach() {
         var style =
         "#" + this._UID + " * {                     "+
@@ -181,14 +182,20 @@ class ArrowLayout {
             "mouseClick"   : "right",
             "centerAround" : "cursor"
         });
-
-
     }
 
+    /**
+     * Returns the total width of the three arrow containers. The containers are sealed around the arrows upon every update, so getting the
+     * width of all arrows using the containers is accurate enough.
+     */
     getTotalWidth() {
         return $("#" + this._UID + " .left.container").width() + $("#" + this._UID + " .through.container").width() + $("#" + this._UID + " .right.container").width();
     }
 
+    /**
+     * 
+     *
+     */
     isAdditionPermitted(group, type) {
         if (group == "left") {
             if(this._NUM_ALL_LEFT == this._MAX_LEFT)                return false;
@@ -236,9 +243,16 @@ class ArrowLayout {
             else                                                    return false;
         }
 
+        else                                                        return false;
+
         return true;
     }
    
+    /**
+     * Adjust the width of a given container using the number of elements inside of it and the width of each element.
+     * This may not be necessary anymore, but it's been left in until further testing.
+     *
+     */
     adjustContainerWidth(container, num_elems, elem_width) {
         $(container).css("width", (num_elems * elem_width));
     }
@@ -288,9 +302,6 @@ class ArrowLayout {
      *
      */
     scaleImages(add_width) {
-
-        console.log("Time to scale!");
-
         // Starting at 100% scale (of the current image dimensions), iterate down one percent at a time until all of the existing elements and the future element, when
         // multiplied by the current scale factor, are narrow enough to fit inside the approach container. Store this scale factor in this._height_scale for use in scaling all
         // existing images and allowing future images to be of the same size.
@@ -370,6 +381,14 @@ class ArrowLayout {
     /*                  THROUGH                             */
     /********************************************************/
 
+    /**
+     * Handles the insertion of a new arrow image into the through group container. The <tt>container</tt> parameter seems unnecessary
+     * considering the container to which HTML is added is known, but this function may be extended for the general case; furthermore,
+     * it may work better when multiple approaches are present.
+     * @param {string} type The type of movement to be added (exclusive, shared through left, shared through right, sahred through left right, shared left right)
+     * @param {string} container The reference form of the through container (".through.container")
+     * @param {string} html_insert The HTML code for the image to be inserted
+     */
     insertThrough(type, container, html_insert) {
         if(type == "exclusive") {
             if(this._NUM_SHARED_THROUGH_LEFT > 0)
@@ -393,17 +412,32 @@ class ArrowLayout {
         }
     }
 
-
+    /**
+     * Handles the addition of arrows from the through group to the through container.
+     * @param {string} type The type of through arrow to be added (exclusive, shared through left, shared through right, shared through left right, shared left right)
+     */
     clickThrough(type) {
+        // Define this, our object of focus, to be the through container for this unique approach
         var _this = "#" + this._UID + " .through.container";
 
+        // If the addition of a through arrow of the passed type isn't allowed, return now to avoid
+        // unnecessary computation. Because of how isAdditionPermitted is written, this will also check
+        // to make sure a valid through type has been submitted; in the case that an unknown through type
+        // has been passed, isAdditionPermitted will return false.
         if(!this.isAdditionPermitted("through", type))
             return;
 
+        // Instantiate and define the necessary information for the passed type.
+
+        // The path to the type's SVG image.
         var asset = "";
+        // The width of the arrow being added.
         var img_width = 0;
+        // An arbitrary value that is tuned in the backend to mitigate display issues in the through container.
         var width_mod = 0;
+        // The number of occurences of the type of through movement to be drawn.
         var num = 0;
+        // The class(es) to which the through movement should be added (for later addressing)
         var html_class = "";
         if(type == "exclusive") {
             asset       = "assets/arrows/arrow_through.svg";
@@ -441,24 +475,35 @@ class ArrowLayout {
             html_class  = "shared left right arrow";
         }
 
+        // If the addition of this movement makes the combined width of all arrows (including this hypothetical arrow)
+        // greater than the alloted width of the approach container...
         if(this.getTotalWidth() + img_width + width_mod > this._APPROACH_WIDTH) {
+            // scale down the size of all existing images and modify the image scale factor for all future images.
             this.scaleImages(img_width + width_mod);
+            // Adjust the container width to accomodate a new through arrow of this type.
             this.adjustContainerWidth(_this, num + 1, img_width);
+            // Update the widths of all arrows using the newly modified scale factor.
             this.updateWidths();
-        } else this.adjustContainerWidth(_this, num + 1, img_width + width_mod);
+        }
+        // otherwise allocate enough space in the container for a new through movement of the passed type. 
+        else this.adjustContainerWidth(_this, num + 1, img_width + width_mod);
 
+        // Define the HTML code to be added to the container using the asset and class information defined above.
         var html_insert = "<img class='" + html_class + "' style='height: " + (this._ARROW_HEIGHT * this._height_scale) + "px;' src='" + asset +"'>";
 
-        console.log("Inserting into " + _this);
+        // Insert this HTML code into the through container based on a rule set of existing movements.
         this.insertThrough(type, _this, html_insert);
 
+        // Increment by one the known number of existing movements of the type passed.
         if(type == "exclusive")                      this._NUM_EXCLUSIVE_THROUGH++;
         else if(type == "shared through left")       this._NUM_SHARED_THROUGH_LEFT++;
         else if(type == "shared through right")      this._NUM_SHARED_THROUGH_RIGHT++;
         else if(type == "shared through left right") this._NUM_SHARED_THROUGH_LEFT_RIGHT++;
         else if(type == "shared left right")         this._NUM_SHARED_LEFT_RIGHT++;
-        
+        // Increement by one the known number of all through movements.
         this._NUM_ALL_THROUGH++;
+
+        // Fit all of the containers snuggly around the content inside of them.
         this.adjustAllContainerWidths();
     }
 

@@ -58,7 +58,7 @@ $("#piMenu").prepend(
 "</div>"+
 "<div class='ui item'>"+
 "    <div class='ui input corner labeled'>"+
-"        <input type='text' class='wideInput' placeholder='Context Point Two'>"+
+"        <input type='text' id='cpTwoNameInput' class='wideInput' placeholder='Context Point Two'>"+
 "        <div class='ui corner label'>"+
 "            <i class='help icon'></i>"+
 "        </div>"+
@@ -66,7 +66,7 @@ $("#piMenu").prepend(
 "</div>"+
 "<div class='ui item'>"+
 "    <div class='ui input corner labeled'>"+
-"        <input type='text' class='wideInput' placeholder='Context Point Three'>"+
+"        <input type='text' id='cpThreeNameInput' class='wideInput' placeholder='Context Point Three'>"+
 "        <div class='ui corner label'>"+
 "            <i class='help icon'></i>"+
 "        </div>"+
@@ -74,7 +74,7 @@ $("#piMenu").prepend(
 "</div>"+
 "<div class='ui item'>"+
 "    <div class='ui input corner labeled'>"+
-"        <input type='text' class='wideInput' placeholder='Context Point Four'>"+
+"        <input type='text' id='cpFourNameInput' class='wideInput' placeholder='Context Point Four'>"+
 "        <div class='ui corner label'>"+
 "            <i class='help icon'></i>"+
 "        </div>"+
@@ -136,6 +136,44 @@ $("#westRouteNameHelpClickable").click(function() {
 $("#cpOneNameHelpClickable").click(function() {
     $("#cpOneNameHelp").modal("show");
 });
+
+$("#cpOneNameInput").parent().on("input", function() {
+    $(".input.tab.content.intersection.internal.context-point-one span").text($("#cpOneNameInput").val());
+});
+$("#cpTwoNameInput").parent().on("input", function() {
+    $(".input.tab.content.intersection.internal.context-point-two span").text($("#cpTwoNameInput").val());
+});
+$("#cpThreeNameInput").parent().on("input", function() {
+    $(".input.tab.content.intersection.internal.context-point-three span").text($("#cpThreeNameInput").val());
+});
+$("#cpFourNameInput").parent().on("input", function() {
+    $(".input.tab.content.intersection.internal.context-point-four span").text($("#cpFourNameInput").val());
+});
+
+
+$("#nRouteNameInput").parent().on("input", function() {
+    console.log("Got input from input parent.");
+    $(".input.tab.content.intersection.internal.roadway.southbound p").text($("#nRouteNameInput").val());
+});
+$("#nRouteNameInput").on("input", function() {
+    console.log("Got input from input.");
+});
+
+$("#wRouteNameInput").parent().on("input", function() {
+    $(".input.tab.content.intersection.internal.roadway.westbound p").text($("#wRouteNameInput").val());
+});
+$("#nRouteNameInput").parent().on("input", function() {
+    $(".input.tab.content.intersection.internal.roadway.northbound p").text($("#nRouteNameInput").val());
+});
+$("#eRouteNameInput").parent().on("input", function() {
+    $(".input.tab.content.intersection.internal.roadway.eastbound p").text($("#eRouteNameInput").val());
+});
+
+
+
+
+
+
 
 /**
  * When a child of the Add Tab tab is clicked, identify the child clicked and open a new tab
@@ -211,6 +249,19 @@ $(".appPane .secondary a[data-tab='add_tab'").click(function() {
         isFirstNewtabLoad = false;
     }
 });
+
+$(".tab.segment.active").bind("elementsVisible", function() {
+    var southbound_approach = new ArrowLayout($(".input.tab.content.intersection.internal.approach.southbound"), "input-tab-viewer-southbound");
+    var westbound_approach  = new ArrowLayout($(".input.tab.content.intersection.internal.approach.westbound"), "input-tab-viewer-westbound");
+    var northbound_approach = new ArrowLayout($(".input.tab.content.intersection.internal.approach.northbound"), "input-tab-viewer-northbound");
+    var eastbound_approach  = new ArrowLayout($(".input.tab.content.intersection.internal.approach.eastbound"), "input-tab-viewer-eastbound");
+
+    $(".tab.segment.active").unbind("elementsVisible");
+});
+
+
+
+
 
 
 

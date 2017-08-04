@@ -87,6 +87,8 @@ var clearCanvas = function() {
     updateMovementBlocksColor("#CCCCCC");
     $("#zone_1").click();
     updateTerminal("The canvas has been cleared. Enabling drawing for Zone 1.");
+
+    console.log("Clear canvas completed!");
 }
 
 // !!! resetArrow() REQUIRES AN ARROW ELEMENT AND AN APPROACH 

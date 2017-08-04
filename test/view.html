@@ -191,7 +191,7 @@
         acquireResources().done(function(){
             killLoader().done(function(){
                 awakenContent().done(function(){
-                    console.log(COOKIETOOL.cookiesFoundOnStartup());
+                    $(".tab.segment.active").trigger("elementsVisible");
                     if(COOKIETOOL.cookiesFoundOnStartup() && COOKIETOOL.isCookieLatestBackup())
                         $("#cookies_found").modal("show");
                 });

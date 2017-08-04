@@ -100,8 +100,10 @@ $("#toolbar div").click(function(){
             exportToCSV();
     }
 
-    if(button_id == "import")
+    if(button_id == "import") {
+        clearCanvas();
         triggerUpload(); 
+    }
 
     if(button_id == "clear")
         clearCanvas();
