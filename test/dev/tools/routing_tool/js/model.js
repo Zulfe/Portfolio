@@ -375,7 +375,9 @@ var importFromCSV = function(evt) {
             dir = parseInt(csv_data[row][2]);
             mvt = parseInt(csv_data[row][3]);
 
-            totalRoutes[route_num - 1][entry_count] = [zone, dir, mvt];
+            console.log("Attempting to write [" + zone + ", " + dir + ", " + mvt + "] to totalRoutes[" + (route_num) + ", " + entry_count + "].");
+
+            totalRoutes[route_num][entry_count] = [zone, dir, mvt];
             entry_count = entry_count + 1;
         }
 

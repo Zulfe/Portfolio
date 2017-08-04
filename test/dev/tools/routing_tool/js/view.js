@@ -69,9 +69,11 @@ var clearCanvas = function() {
     // above or way below the mouse.
     numClicks = numClicks - zonesDrawn.filter(v => v).length;
     // Set the latest incomplete route and latest accessed route numbers to SBL.
-    route_number, lastAtRouteNumber = 0;
+    route_number = 0;
+    lastAtRouteNumber = 0;
     // Set the application's mode to nothing. Clicks to the canvas are ignored.
-    plotModeEnabled, plottingStarted = false;
+    plotModeEnabled = false;
+    plottingStarted = false;
     zoneDrawEnabled = true;
     
     // Set the draw state of all zones to false. None of the zones are drawn now.
@@ -85,6 +87,7 @@ var clearCanvas = function() {
     $("#canvas").children().remove();
     // Set the background color of all entrance blocks on the toolbar to gray.
     updateMovementBlocksColor("#CCCCCC");
+    $("#files")[0].value = "";
     $("#zone_1").click();
     updateTerminal("The canvas has been cleared. Enabling drawing for Zone 1.");
 
