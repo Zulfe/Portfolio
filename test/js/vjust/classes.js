@@ -39,6 +39,17 @@ class Project {
         this._intersections = new Array();
         for(var interNum = 0; interNum < NUM_INTERSECTION_CONFIGS; interNum++)
             this._intersections.push(new Intersection(interNum, 6));
+       
+    }
+
+    /**
+     * Fills masterPCETable with UserVolumeDefinitions converted to Passenger Car Equivalents
+     */
+    updateMasterPCETable() {
+        masterPCETable = userVolumeDefinitions.getUserVolumes().forEach(function(object, index) {
+            object = object.getPassengerCarEquivalent(userVolumeDefinitions.getTruckPercentages()[index])
+            }
+        )
     }
 
     /**
@@ -73,20 +84,15 @@ class Project {
         return this._intersections;
     }
 
-    setNorthRouteName(name) {
-        this._n_route_name = name;
-    }
-
-    setEastRouteName(name) {
-        this.e_route_name = name;
-    }
-
-    setSouthRouteName(name) {
-        this.s_route_name = name;
-    }
-
-    setWestRouteName(name) {
-        this.w_route_name = name;
+    setRouteName(route, name) {
+        if(route == "north" || route == "southbound")
+            this._n_route_name = name;
+        if(route == "east"  || route == "westbound")
+            this._e_route_name = name;
+        if(route == "south" || route == "northbound")
+            this._s_route_name = name;
+        if(route == "west"  || route == "eastbound")
+            this._w_route_name = name;
     }
 
     /**
@@ -347,16 +353,63 @@ class Zone {
         if(zone_ID > 6) {
             console.warn("Invalid Zone construction: zone ID cannot be greater than 6. Skipping...");
         }
+        
+        this._ControlEnum      = {
+            "0" : "Signalized",
+            "1" : "Two-Way Stop Controlled",
+            "2" : "Roundabout",
+        //    "3" : "All-Way Stop Controlled"
+        }
 
-        this._intersection_ID = intersection_ID;
-        this._zone_ID         = zone_ID;
-        this._active_flag     = 1;
-        this._north           = new Direction("north", intersection_ID, zone_ID, 0);
-        this._south           = new Direction("south", intersection_ID, zone_ID, 2);
-        this._east            = new Direction("east" , intersection_ID, zone_ID, 1);
-        this._west            = new Direction("west" , intersection_ID, zone_ID, 3);
-        this._direction_array = [this._north, this._south, this._east, this._west];
+        this.CONTROL_SIGNAL     = 0;
+        this.CONTROL_TWSC       = 1;
+        this.CONTROL_ROUNDABOUT = 2;
+        //this.CONTROL_AWSC       = 3;
 
+        this._intersection_ID   = intersection_ID;
+        this._zone_ID           = zone_ID;
+        this._active_flag       = 1;
+        this._southbound        = new Direction("southbound", intersection_ID, zone_ID, 0);
+        this._westbound         = new Direction("westbound" , intersection_ID, zone_ID, 1);
+        this._northbound        = new Direction("northbound", intersection_ID, zone_ID, 2);
+        this._eastbound         = new Direction("eastbound" , intersection_ID, zone_ID, 3);
+        this._direction_array   = [this._north, this._south, this._east, this._west];
+        this._control_type      = this.CONTROL_SIGNAL;
+
+        //TEMPORARILY FILL CONFIG ARRAY AS CONVENTIONAL INTERSECTION
+        this._config_arr = [];
+        for (var x = 0; x < 24; x++) {
+            this._config_arr[x] = [];
+            this._config_arr[x][0] = Math.floor(x / 2);
+            this._config_arr[x][1] = x % 2;
+            this._config_arr[x][2] = Math.floor(x / 6);
+            this._config_arr[x][3] = Math.floor((x % 6) / 2);
+
+            this._config_arr[x][4] = x % 2 - 1;
+            this._config_arr[x][5] = Math.floor(x / 6) * (x % 2) + (x % 2) - 1;
+            this._config_arr[x][6] = Math.floor((x % 6) / 2) * (x % 2) + (x % 2) - 1;
+        }
+
+        for (x = 0; x < 24; x++) {
+            var str = "";
+            for (var y = 0; y < 7; y++) {
+                str = str + this._config_arr[x][y] + ",";
+            }
+        }
+        //END TEMPORARY FILL
+            
+       this.updateZonePCEs;
+        
+    }
+
+    /**
+     * Updates the BoundedDetailedVolume object in each Direction object when a new zone is instantiated
+     * or if UserVolumeDefinitions change
+     */
+    updateZonePCEs() {
+        for (x = 0; x < this._config_arr.length; x++) {
+        
+        }
     }
 
     /**
@@ -364,7 +417,7 @@ class Zone {
      * @returns {Direction} The Direction object for northbound traffic
      */
     getNorthbound() {
-        return this._north;
+        return this._northbound;
     }
 
     /**
@@ -372,7 +425,7 @@ class Zone {
      * @returns {Direction} The Direction object for southbound traffic
      */
     getSouthbound() {
-        return this._south;
+        return this._southbound;
     }
 
     /**
@@ -380,7 +433,7 @@ class Zone {
      * @returns {Direction} The Direction object for eastbound traffic
      */
     getEastbound() {
-        return this._east;
+        return this._eastbound;
     }
 
     /**
@@ -388,7 +441,7 @@ class Zone {
      * @returns {Direction} The Direction object for westbound traffic
      */
     getWestbound() {
-        return this._west;
+        return this._westbound;
     }
 
     /**
@@ -428,6 +481,28 @@ class Zone {
     getDirectionByIndex(direction_pos) {
         return this._direction_array[direction_pos];
     }
+
+    /**
+     * Changes the zone analysis type between Signalized, Two-Way Stop Control, Roundabout, or All-Way Stop Control
+     * @param {integer} <tt>0</tt> for Signalized, <tt>1</tt> for TWSC, <tt>2</tt> for Roundabout, or <tt>3</tt> for AWSC
+     */
+    setControl(controlVal) {
+        this._control_type = controlVal;
+    }
+
+    /** Returns the control type of this zone as an integer
+      * @returns {integer} 0 for Signalized, 1 for TWSC, 2 for Roundabout, or 3 for AWSC
+      */
+     getControlVal() {
+         return this._control_type;
+     }
+
+    /** Returns the control type of this zone as a string
+      * @returns {string} A string describing the zone control type
+      */
+     getControlType() {
+        return this._ControlEnum[this._control_type.toString()];
+     }
 }
 
 
@@ -439,7 +514,7 @@ class Direction {
      * The lowest level of the Project data structure. The Direction object contains information about its cardinal direction and
      * the number of (left, through, right, shared left, shared right, and channeled right) lanes for said cardinal direction.
      * @constructor
-     * @param {string} cardinal_direction The cardinal direction (north, east, south, or west) for this Direction object.
+     * @param {string} cardinal_direction The cardinal direction (northbound, eastbound, southbound, or westbound) for this Direction object.
      */
     constructor(cardinal_direction, intersection_id, zone_id, direction_id) {
         this._cardinal_direction   = cardinal_direction;
@@ -450,8 +525,8 @@ class Direction {
         this._shared_right         = 0;
         this._channeled_right      = 0;
         this._entry_array          = [this._left_turn, this._through, this._right_turn, this._shared_left, this._shared_right, this._channeled_right];
-        this._user_movement_vols   = new DetailedVolume(this._cardinal_direction, -1, -1, -1);
-        this._TCU_vols             = new DetailedVolume(this._cardinal_direction, -1, -1, -1);
+        this._user_movement_vols   = new BoundedDetailedVolume(this._cardinal_direction, -1, -1, -1);
+        this._TCU_vols             = new BoundedDetailedVolume(this._cardinal_direction, -1, -1, -1);
         this._address              = [intersection_id, zone_id, direction_id];
 
         //this._route                = new Object();
@@ -617,187 +692,6 @@ class Direction {
         this._TCU_vols.setLeft(left_vol * left_vol_splitfrac);
     }
 }
-
-
-
-class ModalFactory {
-    /** 
-     * This is a class that helps with the creation of help modals on the application view. This tool will automatically
-     * store new modals in the help_modals div. An image or youtube video may be shown on the modal, but not both simultaneously.
-     * One ModalFactory object can be used to generate any number of modal elements on the HTML page. Simply modify the class's
-     * member variables and regenerate with <tt>ModalObject.injectModalHTML(ModalObject.generateModalHTML())</tt>; however, it
-     * is recommended to create a new ModalFactory object for each modal if one wishes to later manage the modal. Once a new
-     * modal is generated and injected, the previous modal cannot be modified and must be removed from the page manually via ID.
-     * @constructor
-     * @param {string} element_id The element ID to be used in the creation of the modal
-     * @param {string} header The header text that is to be shown on the modal
-     * @param {string} image An image to be shown on the help modal. If an image shouldn't be used, specify "null"
-     * @param {string} image_size The size of the image following Semantic-UI descriptors (small, medium, large, or huge). If an image wasn't used, specify "null"
-     * @param {string} youtube_import The URL of a YouTube video to be added to the modal. If a YouTube video shouldn't be used, specify "null"
-     * @param {string} description The description text to be shown in the description of the modal
-     */
-    constructor(element_id, header, image, image_size, youtube_import, description, button_text) {
-        // Header error tracer for improperly defined ModalFactory object.
-        if(header === undefined) 
-            this._header = "Undefined Header";
-        else
-            this._header = header;
-        
-        // Description error tracer for improperly defined ModalFactory object.
-        if(description === undefined)
-            this._description = "Undefined description! Check your function call.";
-        else
-            this._description = description;
-
-        // Default button text value.
-        if(button_text === undefined)
-            this._button_text = "Got it!";
-        else
-            this._button_text = button_text;
-
-        this._element_id       = element_id;
-        this._image            = image;
-        this._image_size       = image_size;
-        this._youtube_import   = youtube_import;
-        this._button_text      = button_text;
-
-        // Add the modal to the DOM upon object instantiation
-        this.injectModalHTML(this.generateModalHTML());
-    }
-
-    /**
-     * Returns the ID to be used in the generation of the modal.
-     * @returns {string} The stored ID
-     */
-    getElementID() {
-        return this._element_id;
-    }
-
-    /**
-     * Returns the header to be used in the generation of the modal.
-     * @returns {string} The stored description
-     */
-    getHeader() {
-        return this._header;
-    }
-
-    /**
-     * Returns the image data (not the URL) for the image to be used in the generation of the modal.
-     * @returns {string} The stored image data
-     */
-    getImageURI() {
-        return this._image;
-    }
-
-    /**
-     * Returns the image size descriptior to be used in the generation of the modal.
-     * @returns {string} The stored image size
-     */
-    getImageSize() {
-        return this._image_size;
-    }
-
-    /**
-     * Returns the URL of the YouTube video to be used in the generation of the modal.
-     * @returns {string} The stored YouTube video URL
-     */
-    getYoutubeImportURL() {
-        return this._youtube_import;
-    }
-
-    /**
-     * Returns the description to be used in the generation of the modal.
-     * @returns {string} The stored description text
-     */
-    getDescription() {
-        return this._description;
-    }
-
-    /**
-     * Change the element ID of the last generated modal. This function will remove the last generated modal
-     * and replace it with a new modal with the changed element ID. If you're looking for a method to change
-     * the element ID in order to create a new modal, see {@link setElementID}.
-     * @see setElementID
-     * @param {string} new_id The element ID to switch to
-     */
-    setExistingElementID() {
-        this._element_id = new_id;
-        $("#" + element_ID).remove();
-        injectModalHTML(generateModalHTML());
-    }
-
-    /**
-     * Check if a given string qualifies as a URL.
-     * @returns {boolean} <tt>true</tt> if URL; <tt>false</tt> if not
-     */
-    isURL(url) {
-            var strRegex = "^((https|http|ftp|rtsp|mms)?://)"
-                + "?(([0-9a-z_!~*'().&=+$%-]+: )?[0-9a-z_!~*'().&=+$%-]+@)?" //ftp的user@
-                + "(([0-9]{1,3}\.){3}[0-9]{1,3}" // IP形式的URL- 199.194.52.184
-                + "|" // 允许IP和DOMAIN（域名）
-                + "([0-9a-z_!~*'()-]+\.)*" // 域名- www.
-                + "([0-9a-z][0-9a-z-]{0,61})?[0-9a-z]\." // 二级域名
-                + "[a-z]{2,6})" // first level domain- .com or .museum
-                + "(:[0-9]{1,4})?" // 端口- :80
-                + "((/?)|" // a slash isn't required if there is no file name
-                + "(/[0-9a-z_!~*'().;?:@&=+$,%#-]+)+/?)$";
-             var re = new RegExp(strRegex);
-             return re.test(url);
-    }
-
-    /**
-     * Generate the HTML for the modal that is to be added to the view using settings defined in this object's member variables.
-     * In order for the generated HTML, use this in conjuntion with ModalFactory's injection function.
-     * @see injectModalHTML
-     * @returns {string} The HTML code for the modal
-     */
-    generateModalHTML() {
-        var htmlInjection;
-        if(this._image === undefined || this._image === "null") {
-            if(this._youtube_import === undefined || this._image === "null") {
-                htmlInjection = "<div id='" + this._element_id + "' class='ui modal'><div class='header'>" + this._header + "</div><div class='content'><p>" +
-                                this._description + "</p></div><div class='actions'><div class='ui positive right labeled icon button'>" + this._button_text + "<i class='checkmark icon'></i></div>";
-            }
-            else {
-                if(isURL(this._youtube_import)) {
-                    htmlInjection = "<div id='" + this._element_id + "' class='ui modal'><div class='header'>" + this._header + "</div><div class='image content'>" +
-                                    "<div class='ui image large'><iframe width='390' height'220' src='" + this._youtube_import + "' frameborder='0' allowfullscreen>" +
-                                    "</iframe></div><div class='description'><p>" + this._description + "</p></div></div><div class='actions'><div class='ui positive" +
-                                    " right labeled icon button'>" + this._button_text + "</div><i class='checkmark icon'></i></div></div></div>";
-                }
-                else {
-                    this._description = this._description + " The YouTube URL wasn't recognized as a valid URL. Make sure http:// or https:// has been included.";
-                    htmlInjection = "<div id='" + this._element_id + "' class='ui modal'><div class='header'>" + this._header + "</div><div class='content'><p>" + 
-                                    this._description + "</p></div><div class='actions'><div class='ui positive right labeled icon button'>" + this._button_text + "<i class='checkmark icon'></i></div>";
-                }
-            }
-        }
-        else {
-            if(this._image_size === undefined || this._image_size === "null") {
-                htmlInjection = "<div id='" + this._element_id + "' class='ui modal'><div class='header'>" + this._header + "</div><div class='image content'>" +
-                                "<div class='ui image medium'><img src='" + this._image + "'></div><div class='description'><p>" + this._description + "</p></div></div>" +
-                                "<div class='actions'><div class='ui positive right labeled icon button'>" + this._button_text + "</div><i class='checkmark icon'></i></div></div></div>";
-            }
-            else {
-                htmlInjection = "<div id='" + this._element_id + "' class='ui modal'><div class='header'>" + this._header + "</div><div class='image content'>" +
-                                "<div class='ui image " + this._image_size + "'><img src='" + this._image + "'></div><div class='description'><p>" + this._description + "</p></div></div>" +
-                                "<div class='actions'><div class='ui positive right labeled icon button'>" + this._button_text + "</div><i class='checkmark icon'></i></div></div></div>";
-            }
-        }
-
-        return htmlInjection;
-    }
-
-    /**
-     * Append the given HTML code to the end of the #modal_wrapper div in the HTML view.
-     * @param {string} modal_html The HTML to be appended
-     */
-    injectModalHTML(modal_html) {
-        $("#modal_wrapper").append(modal_html);
-    }
-
-}
-
 
 class CookiesUtility {
     /**
@@ -1207,9 +1101,9 @@ class DetailedVolume {
      *
      * @example
      * // Convert an existing DetailedVolume object into a PCE-Enabled DetailedVolume object based on the original object's values
-     * myDetailedVolume.getLeft() // → 500
+     * myDetailedVolume.getLeft() // â†’ 500
      * myDetailedVolume = myDetailedVolume.getPassengerCarEquivalent(0.05, 0.10, 0.15);
-     * myDetailedVolume.getLeft() // → 525
+     * myDetailedVolume.getLeft() // â†’ 525
      */
     getPassengerCarEquivalent(left_truck_per, through_truck_per, right_truck_per) {
         var new_detvol = new DetailedVolume(this._direction, (this._left + (this._left * left_truck_per)), (this._through * (this._through * through_truck_per)), (this._right * (this._right * right_truck_per)));
@@ -1312,9 +1206,9 @@ class BoundedDetailedVolume {
      *
      * @example
      * // Convert an existing BoundedDetailedVolume object into a PCE-Enabled BoundedDetailedVolume object based on the original object's values
-     * myBoundedDetailedVolume.getLeft() // → 500
+     * myBoundedDetailedVolume.getLeft() // â†’ 500
      * myBoundedDetailedVolume = myBoundedDetailedVolume.getPassengerCarEquivalent(0.05, 0.10, 0.15);
-     * myBoundedDetailedVolume.getLeft() // → 525
+     * myBoundedDetailedVolume.getLeft() // â†’ 525
      */
     getPassengerCarEquivalent(left_truck_per, through_truck_per, right_truck_per) {
         var new_bdetvol = new BoundedDetailedVolume(this._direction, (this._left + (this._left * left_truck_per)), (this._through * (this._through * through_truck_per)), (this._right * (this._right * right_truck_per)));
@@ -1545,13 +1439,13 @@ class VolumetricIntersection {
     constructor(north_carvol, east_carvol, south_carvol, west_carvol, north_truckvol, east_truckvol, south_truckvol, west_truckvol, bounded) {
         if(bounded) {
             this._north_carvol_bounded   = north_carvol;
-            this._east_carvol_bounded    = north_carvol;
-            this._south_carvol_bounded   = north_carvol;
-            this._west_carvol_bounded    = north_carvol;
+            this._east_carvol_bounded    = east_carvol;
+            this._south_carvol_bounded   = south_carvol;
+            this._west_carvol_bounded    = west_carvol;
             this._north_truckvol_bounded = north_truckvol;
-            this._east_truckvol_bounded  = north_truckvol;
-            this._south_truckvol_bounded = north_truckvol;
-            this._west_truckvol_bounded  = north_truckvol;
+            this._east_truckvol_bounded  = east_truckvol;
+            this._south_truckvol_bounded = south_truckvol;
+            this._west_truckvol_bounded  = west_truckvol;
         
             this._north_carvol   = new DetailedVolume("north", this._south_carvol_bounded.getLeft(), this._south_carvol_bounded.getThrough(), this._south_carvol_bounded.getRight());
             this._east_carvol    = new DetailedVolume("east" , this._west_carvol_bounded.getLeft(), this._west_carvol_bounded.getThrough(), this._west_carvol_bounded.getRight());
@@ -1605,7 +1499,7 @@ class VolumetricIntersection {
      * @returns {BoundedDetailedVolume[]} An array of car BoundedDetailedVolume objects in the order north, east, south, west
      */
     getBoundedCarVolumes() {
-        return [this._north_carvol_bounded, this._east_carvol_bounded, this._south_carvol_bounded, this._west_carvol_bounded];
+        return [his._south_carvol_bounded, this._west_carvol_bounded, this._north_carvol_bounded, this._east_carvol_bounded];
     }
 
     /**
@@ -1614,7 +1508,69 @@ class VolumetricIntersection {
      * @returns {BoundedDetailedVolume[]} An array of truck BoundedDetailedVolume objects in the order north, east, south, west
      */
     getBoundedTruckVolumes() {
-        return [this._north_truckvol_bounded, this._east_truckvol_bounded, this._south_truckvol_bounded, this._west_truckvol_bounded];
+        return [this._south_truckvol_bounded, this._west_truckvol_bounded, this._north_truckvol_bounded, this._east_truckvol_bounded];
+    }
+
+    /**
+     * Calculate and return the percentage of trucks for each direction using the general volume from said direction. The general volume
+     * is equal to the sum of the left, through, and right volumes. The returned array contains percentages in the order north, east, south
+     * and west. Note that the percentages correspond to unbounded directions, meaning southbound traffic contains the percentage of trucks
+     * equal to the first (north) value returned from this function.
+     * @returns {double[]} An array of decimal numbers between 0 and 1 representing percentages
+     */
+    getGeneralTruckPercentages() {
+        var carvols = this.getUnboundedCarVolumes();
+        var truckvols = this.getUnboundedTruckVolumes();
+
+        var north_genperc = (truckvols[0].getLeft() + truckvols[0].getThrough() + truckvols[0].getRight()) / (truckvols[0].getLeft() + truckvols[0].getThrough() + truckvols[0].getRight() +
+                                                                                                              carvols[0].getLeft() + carvols[0].getThrough() + carvols[0].getRight());
+
+        var east_genperc = (truckvols[1].getLeft() + truckvols[1].getThrough() + truckvols[1].getRight()) / (truckvols[1].getLeft() + truckvols[1].getThrough() + truckvols[1].getRight() +
+                                                                                                              carvols[1].getLeft() + carvols[1].getThrough() + carvols[1].getRight());
+        
+        var south_genperc = (truckvols[2].getLeft() + truckvols[2].getThrough() + truckvols[2].getRight()) / (truckvols[2].getLeft() + truckvols[2].getThrough() + truckvols[2].getRight() +
+                                                                                                              carvols[2].getLeft() + carvols[2].getThrough() + carvols[2].getRight());
+        
+        var west_genperc = (truckvols[3].getLeft() + truckvols[3].getThrough() + truckvols[3].getRight()) / (truckvols[3].getLeft() + truckvols[3].getThrough() + truckvols[3].getRight() +
+                                                                                                              carvols[3].getLeft() + carvols[3].getThrough() + carvols[3].getRight());
+
+        return [north_genperc, east_genperc, south_genperc, west_genperc];
+    }
+
+    /**
+     * Calculate and return the percentage of trucks for each movement for each direction. This will return a two dimensional array
+     * where the first row is truck percentages for the movements left, through, and right (in that order) north of the intersection.
+     * The second row corresponds to eastern movements, the third to southern movements, and the fourth to western movements.
+     * @returns {double[][]} A two-dimensional array of decimal numbers between 0 and 1 representing percentages
+     *
+     */
+    getSpecificTruckPercentages() {
+        var carvols = this.getUnboundedCarVolumes();
+        var truckvols = this.getUnboundedTruckVolumes();
+
+        var north_specperc_left = (truckvols[0].getLeft()) / (truckvols[0].getLeft() + carvols[0].getLeft());
+        var north_specperc_through = (truckvols[0].getThrough()) / (truckvols[0].getThrough() + carvols[0].getThrough());
+        var north_specperc_right = (truckvols[0].getRight()) / (truckvols[0].getRight() + carvols[0].getRight());
+
+        var east_specperc_left = (truckvols[1].getLeft()) / (truckvols[1].getLeft() + carvols[1].getLeft());
+        var east_specperc_through = (truckvols[1].getThrough()) / (truckvols[1].getThrough() + carvols[1].getThrough());
+        var east_specperc_right = (truckvols[1].getRight()) / (truckvols[1].getRight() + carvols[1].getRight());
+
+        var south_specperc_left = (truckvols[2].getLeft()) / (truckvols[2].getLeft() + carvols[2].getLeft());
+        var south_specperc_through = (truckvols[2].getThrough()) / (truckvols[2].getThrough() + carvols[2].getThrough());
+        var south_specperc_right = (truckvols[2].getRight()) / (truckvols[2].getRight() + carvols[2].getRight());
+        
+        var west_specperc_left = (truckvols[3].getLeft()) / (truckvols[3].getLeft() + carvols[3].getLeft());
+        var west_specperc_through = (truckvols[3].getThrough()) / (truckvols[3].getThrough() + carvols[3].getThrough());
+        var west_specperc_right = (truckvols[3].getRight()) / (truckvols[3].getRight() + carvols[3].getRight());
+    
+        return [
+            [north_specperc_left, north_specperc_through, north_specperc_right],
+            [east_specperc_left, east_specperc_through, east_specperc_right],
+            [south_specperc_left, south_specperc_through, south_specperc_right],
+            [west_specperc_left, west_specperc_through, west_specperc_right]
+        ];
+    
     }
 
     /**

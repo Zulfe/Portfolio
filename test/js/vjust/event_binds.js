@@ -1,88 +1,10 @@
+$(document).bind("contentLoaded", function() {
 
-$("#piMenu").prepend(
-"<div class='ui item'>" +
-"    <div class='ui input corner labeled'>"+
-"        <input type='text' id='projNameInput' class='wideInput' placeholder='My VJUST Project'>"+
-"        <div id='projNameHelpClickable' class='ui corner label'>"+
-"            <i class='help icon'></i>"+
-"        </div>"+
-"    </div>"+
-"</div>"+
-"<div class='ui item'>"+
-"    <div class='ui input corner labeled'>"+
-"        <input type='text' id='interNameInput' class='wideInput' placeholder='Intersection Name'>"+
-"        <div id='interNameHelpClickable' class='ui corner label'>"+
-"            <i class='help icon'></i>"+
-"        </div>"+
-"    </div>"+
-"</div>"+
-"<div class='ui item'>"+
-"    <div class='ui input corner labeled'>"+
-"        <input type='text' id='nRouteNameInput' class='wideInput' placeholder='N Route Name'>"+
-"        <div id='northRouteNameHelpClickable' class='ui corner label'>"+
-"            <i class='help icon'></i>"+
-"        </div>"+
-"    </div>"+
-"</div>"+
-"<div class='ui item'>"+
-"    <div class='ui input corner labeled'>"+
-"        <input type='text' id='sRouteNameInput' class='wideInput' placeholder='S Route Name'>"+
-"        <div id='southRouteNameHelpClickable' class='ui corner label'>"+
-"            <i class='help icon'></i>"+
-"        </div>"+
-"    </div>"+
-"</div>"+
-"<div class='ui item'>"+
-"    <div class='ui input corner labeled'>"+
-"        <input type='text' id='eRouteNameInput' class='wideInput' placeholder='E Route Name'>"+
-"        <div id='eastRouteNameHelpClickable' class='ui corner label'>"+
-"            <i class='help icon'></i>"+
-"        </div>"+
-"    </div>"+
-"</div>"+
-"<div class='ui item'>"+
-"    <div class='ui input corner labeled'>"+
-"        <input type='text' id='wRouteNameInput' class='wideInput' placeholder='W Route Name'>"+
-"        <div id='westRouteNameHelpClickable', class='ui corner label'>"+
-"            <i class='help icon'></i>"+
-"        </div>"+
-"    </div>"+
-"</div>"+
-"<div class='ui item'>"+
-"    <div class='ui input corner labeled'>"+
-"        <input type='text' id='cpOneNameInput' class='wideInput' placeholder='Context Point One'>"+
-"        <div class='ui corner label'>"+
-"            <i class='help icon'></i>"+
-"        </div>"+
-"    </div>"+
-"</div>"+
-"<div class='ui item'>"+
-"    <div class='ui input corner labeled'>"+
-"        <input type='text' id='cpTwoNameInput' class='wideInput' placeholder='Context Point Two'>"+
-"        <div class='ui corner label'>"+
-"            <i class='help icon'></i>"+
-"        </div>"+
-"    </div>"+
-"</div>"+
-"<div class='ui item'>"+
-"    <div class='ui input corner labeled'>"+
-"        <input type='text' id='cpThreeNameInput' class='wideInput' placeholder='Context Point Three'>"+
-"        <div class='ui corner label'>"+
-"            <i class='help icon'></i>"+
-"        </div>"+
-"    </div>"+
-"</div>"+
-"<div class='ui item'>"+
-"    <div class='ui input corner labeled'>"+
-"        <input type='text' id='cpFourNameInput' class='wideInput' placeholder='Context Point Four'>"+
-"        <div class='ui corner label'>"+
-"            <i class='help icon'></i>"+
-"        </div>"+
-"    </div>"+
-"</div>");
+var view = new View();
+
 
 // Add content to the Application Settings menu now that it is hidden.
-$("#appSettMenu").prepend(
+view.prependToView("#appSettMenu", 
 "<div class='ui item'> "+
 "    <div class='ui slider checkbox'> "+
 "        <input id='tooltipsToggleswitch' type='checkbox' name='tooltipsToggle'> "+
@@ -94,116 +16,115 @@ $("#appSettMenu").prepend(
 /**
  * When a menu header is clicked, reveal the content inside. When it is clicked and already visible, hide the content.
  */
-$("#introItemHeader").click(function(){
-    $(".introMenu").transition("slide down");
+view.createListener("#introItemHeader", "click", function() {
+    view.animateElement(".introMenu", "slide down");
 });
-$("#projInfoItem").click(function(){
-    $("#piMenu").transition("slide down");
+view.createListener("#projInfoItem", "click", function() {
+    view.animateElement("#piMenu", "slide down");
 });
-$("#appSettHeader").click(function(){
-    $("#appSettMenu").transition("slide down");
+view.createListener("#appSettHeader", "click", function() {
+    view.animateElement("#appSettMenu", "slide down");
 });
 
 /**
  * Use the ModalFactory class to create a new modal ID'd cookies_found. It has no image and no YouTube URL to load a video from.
  * Ideally all current help modals will be converted into ModalFactory objects that can be manipulated.
- */
-var modalfac = new ModalFactory("cookies_found", "We found a backup!", "null", "null", "null", "Hooray! We found a backup. We've automatically applied the settings to your current" +
-                                " configuration!", "Hooray!");
+*/
+//view.createNewModal("cookies_found", "We found a backup!", "null", "null", "null", "Hooray! We found a backup. We've automatically applied the settings to your current configuration!", "Hooray!");
+
 
 /**
  * When a input box help clickable is clicked, open the corresponding help modal.
  * Input box clickables are tags found in the upper right-hand corner of the box, and feature a question-mark icon.
  */
-$("#projNameHelpClickable").click(function() {
-    $("#projNameHelp").modal("show");
+view.createListener("#projNameHelpClickable", "click", function() {
+    view.displayModal("#projNameHelp"); 
 });
-$("#interNameHelpClickable").click(function() {
-    $("#interNameHelp").modal("show");
+view.createListener("#interNameHelpClickable", "click", function() {
+    view.displayModal("#interNameHelp"); 
 });
-$("#northRouteNameHelpClickable").click(function() {
-    $("#nsRouteNameHelp").modal("show");
+view.createListener("#northRouteNameHelpClickable", "click", function() {
+    view.displayModal("#nsRouteNameHelp"); 
 });
-$("#southRouteNameHelpClickable").click(function() {
-    $("#nsRouteNameHelp").modal("show");
+view.createListener("#southRouteNameHelpClickable", "click", function() {
+    view.displayModal("#nsRouteNameHelp"); 
 });
-$("#eastRouteNameHelpClickable").click(function() {
-    $("#ewRouteNameHelp").modal("show");
+view.createListener("#eastRouteNameHelpClickable", "click", function() {
+    view.displayModal("#ewRouteNameHelp"); 
 });
-$("#westRouteNameHelpClickable").click(function() {
-    $("#ewRouteNameHelp").modal("show");
+view.createListener("#westRouteNameHelpClickable", "click", function() {
+    view.displayModal("ewRouteNameHelp"); 
 });
-$("#cpOneNameHelpClickable").click(function() {
-    $("#cpOneNameHelp").modal("show");
+view.createListener("#cpOneNameHelpClickable", "click", function() {
+    view.displayModal("#cpOneNameHelp"); 
+});
+view.createListener("#cpTwoNameHelpClickable", "click", function() {
+    view.displayModal("#cpTwoNameHelp"); 
+});
+view.createListener("#cpThreeNameHelpClickable", "click", function() {
+    view.displayModal("#cpThreeNameHelp"); 
+});
+view.createListener("#cpFourNameHelpClickable", "click", function() {
+    view.displayModal("#cpFourNameHelp"); 
 });
 
 /**
  * Input binds for context points one, two, three, and four.
  */
-$("#cpOneNameInput").parent().on("input", function() {
-    $(".input.tab.content.intersection.internal.context-point-one span").text($("#cpOneNameInput").val());
+view.createListener($("#cpOneNameInput").parent(), "input", function() {
+    view.setElementText(".input.tab.content.intersection.internal.context-point-one span", view.getInputValue("#cpOneNameInput")); 
 });
-$("#cpTwoNameInput").parent().on("input", function() {
-    $(".input.tab.content.intersection.internal.context-point-two span").text($("#cpTwoNameInput").val());
+view.createListener($("#cpTwoNameInput").parent(), "input", function() {
+    view.setElementText(".input.tab.content.intersection.internal.context-point-two span", view.getInputValue("#cpTwoNameInput"));
 });
-$("#cpThreeNameInput").parent().on("input", function() {
-    $(".input.tab.content.intersection.internal.context-point-three span").text($("#cpThreeNameInput").val());
+view.createListener($("#cpThreeNameInput").parent(), "input", function() {
+    view.setElementText(".input.tab.content.intersection.internal.context-point-three span", view.getInputValue("#cpThreeNameInput"));
 });
-$("#cpFourNameInput").parent().on("input", function() {
-    $(".input.tab.content.intersection.internal.context-point-four span").text($("#cpFourNameInput").val());
+view.createListener($("#cpFourNameInput").parent(), "input", function() {
+    view.setElementText(".input.tab.content.intersection.internal.context-point-four span", view.getInputValue("#cpFourNameInput"));
 });
+
 
 /**
  * Input binds for north, east, south, and west routes.
  */
-$("#nRouteNameInput").on("input", function() {
-    project.setNorthRouteName($("#nRouteNameInput").val());
-    $(".input.tab.content.intersection.internal.roadway.southbound p").text($("#nRouteNameInput").val());
+view.createListener("#nRouteNameInput", "input", function() {
+    var inputValue = view.getInputValue("#nRouteNameInput");
+    project.setRouteName("north", inputValue);
+    view.setElementText(".input.tab.content.intersection.internal.roadway.southbound p", inputValue);
 });
-$("#eRouteNameInput").on("input", function() {
-    project.setEastRouteName($("#eRouteNameInput").val());
-    $(".input.tab.content.intersection.internal.roadway.westbound p").text($("#eRouteNameInput").val());
+view.createListener("#eRouteNameInput", "input", function() {
+    var inputValue = view.getInputValue("#eRouteNameInput");
+    project.setRouteName("east", inputValue);
+    view.setElementText(".input.tab.content.intersection.internal.roadway.westbound p", inputValue);
 });
-$("#sRouteNameInput").on("input", function() {
-    project.setSouthRouteName($("#sRouteNameInput").val());
-    $(".input.tab.content.intersection.internal.roadway.northbound p").text($("#sRouteNameInput").val());
+view.createListener("#sRouteNameInput", "input", function() {
+    var inputValue = view.getInputValue("#sRouteNameInput");
+    project.setRouteName("south", inputValue);
+    view.setElementText(".input.tab.content.intersection.internal.roadway.northbound p", inputValue);
 });
-$("#wRouteNameInput").on("input", function() {
-    project.setWestRouteName($("#wRouteNameInput").val());
-    $(".input.tab.content.intersection.internal.roadway.eastbound p").text($("#wRouteNameInput").val());
+view.createListener("#wRouteNameInput", "input", function() {
+    var inputValue = view.getInputValue("#wRouteNameInput");
+    project.setRouteName("west", inputValue);
+    view.setElementText(".input.tab.content.intersection.internal.roadway.eastbound p", inputValue);
 });
-
-
-
-
-
 
 
 /**
  * When a child of the Add Tab tab is clicked, identify the child clicked and open a new tab
  * with content corresponding to the clicked child.
  */
-$(".appPane div[data-tab='add_tab']").children().click(function(){
-    console.log("Clicked a child in the add tab tab!");
-    var UID = Math.random().toString(36).substring(2, 5);
-    console.log("New tab UID: " + UID);
-    $(".appPane .secondary a:last-of-type").before("<a class='item' data-tab='" + UID + "'>" + UID + "<i class='medium close icon'></i></a>");
-    $(".appPane .tab:last").before("<div class='ui bottom attached tab segment' data-tab='" + UID + "'>This is sample input for a new tab.</div>");
-    $(".appPane .menu .item").tab();
+view.createListener($(".appPane div[data-tab='add_tab']").children(), "click", function() {
+    view.createNewTab();
 });
 
-
-/**
- * Note: This should be in globals.js
- */
-var latestActive;
 /**
  * When the user mouses over any of the tabs, find the tab that is active and store it in latestActive.
  * This is done to improve the functionality and fluidity of the tabflow function. If mouseenter is used instead,
  * rapid mouse movement can result in a failed loggings of the latest active tab.
  */
-$(".appPane .secondary").on("mouseover", "a", function(){
-    latestActive = $(this).parent().children(".active");
+view.createListener(".appPane .secondary a", "mouseover", function() {
+    view.logLatestActiveTab(this);
 });
 
 var tabflow = function(tab_element) {
@@ -294,3 +215,5 @@ $("#restore_from_cookies").click(function() {
 //// [\SUBSECTION] ////// [SIDEBAR >> APPLICATION SETTINGS] //////
 
 // [END] ////////// [USER BEHAVIOR BINDS] ////////////////////
+//
+});

@@ -1,0 +1,35 @@
+
+> Primary UI
+    ↳ https://zulfe.github.io/test/view.html 
+    ↳ Updated splash/loading page with VDOT logo and animations
+    ↳ Completed dynamic tabbing
+        ↳ Allows the user to view and configure multiple intersections side by side
+    ↳ Still developing intersection image layout on the Add tab
+    ↳ Help modals completed for Project Information inputs
+        ↳ Clicking a Project Information input box opens a message pertaining to the input content
+
+> Expanded upon core data structure
+    ↳ User-defined data
+        ↳ Volumes, truck percentages
+        ↳ Interfacing Fratar to core data
+
+> Expanded routing data structure
+    ↳ Completed graphical tool for building and editing routing tables
+        ↳ https://zulfe.github.io/test/dev/tools/routing_tool/route_tool.html
+        ↳ Saves time and mitigates errors
+    ↳ Improving functions for transposing data from routing tool configuration files
+
+> Updated and added to web-based documentation
+    ↳ ./docs/index.html
+
+
+
+
+
+route,zone,dir,mvt,o_zone,o_dir,o_mvt
+1,    0,   0,  0,  -1,    -1,   -1
+1,    1,   3,  2,   0,     0,    0
+1,    2,   0,  0,   1,     3,    2
+1,    3,   3,  1,   2,     0,    0
+1,    4,   3,  1,   3,     3,    1
+

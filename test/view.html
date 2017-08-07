@@ -186,12 +186,15 @@
         // when the page loads.
         $(".introMenu").transition("slide down");
 
+        $("#piMenu").load("project_info_menu.html");
+
         // When the resources have been acquired and stored locally, kill the loader
         // and load in the page's contents.
         acquireResources().done(function(){
             killLoader().done(function(){
                 awakenContent().done(function(){
                     $(".tab.segment.active").trigger("elementsVisible");
+                    $(document).trigger("contentLoaded");
                     if(COOKIETOOL.cookiesFoundOnStartup() && COOKIETOOL.isCookieLatestBackup())
                         $("#cookies_found").modal("show");
                 });
@@ -207,6 +210,7 @@
     });
     </script>
 
+    <script src="js/vjust/view.js"></script>
     <script src="js/vjust/event_binds.js"></script>
 
 
