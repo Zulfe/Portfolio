@@ -45,7 +45,9 @@ var objectKeyByValue = function(obj, val) {
 *
 */
 var saveRoute = function() {
-    if(route_number < 11) {
+    console.log("Saving to route number " + route_number);
+    if(route_number <= 11) {
+        console.log("lastAt: " + lastAtRouteNumber);
         if(lastAtRouteNumber == route_number) {
             updateTerminal(routeTo.Verbal[route_number.toString()] + " has been recorded. Now recording " + routeTo.Verbal[(route_number + 1).toString()] + ".");
             
@@ -83,7 +85,8 @@ var saveRoute = function() {
             
         }
     }
-    else {
+
+    if(route_number == 12) {
         updateToolItemColor(routeTo.ID[11], "#94B95B");
         updateTerminal("All routes have been written. Please export!");
    

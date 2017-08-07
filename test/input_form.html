@@ -50,6 +50,20 @@
         border-bottom: 1px solid black;
     }
 
+    .input.tab.content.table input {
+        height: 100%;
+        width: 100%;
+
+        background-color: #DDDDDD;
+        border: none;
+
+        text-align: center;
+    }
+
+    .input.tab.content.table input:focus {
+        outline: none;
+    }
+
     .input.tab.content.table > table > thead,
     .input.tab.content.table-extended > table > thead
     {
@@ -102,6 +116,8 @@
         border-bottom: none !important;
     }
 
+
+
     /*
     * Extended Table
     */
@@ -130,6 +146,19 @@
         width: 50% !important;
     }
 
+    .input.tab.content.intersection.table-extended input {
+        height: 100%;
+        width: 100%;
+
+        background-color: #DDDDDD;
+        border: none;
+
+        text-align: center;
+    }
+
+    .input.tab.content.intersection.table-extended input:focus {
+        outline: none;
+    }
 
     /*
     * Button Panel
@@ -146,7 +175,7 @@
         top: 67.5%;
         left: 2%;
 
-        font-size: 1.85vw;
+        font-size: 1.65vw;
     }
 
     .input.tab.content.intersection.button.fratar {
@@ -414,52 +443,52 @@
                     <td class="input tab content nested-table-container">
                         <table class="input tab content nested-table">
                             <tr>
-                                <td>0</td>
-                                <td>0</td>
-                                <td>0</td>
+                                <td><input type="text" placeholder="0" onkeypress='return event.charCode >= 48 && event.charCode <= 57' name="usertable-eastbound-left"></td>
+                                <td><input type="text" placeholder="0" onkeypress='return event.charCode >= 48 && event.charCode <= 57' name="usertable-eastbound-through"></td>
+                                <td><input type="text" placeholder="0" onkeypress='return event.charCode >= 48 && event.charCode <= 57' name="usertable-eastbound-right"></td>
                             </tr>
                         </table>
                     </td>
-                    <td class="perc-input">0.00%</td>
+                    <td class="perc-input"><input type="text" placeholder="0" onkeypress='return event.charCode >= 48 && event.charCode <= 57' name="usertable-eastbound-gentruckperc"</td>
                 </tr>
                 <tr>
                     <td>Westbound</td>
                     <td class="input tab content nested-table-container">
                         <table class="input tab content nested-table">
                             <tr>
-                                <td>0</td>
-                                <td>0</td>
-                                <td>0</td>
+                                <td><input type="text" placeholder="0" onkeypress='return event.charCode >= 48 && event.charCode <= 57' name="usertable-westbound-left"></td>
+                                <td><input type="text" placeholder="0" onkeypress='return event.charCode >= 48 && event.charCode <= 57' name="usertable-westbound-through"></td>
+                                <td><input type="text" placeholder="0" onkeypress='return event.charCode >= 48 && event.charCode <= 57' name="usertable-westbound-right"></td>
                             </tr>
                         </table>
                     </td>
-                    <td class="perc-input">0.00%</td>
+                    <td class="perc-input"><input type="text" placeholder="0" onkeypress='return event.charCode >= 48 && event.charCode <= 57' name="usertable-westbound-gentruckperc"></td>
                 </tr>
                 <tr>
                     <td>Southbound</td>
                     <td class="input tab content nested-table-container">
                         <table class="input tab content nested-table">
                             <tr>
-                                <td>0</td>
-                                <td>0</td>
-                                <td>0</td>
+                                <td><input type="text" placeholder="0" onkeypress='return event.charCode >= 48 && event.charCode <= 57' name="usertable-southbound-left"></td>
+                                <td><input type="text" placeholder="0" onkeypress='return event.charCode >= 48 && event.charCode <= 57' name="usertable-southbound-through"></td>
+                                <td><input type="text" placeholder="0" onkeypress='return event.charCode >= 48 && event.charCode <= 57' name="usertable-southbound-right"></td>
                             </tr>
                         </table>
                     </td>
-                    <td class="perc-input">0.00%</td>
+                    <td class="perc-input"><input type="text" placeholder="0" onkeypress='return event.charCode >= 48 && event.charCode <= 57' name="usertable-southbound-gentruckperc"></td>
                 </tr>
                 <tr>
                     <td>Northbound</td>
                     <td class="input tab content nested-table-container">
                         <table class="input tab content nested-table">
                             <tr>
-                                <td>0</td>
-                                <td>0</td>
-                                <td>0</td>
+                                <td><input type="text" placeholder="0" onkeypress='return event.charCode >= 48 && event.charCode <= 57' name="usertable-northbound-left"></td>
+                                <td><input type="text" placeholder="0" onkeypress='return event.charCode >= 48 && event.charCode <= 57' name="usertable-northbound-through"></td>
+                                <td><input type="text" placeholder="0" onkeypress='return event.charCode >= 48 && event.charCode <= 57' name="usertable-northbound-right"></td>
                             </tr>
                         </table>
                     </td>
-                    <td class="perc-input">0.00%</td>
+                    <td class="perc-input"><input type="text" placeholder="0" onkeypress='return event.charCode >= 48 && event.charCode <= 57' name="usertable-northbound-gentruckperc"></td>
                 </tr>
             </tbody>
         </table>
@@ -479,45 +508,18 @@
                     <td>
                         <table class="input tab content nested-table-extended">
                             <tr>
-                                <td>0.80</td>
-                                <td>0.95</td>
+                                <td><input type="text" placeholder="0.85" onkeypress='return event.charCode >= 48 && event.charCode <= 57' name="userextendedtable-uturn-factor"></td>
+                                <td><input type="text" placeholder="0.95" onkeypress='return event.charCode >= 48 && event.charCode <= 57' name="userextendedtable-left-factor"></td>
                             </tr>
                         </table>
                     </td>
-                    <td>
-                        X
-                    </td>
-                    <td>
-                        0.85
-                    </td>
-                    <td>
-                        X
-                    </td>
-                </tr>
-                <tr>
-                    <td>Suggested Value</td>
-                    <td>
-                        <table class="input tab content nested-table-extended">
-                            <tr>
-                                <td>0.80</td>
-                                <td>0.95</td>
-                            </tr>
-                        </table>
-                    </td>
-                    <td>
-                        X
-                    </td>
-                    <td>
-                        0.85
-                    </td>
-                    <td>
-                        X
-                    </td>
+                    <td style="background-color: #BBBBBB"></td>
+                    <td><input type="text" placeholder="0.85" onkeypress='return event.charCode >= 48 && event.charCode <= 57' name="userextendedtable-right-factor"></td>
+                    <td style="background-color: #BBBBBB"></td>
                 </tr>
                 <tr>
                     <td colspan="2">Truck to PCE Factor</td>
-                    <td colspan="2">Suggested is 2.00</td>
-                    <td>2.00</td>
+                    <td colspan="3"><input type="text" placeholder="2.00" onkeypress='return event.charCode >= 48 && event.charCode <= 57' name="userextendedtable-truckpce-factor"></td>
                 </tr>
                 <tr>
                     <td colspan="2">Critical Lane Volume</td>

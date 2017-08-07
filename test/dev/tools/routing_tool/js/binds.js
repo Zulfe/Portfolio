@@ -214,5 +214,4 @@ $("#canvas").mousemove(function(mouseevent) {
 
 
 $(window).keypress(function(event) {
-    console.log(event.which);
 });
