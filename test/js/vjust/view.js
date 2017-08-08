@@ -1,67 +1,196 @@
-var binder = function(selector, speaker, exec_function) {
-    $(selector).on(speaker, exec_function);
-}
-
 class View {
+    /**
+     * A class for handling all view-related tasks, such as the adding, displaying, removing, repositioning, and animation of elements visible to the end user.
+     * All listeners for on-screen elements are created here through <tt>createListener()</tt>.
+     */
     constructor() {
         this._dynamically_generated_modals = [];
+        this._first_visit_input_modals_enabled = true;
+        this._latest_active_tab = "";
+
+        this._first_click_modals = [
+            "projNameHelp",
+            "interNameHelp",
+            "nsRouteNameHelp",
+            "ewRouteNameHelp",
+            "cpOneNameHelp"
+        ];
+
+
     }
 
+    /**
+     * Add to the beginning of the body tag the passed code.
+     */
     prependToView(selector, code) {
         $(selector).prepend(code);
     }
 
+    /**
+     * Add to the end of the body tag the passed code.
+     */
     appendToView(selector, code) {
         $(selector).append(code);
     }
 
+    /**
+     * Load into the selected element(s) the snippet of code contained in the file specified.
+     * @param {string|Object} selector The reference form or jQuery object of the element(s) to have code injected into them
+     * @param {string} snippet The file name or path to the file containing the snippet of code to be injected
+     */
     loadIntoElement(selector, snippet) {
+        console.log("Importing", snippet, "into ", $(selector));
         $(selector).load(snippet);
     }
 
-    createListener(selector, speaker, exec_function) {
-        $(selector).on(speaker, exec_function);
+    /**
+     * Create a new event delegation that listens to the element(s) specified for the event specified. When the listener hears the event, execute
+     * the given function.
+     * @param {string} selector The reference form or jQuery object of the element(s) to have an event handler bound to them
+     * @param {string} event The jQuery notation for the event desired ("click", "input", "mouseover")
+     * @param {function} exec_function The function to be executed when the listener hears the event on the element specified
+     */
+    createListener(selector, event, exec_function) {
+        if(jQuery.type(selector) == "array")
+            $(selector[0]).on(event, selector[1], exec_function);
+        else
+            $(selector).on(event, exec_function);
     }
 
+    /**
+     * Use the ModalFactory class to create a new ModalFactory object, thus creating and injecting HTML code into the DOM for a Semantic-UI modal.
+     * @see ModalFactory
+     */
     createNewModal(element_id, header, image, image_size, youtube_import, description, button_text) {
         this._dynamically_generated_modals.push(new ModalFactory(element_id, header, image, image_size, youtube_import, description, button_text));
     }
 
-    createNewTab() {
-        var UID = Math.random().toString(36).substring(2, 6);
-        $(".appPane .secondary a:last-of-type").before("<a class='item' data-tab='" + UID + "'>" + UID + "<i class='medium close icon'></i></a>");
-        $(".appPane .tab:last").before("<div class='ui bottom attached tab segment' data-tab='" + UID + "'>This is sample input for a new tab.</div>");
+    /**
+     * Open a new tab on the tab bar.
+     * Note! Need to implement adding a tab with a given ID.
+     *
+     */
+    createNewTab(int_type) {
+        if($(".appPane .secondary a[data-tab='" + int_type + "']").length > 0) { 
+            this.warn("You can only have one type of this tab open at a time!");
+            return;
+        }
+        
+        var UID = int_type.toLowerCase().replace(/\b[a-z]/g, function(letter) { return letter.toUpperCase(); });
+
+        $(".appPane .secondary a:last-of-type").before("<a class='item' data-tab='" + int_type + "'>" + UID + "<i class='medium close icon'></i></a>");
+        $(".appPane .tab:last").before("<div class='ui bottom attached tab segment' data-tab='" + int_type + "'></div>");
+        this.loadIntoElement(".appPane .tab.segment[data-tab='" + int_type + "']", int_type + ".html");
         $(".appPane .menu .item").tab();
     }
 
+    /**
+     * Remove a tab from the tab bar with the given UID.
+     */
     removeTab() {
 
     }
 
-    tabFlow() {
+    notifyContent(clicked_tab) {
+        var tab_id = $(clicked_tab).attr("data-tab");
 
+        if(tab_id == "add_tab" || false) return;
+
+        console.log("Notifying (.appPane .tag.segment[data-tab='" + tab_id + "'] .container) that it's time to load.");
+        $(".appPane .tab.segment[data-tab='" + tab_id + "'] .container").trigger("tabLoaded");
     }
 
+    tabFlow(tab_element) {
+        var tab_tree = $(tab_element).parent();
+        var num_tabs = $(tab_tree).children().length;
+      
+        console.log($(tab_element));
+
+        if(!($(tab_element)[0] == $(this._latest_active_tab)[0])) {
+            console.log("Tab to be closed is not active tab!");
+            return this._latest_active_tab;
+        }
+
+        if(num_tabs == 2)
+            return tab_tree.children().eq(1);
+        else {
+            var tab_element_pos;
+            $(tab_tree).children().each(function(index, curChild){
+                if($(curChild)[0] == $(tab_element)[0])
+                    tab_element_pos = index;
+            });
+
+            if(tab_element_pos == 0 || tab_element_pos != (num_tabs - 2))
+                return tab_tree.children().eq(tab_element_pos + 1);
+            else
+                return tab_tree.children().eq(tab_element_pos - 1);
+        }
+    }
+
+    /**
+     * Return the content of a user input box with the specified selector.
+     * @returns {string} The content of the input box at the selector given
+     */
     getInputValue(selector) {
         return $(selector).val();
     }
 
+    /**
+     * Animate an element
+     *
+     */
     animateElement(selector, animation) {
         $(selector).transition(animation);
     }
 
+    /**
+     * Store to an associated member variable the tab element that was previously active.
+     * @param {string} selector The selector for a tab element in a tab bar
+     */
     logLatestActiveTab(selector) {
         this._latest_active_tab = $(selector).parent().children(".active");
     }
 
+    /**
+     * Check if the given modal ID (minus the #) is in the list of predefined first click displayable
+     * modals. First click displayable modals are those that display on the first click only if the
+     * script has determined that it is the user's first time visiting the tool.
+     * @param {string} modal_id The ID of the modal in reference form (#someModal)
+     * @returns {boolean} <tt>true</tt> if the modal is in the list of first click helper modals;
+     *                    <tt>false</tt> if it is not
+    */
+    isModalFirstClickHelper(modal_id) {
+        return ($.inArray(modal_id.substring(1), this._first_click_modals) != -1 ? true : false);
+    }
+
+    /**
+     * Make visible to the user the modal with the ID attribute specified. If modals for first ti
+     */
     displayModal(modal_id) {
-        $(modal_id).modal("show");
+        if(this.isModalFirstClickHelper(modal_id))
+            if(this._first_visit_input_modals_enabled)
+                $(modal_id).modal("show");
+        else
+            $(modal_id).modal("show");
+    }
+
+    /**
+     * Enable or disable the displaying of help modals when a user clicks on modal-enabled elements for the first time.
+     * @param {boolean} flag <tt>true</tt> for enabled; <tt>false</tt> for disable
+     */
+    toggleFirstVisitInputModals(flag) {
+        if(flag) {
+            this._first_visit_input_modals_enabled = true;
+        }
+        else {
+            this._first_visit_input_modals_enabled = false;
+        }
     }
 
     setElementText(selector, new_text, parent_animation) {
         if(parent_animation === undefined)
             $(selector).text(new_text);
-        else {
+        else
             $(selector).parent().transition({
                 "animation" : parent_animation,
                 onComplete  : function() {
@@ -69,8 +198,41 @@ class View {
                     $(selector).parent().transition(parent_animation);
                 }
             });
+    }
+
+    isCookiesDefined() {
+        if($(document).cookie.length > 0)
+            return true;
+        else
+            return false;
+    }
+
+    isFirstVisit() {
+        return true;
+    }
+
+    warn(message) {
+        if($("#warnbox_container").length > 0) {
+            clearInterval($("#warnbox_container").attr("data-interval-id"));
+            $("#warnbox_container").remove();
         }
-            
+
+        var prepend_code = "<div id='warnbox_container' style='pointer-events: none !important; height: 100%; width: 100%; z-index: 9998;'><div id='warnbox' class='ui red message' style='height: 10%; width: 20%; position: absolute; top: 3%; right: 3%;'><i style='pointer-events: initial !important;' class='close icon'></i>" + message + "</div></div>";
+        $("body").prepend(prepend_code);
+        
+        $("#warnbox_container").fadeIn(200);
+        
+        $("#warnbox i").click(function() {
+            clearInterval($("#warnbox_container").attr("data-interval-id"));
+            $("#warnbox_container").remove();
+        });
+
+        $("#warnbox_container").shake(4, 8, 550).delay(3000).fadeOut(1800);
+        
+        var timeout = setTimeout(function() {
+            $("#warnbox_container").remove();
+        }, 6750);
+        $("#warnbox_container").attr("data-interval-id", timeout);
     }
 }
 

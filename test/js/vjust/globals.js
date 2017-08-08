@@ -56,8 +56,6 @@ var UNIVERSAL_LEFT_TURN_ADJUSTMENT_FACTOR  = 0.95;
 
 
 
-
-
 var IntersectionEnum = {
     "0"  : "Conventional1",
     "1"  : "Conventional2",
@@ -98,6 +96,21 @@ var DirectionEnum = {
     "1" : "South",
     "2" : "East",
     "3" : "West"
+};
+
+
+
+
+jQuery.fn.shake = function(intShakes, intDistance, intDuration) {
+    this.each(function() {
+        $(this).css("position","relative"); 
+        for (var x=1; x<=intShakes; x++) {
+        $(this).animate({left:(intDistance*-1)}, (((intDuration/intShakes)/4)))
+    .animate({left:intDistance}, ((intDuration/intShakes)/2))
+    .animate({left:0}, (((intDuration/intShakes)/4)));
+    }
+  });
+return this;
 };
 
 // [END] ////////// [GLOBAL VARIABLES] ////////////////////

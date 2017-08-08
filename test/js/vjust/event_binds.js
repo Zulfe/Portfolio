@@ -1,3 +1,9 @@
+/**
+ * @fileOverview A controller to interface the VJuST data structure and VJuST frontend.
+ * @author Damon A. Shaw of VDOT <Damon.Shaw@vdot.virginia.gov || admins@vt.edu>
+ * @version Alpha-0.0.2
+ */
+
 $(document).bind("contentLoaded", function() {
 
 var view = new View();
@@ -13,9 +19,15 @@ view.prependToView("#appSettMenu",
 "    <div class='ui item'><div id='restore_from_cookies' class='ui button'>Restore From Cookies</div></div>" +
 "</div>");
 
-/**
- * When a menu header is clicked, reveal the content inside. When it is clicked and already visible, hide the content.
- */
+
+/* Application-wide Change Listener
+ * =============================================================================================== */
+$(document).bind("changeDetected", function() {
+
+});
+
+/* Sidebar Headers
+ * =============================================================================================== */
 view.createListener("#introItemHeader", "click", function() {
     view.animateElement(".introMenu", "slide down");
 });
@@ -27,20 +39,21 @@ view.createListener("#appSettHeader", "click", function() {
 });
 
 /**
- * Use the ModalFactory class to create a new modal ID'd cookies_found. It has no image and no YouTube URL to load a video from.
- * Ideally all current help modals will be converted into ModalFactory objects that can be manipulated.
+ * Use the ModalFactory class to create a new modal ID'd cookies_found. It has no image and no
+ * YouTube URL to load a video from.
+ * Ideally all current help modals will be converted into ModalFactory objects that can be
+ * manipulated.
 */
 //view.createNewModal("cookies_found", "We found a backup!", "null", "null", "null", "Hooray! We found a backup. We've automatically applied the settings to your current configuration!", "Hooray!");
 
 
-/**
- * When a input box help clickable is clicked, open the corresponding help modal.
- * Input box clickables are tags found in the upper right-hand corner of the box, and feature a question-mark icon.
- */
-view.createListener("#projNameHelpClickable", "click", function() {
+
+/* Input Box Help Clickables
+ * =============================================================================================== */
+view.createListener("#projNameHelpClickable",       "click", function() {
     view.displayModal("#projNameHelp"); 
 });
-view.createListener("#interNameHelpClickable", "click", function() {
+view.createListener("#interNameHelpClickable",      "click", function() {
     view.displayModal("#interNameHelp"); 
 });
 view.createListener("#northRouteNameHelpClickable", "click", function() {
@@ -49,28 +62,29 @@ view.createListener("#northRouteNameHelpClickable", "click", function() {
 view.createListener("#southRouteNameHelpClickable", "click", function() {
     view.displayModal("#nsRouteNameHelp"); 
 });
-view.createListener("#eastRouteNameHelpClickable", "click", function() {
+view.createListener("#eastRouteNameHelpClickable",  "click", function() {
     view.displayModal("#ewRouteNameHelp"); 
 });
-view.createListener("#westRouteNameHelpClickable", "click", function() {
+view.createListener("#westRouteNameHelpClickable",  "click", function() {
     view.displayModal("ewRouteNameHelp"); 
 });
-view.createListener("#cpOneNameHelpClickable", "click", function() {
+view.createListener("#cpOneNameHelpClickable",      "click", function() {
     view.displayModal("#cpOneNameHelp"); 
 });
-view.createListener("#cpTwoNameHelpClickable", "click", function() {
+view.createListener("#cpTwoNameHelpClickable",      "click", function() {
     view.displayModal("#cpTwoNameHelp"); 
 });
-view.createListener("#cpThreeNameHelpClickable", "click", function() {
+view.createListener("#cpThreeNameHelpClickable",    "click", function() {
     view.displayModal("#cpThreeNameHelp"); 
 });
-view.createListener("#cpFourNameHelpClickable", "click", function() {
+view.createListener("#cpFourNameHelpClickable",     "click", function() {
     view.displayModal("#cpFourNameHelp"); 
 });
 
-/**
- * Input binds for context points one, two, three, and four.
- */
+
+
+/* Context Point Name Input-View Synchronization
+ * =============================================================================================== */
 view.createListener($("#cpOneNameInput").parent(), "input", function() {
     view.setElementText(".input.tab.content.intersection.internal.context-point-one span", view.getInputValue("#cpOneNameInput")); 
 });
@@ -85,9 +99,9 @@ view.createListener($("#cpFourNameInput").parent(), "input", function() {
 });
 
 
-/**
- * Input binds for north, east, south, and west routes.
- */
+
+/* Route Name Input-View Synchronization
+ * =============================================================================================== */
 view.createListener("#nRouteNameInput", "input", function() {
     var inputValue = view.getInputValue("#nRouteNameInput");
     project.setRouteName("north", inputValue);
@@ -110,70 +124,62 @@ view.createListener("#wRouteNameInput", "input", function() {
 });
 
 
+
+/* Application Settings Togglers and Buttons
+ * =============================================================================================== */
+view.createListener("#tooltipsToggleswitch", "click", function() {
+    view.toggleFirstVisitInputModals($("#tooltipsToggleswitch").prop("checked"));
+});
+
+view.createListener("#restore_from_cookies", "click", function() {
+    //var cookies_data = 
+    project.getCookiesUtility().readConfigFromCookies();
+    //view.updateEverything(cookies_data);
+});
+
+if(view.isFirstVisit())
+    view.toggleFirstVisitInputModals(true);
+
+
+
+/* Tab Creation, Deletion, and Information Collection
+ * =============================================================================================== */
+
 /**
  * When a child of the Add Tab tab is clicked, identify the child clicked and open a new tab
  * with content corresponding to the clicked child.
  */
 view.createListener($(".appPane div[data-tab='add_tab']").children(), "click", function() {
-    view.createNewTab();
+    view.createNewTab($(this).attr("data-intersection-type"));
 });
 
 /**
- * When the user mouses over any of the tabs, find the tab that is active and store it in latestActive.
- * This is done to improve the functionality and fluidity of the tabflow function. If mouseenter is used instead,
- * rapid mouse movement can result in a failed loggings of the latest active tab.
+ * When the user mouses over any of the tabs, find the tab that is active and store it in
+ * latestActive.
+ * This is done to improve the functionality and fluidity of the tabflow function. If mouseenter is
+ * used instead, rapid mouse movement can result in a failed loggings of the latest active tab.
  */
-view.createListener(".appPane .secondary a", "mouseover", function() {
+view.createListener([".appPane .secondary", "a"], "mouseover", function() {
     view.logLatestActiveTab(this);
 });
 
-var tabflow = function(tab_element) {
-    var tab_tree = $(tab_element).parent();
-    var num_tabs = $(tab_tree).children().length;
-   
-    if(!($(tab_element)[0] == $(latestActive)[0])) {
-        console.log("Tab to be closed is not active tab!");
-        return latestActive;
-    }
-
-    if(num_tabs == 2)
-        return tab_tree.children().eq(1);
-    else {
-        var tab_element_pos;
-        $(tab_tree).children().each(function(index, curChild){
-            if($(curChild)[0] == $(tab_element)[0])
-                tab_element_pos = index;
-        });
-
-        if(tab_element_pos == 0 || tab_element_pos != (num_tabs - 2))
-            return tab_tree.children().eq(tab_element_pos + 1);
-        else
-            return tab_tree.children().eq(tab_element_pos - 1);
-    }
-}
-
-$(".appPane .secondary").on("click", "i", function(){
+view.createListener([".appPane .secondary", "i"], "click", function() {
     var UID = $(this).parent().attr("data-tab");
-    console.log("MOVING TO TAB: "); console.log(tabflow($(this).parent()));
-    tabflow($(this).parent()).click();
+    view.tabFlow($(this).parent()).click();
     $(this).parent().remove();
     $(".appPane div[data-tab='" + UID + "']").remove();
     $(".appPane .menu .item").tab();
 });
 
+view.createListener([".appPane .secondary", "a"], "click", function() {
+    view.notifyContent(this);
+});
+
+
+/* Initial Setup
+ * =============================================================================================== */
 var freewall = new Freewall(".appPane div[data-tab='add_tab']");
 freewall.fitWidth();
-
-/**
- * When the Add Tab tab is clicked for the first time, animate the tab's content.
- */
-var isFirstNewtabLoad = true;
-$(".appPane .secondary a[data-tab='add_tab'").click(function() {
-    if(isFirstNewtabLoad) {
-        $(".appPane div[data-tab='add_tab']").children().transition("slide down");
-        isFirstNewtabLoad = false;
-    }
-});
 
 $(".tab.segment.active").bind("elementsVisible", function() {
     var southbound_approach = new ArrowLayout($(".input.tab.content.intersection.internal.approach.southbound"), "input-tab-viewer-southbound");
@@ -186,34 +192,6 @@ $(".tab.segment.active").bind("elementsVisible", function() {
 
 
 
-
-
-
-
-//////////////////////////////////////////////
-
-
-
-
-
-//// [SUBSECTION] ////// [SIDEBAR >> APPLICATION SETTINGS] //////
-
-// When the "Toggle Tooltips" switch is clicked, enable once-valid modals if the switch
-// is being clicked to on; disable all modals from input elements if the switch is being
-// clicked to off.
-$("#tooltipsToggleswitch").click(function(){
-    if($(this).prop("checked"))
-        toggleFirstVisitInputModals(false);
-    else
-        toggleFirstVisitInputModals(true);
-});
-
-$("#restore_from_cookies").click(function() {
-   COOKIETOOL.readConfigFromCookies(); 
-});
-
-//// [\SUBSECTION] ////// [SIDEBAR >> APPLICATION SETTINGS] //////
-
-// [END] ////////// [USER BEHAVIOR BINDS] ////////////////////
-//
+/* END OF FILE | END OF FILE | END OF FILE | END OF FILE | END OF FILE | END OF FILE | END OF FILE
+ * =============================================================================================== */
 });

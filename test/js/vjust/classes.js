@@ -36,6 +36,8 @@ class Project {
         this._cp_three          = cp_three;
         this._cp_four           = cp_four;
 
+        this._cookies_utility   = new CookiesUtility();
+
         this._intersections = new Array();
         for(var interNum = 0; interNum < NUM_INTERSECTION_CONFIGS; interNum++)
             this._intersections.push(new Intersection(interNum, 6));
@@ -82,6 +84,10 @@ class Project {
 
     getIntersectionArray() {
         return this._intersections;
+    }
+
+    getCookiesUtility() {
+        return this._cookies_utility;
     }
 
     setRouteName(route, name) {
