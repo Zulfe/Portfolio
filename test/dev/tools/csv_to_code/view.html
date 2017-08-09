@@ -16,6 +16,8 @@
                 <p style="display: inline;">Variable Name:  </p><input type="text" id="varname_input" style="display: inline">
                 <br>
                 <p style="display: inline;">var?</p><input id="checkbox" type="checkbox" style="display: inline;">
+                <br>
+                <p style="display: inline;">3-D?</p><input id="3d_checkbox" type="checkbox" style="display: inline;">
             </div>
         </div>
 
@@ -79,12 +81,20 @@ $(document).ready(function() {
         }
 
         var csv_data = $.csv.toArrays(csv_text);
+        var using_2D = !($("#3d_checkbox").prop("checked"));
+        var code_string = "";
+        if($("#checkbox").prop("checked") == true)
+            code_string += "var ";
+        code_string += $("#varname_input").val() + " =" + "\n";
+
+
 
         var route_num = 1;
         var zone;
         var dir;
         var mvt;
         var entry_count = 0;
+        code_string += "[" + "\n";
         for(var row = 2; row < csv_data.length; row++) {
             if(!(csv_data[row][0] == route_num.toString())) {
                 entry_count = 0;
@@ -94,47 +104,54 @@ $(document).ready(function() {
             zone = parseInt(csv_data[row][1]);
             dir = parseInt(csv_data[row][2]);
             mvt = parseInt(csv_data[row][3]);
+            o_zone = parseInt(csv_data[row][4]);
+            o_dir = parseInt(csv_data[row][5]);
+            o_mvt = parseInt(csv_data[row][6]);
+
+            code_string += "\t" + "[" + route_num + ", " + zone + ", " + dir + ", " + mvt + ", " + o_zone + ", " + o_dir + ", " + o_mvt + "]" + (row == csv_data.length - 1 ? "\n" : ",\n");
 
             totalRoutes[route_num][entry_count] = [zone, dir, mvt];
             entry_count = entry_count + 1;
         }
+        code_string += "];";
 
         for(var i = 0; i < totalRoutes.length; i++) {
             totalRoutes[i] = destroyAllOfTargetInArray([-1, -1, -1], totalRoutes[i]); 
         }
-        
-        console.log(totalRoutes);
-        var code_string = "";
-        if($("#checkbox").prop("checked") == true)
-            code_string += "var ";
-        code_string += $("#varname_input").val() + " =" + "\n";
+       
+        if(!using_2D) {
+            var code_string = "";
+            if($("#checkbox").prop("checked") == true)
+                code_string += "var ";
+            code_string += $("#varname_input").val() + " =" + "\n";
 
-        code_string += "[" + "\n";
-        for(var i = 0; i < totalRoutes.length; i++) {
-            code_string += "\t" + "[" + "\n";
-            for(var j = 0; j < totalRoutes[i].length; j++) {
-                code_string += "\t";
-                code_string += "[";
+            code_string += "[" + "\n";
+            for(var i = 0; i < totalRoutes.length; i++) {
+                code_string += "\t" + "[" + "\n";
+                for(var j = 0; j < totalRoutes[i].length; j++) {
+                    code_string += "\t";
+                    code_string += "[";
 
-                for(var k = 0; k < totalRoutes[i][j].length; k++) {
-                    if(k == totalRoutes[i][j].length - 1)
-                        code_string += totalRoutes[i][j][k].toString();
+                    for(var k = 0; k < totalRoutes[i][j].length; k++) {
+                        if(k == totalRoutes[i][j].length - 1)
+                            code_string += totalRoutes[i][j][k].toString();
+                        else
+                            code_string += totalRoutes[i][j][k].toString() + ", ";
+                    }
+
+                    if(j == totalRoutes[i].length - 1)
+                        code_string += "]";
                     else
-                        code_string += totalRoutes[i][j][k].toString() + ", ";
+                        code_string += "]," + "\n";
                 }
 
-                if(j == totalRoutes[i].length - 1)
-                    code_string += "]";
+                if(i == totalRoutes.length - 1)
+                    code_string += "\n\t" + "]";
                 else
-                    code_string += "]," + "\n";
+                    code_string += "\n\t" + "]," + "\n";
             }
-
-            if(i == totalRoutes.length - 1)
-                code_string += "\n\t" + "]";
-            else
-                code_string += "\n\t" + "]," + "\n";
+            code_string += "\n" + "]";
         }
-        code_string += "\n" + "]";
 
 
         $(".language-javascript code").html(Prism.highlight(code_string, Prism.languages.javascript));

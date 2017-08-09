@@ -21,16 +21,18 @@ class View {
 
     /**
      * Add to the beginning of the body tag the passed code.
+     * @param {string} code The code to be inserted at the beginning of the body
      */
-    prependToView(selector, code) {
-        $(selector).prepend(code);
+    prependToView(code) {
+        $("body").prepend(code);
     }
 
     /**
      * Add to the end of the body tag the passed code.
+     * @param {string} code The code to be inserted at the end of the body
      */
-    appendToView(selector, code) {
-        $(selector).append(code);
+    appendToView(code) {
+        $("body").append(code);
     }
 
     /**
@@ -91,12 +93,23 @@ class View {
 
     }
 
+    /**
+     * Notify the content associated with the tab header clicked that it's time for any embedded Javascript to load. This
+     * is used to ensure that the content is visible before attempting to pull data from it. When elements widths are
+     * defined by a percentage, executing a jQuery <tt>.width()</tt> or <tt>.height()</tt> call on them results in their
+     * percentage value being returned, not their computed pixel value.
+     * @param {string|Object} clicked_tab The identification of the element in reference form or a jQuery object of the
+     * element.
+     */
     notifyContent(clicked_tab) {
         var tab_id = $(clicked_tab).attr("data-tab");
 
+        // If the clicked tab is the add tab or is a tab that has already been notified, stop now.
+        // A system has not yet been implemented to determine if a tab has already been notified or not.
+        // It's hard to tell when a tab that is closed has all of its content removed, but in closing a tab
+        // this function is called.
         if(tab_id == "add_tab" || false) return;
 
-        console.log("Notifying (.appPane .tag.segment[data-tab='" + tab_id + "'] .container) that it's time to load.");
         $(".appPane .tab.segment[data-tab='" + tab_id + "'] .container").trigger("tabLoaded");
     }
 
