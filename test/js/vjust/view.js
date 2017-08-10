@@ -1,9 +1,11 @@
 class View {
     /**
      * A class for handling all view-related tasks, such as the adding, displaying, removing, repositioning, and animation of elements visible to the end user.
-     * All listeners for on-screen elements are created here through <tt>createListener()</tt>.
+     * All listeners for on-screen elements are created here using <tt>createListener()</tt>.
      */
-    constructor() {
+    constructor(controller) {
+        this._controller = controller;
+
         this._dynamically_generated_modals = [];
         this._first_visit_input_modals_enabled = true;
         this._latest_active_tab = "";
@@ -15,16 +17,15 @@ class View {
             "ewRouteNameHelp",
             "cpOneNameHelp"
         ];
-
-
     }
 
     /**
-     * Add to the beginning of the body tag the passed code.
-     * @param {string} code The code to be inserted at the beginning of the body
+     * Animate an element using a Semantic-UI <tt>.transition()</tt> animation.
+     * @param {string} selector The element(s) to be animated in selector form
+     * @param {string} animation The Semantic-UI animation to be performed
      */
-    prependToView(code) {
-        $("body").prepend(code);
+    animateElement(selector, animation) {
+        $(selector).transition(animation);
     }
 
     /**
@@ -33,16 +34,6 @@ class View {
      */
     appendToView(code) {
         $("body").append(code);
-    }
-
-    /**
-     * Load into the selected element(s) the snippet of code contained in the file specified.
-     * @param {string|Object} selector The reference form or jQuery object of the element(s) to have code injected into them
-     * @param {string} snippet The file name or path to the file containing the snippet of code to be injected
-     */
-    loadIntoElement(selector, snippet) {
-        console.log("Importing", snippet, "into ", $(selector));
-        $(selector).load(snippet);
     }
 
     /**
@@ -70,14 +61,15 @@ class View {
     /**
      * Open a new tab on the tab bar.
      * Note! Need to implement adding a tab with a given ID.
-     *
+     * @param {string} int_type The type of intersection or configuration that is having a tab created for it
      */
     createNewTab(int_type) {
         if($(".appPane .secondary a[data-tab='" + int_type + "']").length > 0) { 
             this.warn("You can only have one type of this tab open at a time!");
             return;
         }
-        
+       
+        // Use the name of the HTML snippet being loaded, but with the first letter capitalized.
         var UID = int_type.toLowerCase().replace(/\b[a-z]/g, function(letter) { return letter.toUpperCase(); });
 
         $(".appPane .secondary a:last-of-type").before("<a class='item' data-tab='" + int_type + "'>" + UID + "<i class='medium close icon'></i></a>");
@@ -87,10 +79,74 @@ class View {
     }
 
     /**
-     * Remove a tab from the tab bar with the given UID.
+     * Make visible to the user the modal with the ID attribute specified. If the modal is designated as one that runs when it is the user's first
+     * visit, and the displaying of modals for a user's first time visit is enabled, show the modal.
+     * @param {string} modal_id The ID of the modal in selector form (#someModal)
      */
-    removeTab() {
+    displayModal(modal_id) {
+        if(this.isModalFirstClickHelper(modal_id))
+            if(this._first_visit_input_modals_enabled)
+                $(modal_id).modal("show");
+        else
+            $(modal_id).modal("show");
+    }
 
+    /**
+     * Return the content of a user input box with the specified selector.
+     * @returns {string} The content of the input box at the selector given
+     */
+    getInputValue(selector) {
+        return $(selector).val();
+    }
+
+    /**
+     * Check if cookies (and thus a backup) is/are present. Return if cookies were found.
+     * @returns {boolean} <tt>true</tt> if cookies have been found; <tt>false</tt> if cookies were not found
+     */
+    isCookiesDefined() {
+        if($(document).cookie.length > 0)
+            return true;
+        else
+            return false;
+    }
+
+    /**
+     * Check if it is the user's first time visiting the page. This and the presence of cookies are close in that
+     * this function depends on the accuracy of <tt>isCookiesDefined()</tt>.
+     * @returns {boolean} <tt>true</tt> if it is the user's first time visiting; <tt>false</tt> if the user has visited before
+     */
+    isFirstVisit() {
+        return !(this.isCookiesDefined());
+    }
+
+    /**
+     * Check if the given modal ID (minus the #) is in the list of predefined first click displayable
+     * modals. First click displayable modals are those that display on the first click only if the
+     * script has determined that it is the user's first time visiting the tool.
+     * @param {string} modal_id The ID of the modal in reference form (#someModal)
+     * @returns {boolean} <tt>true</tt> if the modal is in the list of first click helper modals;
+     *                    <tt>false</tt> if it is not
+    */
+    isModalFirstClickHelper(modal_id) {
+        return ($.inArray(modal_id.substring(1), this._first_click_modals) != -1 ? true : false);
+    }
+
+    /**
+     * Load into the selected element(s) the snippet of code contained in the file specified.
+     * @param {string|Object} selector The reference form or jQuery object of the element(s) to have code injected into them
+     * @param {string} snippet The file name or path to the file containing the snippet of code to be injected
+     */
+    loadIntoElement(selector, snippet) {
+        console.log("Importing", snippet, "into ", $(selector));
+        $(selector).load(snippet);
+    }
+
+    /**
+     * Store to an associated member variable the tab element that was previously active.
+     * @param {string} selector The selector for a tab element in a tab bar
+     */
+    logLatestActiveTab(selector) {
+        this._latest_active_tab = $(selector).parent().children(".active");
     }
 
     /**
@@ -113,12 +169,51 @@ class View {
         $(".appPane .tab.segment[data-tab='" + tab_id + "'] .container").trigger("tabLoaded");
     }
 
+    /**
+     * Add to the beginning of the body tag the passed code.
+     * @param {string} code The code to be inserted at the beginning of the body
+     */
+    prependToView(code) {
+        $("body").prepend(code);
+    }
+
+    /**
+     * Remove a tab from the tab bar with the given UID.
+     */
+    removeTab() {
+
+    }
+
+    /**
+     * Select an element or elements and change the contents of their text. If specified, perform an animation on the parent
+     * element to smoothen the changing of text. This is useful for providing a smooth, transitional progression through
+     * content, like viewing help on a new type of intersection.
+     * @param {string} selector The elements to have their text changed in selector form
+     * @param {string} new_text The text to update the element(s) with
+     * @param {string} parent_animation The SemanticUI <tt>transition()</tt> animation to use on the parent
+     */
+    setElementText(selector, new_text, parent_animation) {
+        if(parent_animation === undefined)
+            $(selector).text(new_text);
+        else
+            $(selector).parent().transition({
+                "animation" : parent_animation,
+                onComplete  : function() {
+                    $(selector).text(new_text);
+                    $(selector).parent().transition(parent_animation);
+                }
+            });
+    }
+
+    /**
+     * Computes the tab that should be moved to if the given tab is being removed from the list.
+     * @param {string} tab_element The tab element to that we expect to remove, in selector form
+     * @returns {jQuery} A jQuery object of the tab to be moved to prior to removing the tab specified
+     */
     tabFlow(tab_element) {
         var tab_tree = $(tab_element).parent();
         var num_tabs = $(tab_tree).children().length;
       
-        console.log($(tab_element));
-
         if(!($(tab_element)[0] == $(this._latest_active_tab)[0])) {
             console.log("Tab to be closed is not active tab!");
             return this._latest_active_tab;
@@ -141,53 +236,6 @@ class View {
     }
 
     /**
-     * Return the content of a user input box with the specified selector.
-     * @returns {string} The content of the input box at the selector given
-     */
-    getInputValue(selector) {
-        return $(selector).val();
-    }
-
-    /**
-     * Animate an element
-     *
-     */
-    animateElement(selector, animation) {
-        $(selector).transition(animation);
-    }
-
-    /**
-     * Store to an associated member variable the tab element that was previously active.
-     * @param {string} selector The selector for a tab element in a tab bar
-     */
-    logLatestActiveTab(selector) {
-        this._latest_active_tab = $(selector).parent().children(".active");
-    }
-
-    /**
-     * Check if the given modal ID (minus the #) is in the list of predefined first click displayable
-     * modals. First click displayable modals are those that display on the first click only if the
-     * script has determined that it is the user's first time visiting the tool.
-     * @param {string} modal_id The ID of the modal in reference form (#someModal)
-     * @returns {boolean} <tt>true</tt> if the modal is in the list of first click helper modals;
-     *                    <tt>false</tt> if it is not
-    */
-    isModalFirstClickHelper(modal_id) {
-        return ($.inArray(modal_id.substring(1), this._first_click_modals) != -1 ? true : false);
-    }
-
-    /**
-     * Make visible to the user the modal with the ID attribute specified. If modals for first ti
-     */
-    displayModal(modal_id) {
-        if(this.isModalFirstClickHelper(modal_id))
-            if(this._first_visit_input_modals_enabled)
-                $(modal_id).modal("show");
-        else
-            $(modal_id).modal("show");
-    }
-
-    /**
      * Enable or disable the displaying of help modals when a user clicks on modal-enabled elements for the first time.
      * @param {boolean} flag <tt>true</tt> for enabled; <tt>false</tt> for disable
      */
@@ -200,37 +248,18 @@ class View {
         }
     }
 
-    setElementText(selector, new_text, parent_animation) {
-        if(parent_animation === undefined)
-            $(selector).text(new_text);
-        else
-            $(selector).parent().transition({
-                "animation" : parent_animation,
-                onComplete  : function() {
-                    $(selector).text(new_text);
-                    $(selector).parent().transition(parent_animation);
-                }
-            });
-    }
-
-    isCookiesDefined() {
-        if($(document).cookie.length > 0)
-            return true;
-        else
-            return false;
-    }
-
-    isFirstVisit() {
-        return true;
-    }
-
+    /**
+     * Create a warning box in the top right of the screen with the given message. The box will be faded in, shaken to grab
+     * the user's attention, kept visible for three seconds, then faded out.
+     * @param {string} message The message to be shown in the warning box
+     */
     warn(message) {
         if($("#warnbox_container").length > 0) {
             clearInterval($("#warnbox_container").attr("data-interval-id"));
             $("#warnbox_container").remove();
         }
 
-        var prepend_code = "<div id='warnbox_container' style='pointer-events: none !important; height: 100%; width: 100%; z-index: 9998;'><div id='warnbox' class='ui red message' style='height: 10%; width: 20%; position: absolute; top: 3%; right: 3%;'><i style='pointer-events: initial !important;' class='close icon'></i>" + message + "</div></div>";
+        var prepend_code = "<div id='warnbox_container' style='pointer-events: none !important; height: 100%; width: 100%; z-index: 9998;'><div id='warnbox' class='ui orange message' style='height: 10%; width: 20%; position: absolute; top: 3%; right: 3%;'><i style='pointer-events: initial !important;' class='close icon'></i>" + message + "</div></div>";
         $("body").prepend(prepend_code);
         
         $("#warnbox_container").fadeIn(200);
@@ -247,6 +276,7 @@ class View {
         }, 6750);
         $("#warnbox_container").attr("data-interval-id", timeout);
     }
+
 }
 
 class ModalFactory {

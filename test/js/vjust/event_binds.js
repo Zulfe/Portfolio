@@ -4,6 +4,7 @@
  * @version Alpha-0.0.2
  */
 
+// Wait until the content is loaded and visible before 
 $(document).bind("contentLoaded", function() {
 
 var view = new View();
@@ -20,11 +21,16 @@ view.prependToView("#appSettMenu",
 "</div>");
 
 
-/* Application-wide Change Listener
- * =============================================================================================== */
-$(document).bind("changeDetected", function() {
+/**
+ * Use the ModalFactory class to create a new modal ID'd cookies_found. It has no image and no
+ * YouTube URL to load a video from.
+ * Ideally all current help modals will be converted into ModalFactory objects that can be
+ * manipulated.
+*/
+//view.createNewModal("cookies_found", "We found a backup!", "null", "null", "null", "Hooray! We found a backup. We've automatically applied the settings to your current configuration!", "Hooray!");
 
-});
+
+
 
 /* Sidebar Headers
  * =============================================================================================== */
@@ -37,14 +43,6 @@ view.createListener("#projInfoItem", "click", function() {
 view.createListener("#appSettHeader", "click", function() {
     view.animateElement("#appSettMenu", "slide down");
 });
-
-/**
- * Use the ModalFactory class to create a new modal ID'd cookies_found. It has no image and no
- * YouTube URL to load a video from.
- * Ideally all current help modals will be converted into ModalFactory objects that can be
- * manipulated.
-*/
-//view.createNewModal("cookies_found", "We found a backup!", "null", "null", "null", "Hooray! We found a backup. We've automatically applied the settings to your current configuration!", "Hooray!");
 
 
 
@@ -137,8 +135,6 @@ view.createListener("#restore_from_cookies", "click", function() {
     //view.updateEverything(cookies_data);
 });
 
-if(view.isFirstVisit())
-    view.toggleFirstVisitInputModals(true);
 
 
 
@@ -163,8 +159,10 @@ view.createListener([".appPane .secondary", "a"], "mouseover", function() {
     view.logLatestActiveTab(this);
 });
 
+
 view.createListener([".appPane .secondary", "i"], "click", function() {
     var UID = $(this).parent().attr("data-tab");
+    console.log("Suggested new tab is " + view.tabFlow($(this).parent()));
     view.tabFlow($(this).parent()).click();
     $(this).parent().remove();
     $(".appPane div[data-tab='" + UID + "']").remove();
@@ -174,6 +172,27 @@ view.createListener([".appPane .secondary", "i"], "click", function() {
 view.createListener([".appPane .secondary", "a"], "click", function() {
     view.notifyContent(this);
 });
+
+
+
+/* Input Tab Data Collection
+ * =============================================================================================== */
+view.createListener(".input.tab.content.table input", "input", function() {
+    var input_id = $(this).attr("name").split("-");
+    var val      = $(this).val();
+   
+    if(input_id[3] === undefined)
+        //project.getUserVolumeDefinitions().updateComponentValueViaVerbal(input_id[1], input_id[2], val);
+        console.log("Trying to write " + val + " to the " + input_id[1] + " " + input_id[2] + " volume");
+    else
+        //project.getUserVolumeDefinitions().updateComponentValueViaVerbal(input_id[1], input_id[2], val);
+        console.log("Trying to write " + val + " to the " + input_id[1] + " " + input_id[2] + " truck percentage");
+});
+
+/* *********************************************************************************************** */
+
+
+
 
 
 /* Initial Setup
@@ -190,6 +209,9 @@ $(".tab.segment.active").bind("elementsVisible", function() {
     $(".tab.segment.active").unbind("elementsVisible");
 });
 
+if(view.isFirstVisit())
+    view.toggleFirstVisitInputModals(true);
+/* **********************************************************************************************  */
 
 
 /* END OF FILE | END OF FILE | END OF FILE | END OF FILE | END OF FILE | END OF FILE | END OF FILE

@@ -11,7 +11,7 @@
     }
     .input.tab.content.table {
         height: 40%;
-        width: 30%;
+        width: 40%;
 
         display: inline-block;
 
@@ -76,7 +76,7 @@
     }
 
     .input.tab.content.table .perc-input {
-        width: 13%;
+        width: 100%;
     }
 
 
@@ -124,7 +124,7 @@
 
     .input.tab.content.intersection.table-extended {
         height: 20%;
-        width: 30%;
+        width: 40%;
 
         top: 45%;
         left: 2%;
@@ -170,7 +170,7 @@
         position: absolute;
 
         height: 16.5%;
-        width: 30%;
+        width: 40%;
 
         top: 67.5%;
         left: 2%;
@@ -205,7 +205,7 @@
 
     .input.tab.content.intersection.view {
         height: auto;
-        width: 65%;
+        width: 55%;
 
         top: 3%;
         right: 2%;
@@ -213,13 +213,16 @@
         display: inline-block;
 
         position: absolute;
-
-        border: 1px solid red;
     }
 
     .input.tab.content.intersection.internal.container {
         height: 100%;
         width: 100%;
+
+
+-webkit-box-shadow: 8px 8px 7px 0px rgba(0,0,0,0.75);
+-moz-box-shadow: 8px 8px 7px 0px rgba(0,0,0,0.75);
+box-shadow: 8px 8px 7px 0px rgba(0,0,0,0.75);
 
         position: relative;
     }
@@ -231,37 +234,37 @@
 
     .input.tab.content.intersection.internal.context-point-one {
         position: absolute;
-        top: 5.4%;
+        top: 0.4%;
         left: 0.8%;
 
-        height: 27.2%;
+        height: 30%;
         width: 32.5%;
     }
 
     .input.tab.content.intersection.internal.context-point-two {
         position: absolute;
-        top: 5.4%;
+        top: 0.4%;
         right: 0.7%;
 
-        height: 27%;
+        height: 30%;
         width: 32.5%;
     }
 
     .input.tab.content.intersection.internal.context-point-three {
         position: absolute;
-        bottom: 9.5%;
+        bottom: 5.2%;
         left: 0.7%;
 
-        height: 27%;
+        height: 30%;
         width: 32.8%;
     }
 
     .input.tab.content.intersection.internal.context-point-four {
         position: absolute;
-        bottom: 9%;
+        bottom: 5.2%;
         right: 0.7%;
 
-        height: 28%;
+        height: 30%;
         width: 32.5%;
     }
 
@@ -275,8 +278,8 @@
     .input.tab.content.intersection.internal.roadway.southbound {
         position: absolute;
 
-        top: 17%;
-        left: 51%;
+        top: 15%;
+        left: 51.05%;
 
         height: 3.5%;
         width: 23%;
@@ -286,7 +289,7 @@
     .input.tab.content.intersection.internal.roadway.westbound {
         position: absolute;
 
-        top: 35.5%;
+        top: 34.5%;
         right: 5.5%;
 
         height: 3.5%;
@@ -296,7 +299,7 @@
     .input.tab.content.intersection.internal.roadway.northbound {
         position: absolute;
 
-        bottom: 16%;
+        bottom: 14%;
         right: 26%;
 
         height: 3.5%;
@@ -311,7 +314,7 @@
     .input.tab.content.intersection.internal.roadway.eastbound {
         position: absolute;
 
-        top: 35.5%;
+        top: 34.5%;
         left: 5.5%;
 
         height: 3.5%;
@@ -405,6 +408,34 @@
 </style>
 
 <div class="input tab content container">
+
+
+    <script>
+        function isValidVolumeCharacter(event, element) {
+
+            if(event.charCode >= 48 && event.charCode <= 57) {
+                if(parseInt($(element).val() + event.key) <= 10000)
+                    return true;
+                else
+                    $(element).val("20000").trigger("input");
+            }
+            
+            return false;
+        }
+        function isValidPercentageCharacter(event, element) {
+            if(event.charCode >= 48 && event.charCode <= 57 || event.charCode == 46 && $(element).val().indexOf(".") == -1) {
+                if(parseFloat($(element).val() + event.key) <= 100)
+                    return true;
+                else
+                    $(element).val("100").trigger("input");
+            }
+
+            return false;
+        }
+    </script>
+
+
+
     <div class="input tab content table">
         <table>
             <thead>
@@ -436,62 +467,115 @@
                             </tbody>
                         </table>
                     </td>
-                    <td>Truck Percent (%)</td>
+                    <td class="input tab content nested-table-container">
+                        <table class="input tab content directional nested-table">
+                            <thead>
+                                <tr>
+                                    <th colspan="3">Truck Percent (%)</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>Left</td>
+                                    <td>Through</td>
+                                    <td>Right</td>
+                                </tr>
+                                <tr>
+                                    <td><img src="assets/arrows/arrow_left.svg"></td>
+                                    <td><img src="assets/arrows/arrow_through.svg"</td>
+                                    <td><img src="assets/arrows/arrow_right.svg"</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </td>
                 </tr>
                 <tr>
                     <td>Eastbound</td>
                     <td class="input tab content nested-table-container">
                         <table class="input tab content nested-table">
                             <tr>
-                                <td><input type="text" placeholder="0" onkeypress='return event.charCode >= 48 && event.charCode <= 57' name="usertable-eastbound-left"></td>
-                                <td><input type="text" placeholder="0" onkeypress='return event.charCode >= 48 && event.charCode <= 57' name="usertable-eastbound-through"></td>
-                                <td><input type="text" placeholder="0" onkeypress='return event.charCode >= 48 && event.charCode <= 57' name="usertable-eastbound-right"></td>
+                                <td><input class="vol-input" type="text" placeholder="0" onkeypress='return isValidVolumeCharacter(event, this)' name="usertable-eastbound-left"></td>
+                                <td><input class="vol-input" type="text" placeholder="0" onkeypress='return isValidVolumeCharacter(event, this)' name="usertable-eastbound-through"></td>
+                                <td><input class="vol-input" type="text" placeholder="0" onkeypress='return isValidVolumeCharacter(event, this)' name="usertable-eastbound-right"></td>
                             </tr>
                         </table>
                     </td>
-                    <td class="perc-input"><input type="text" placeholder="0" onkeypress='return event.charCode >= 48 && event.charCode <= 57' name="usertable-eastbound-gentruckperc"</td>
+                    <td class="input tab content nested-table-container">
+                        <table class="input tab content nested-table">
+                            <tr>
+                                <td><input class="perc-input" type="text" placeholder="0" onkeypress='return isValidPercentageCharacter(event, this)' name="usertable-eastbound-left-truckperc"></td>
+                                <td><input class="perc-input" type="text" placeholder="0" onkeypress='return isValidPercentageCharacter(event, this)' name="usertable-eastbound-through-truckperc"></td>
+                                <td><input class="perc-input" type="text" placeholder="0" onkeypress='return isValidPercentageCharacter(event, this)' name="usertable-eastbound-right-truckperc"></td>
+                            </tr>
+                        </table>
+                    </td>
                 </tr>
                 <tr>
                     <td>Westbound</td>
                     <td class="input tab content nested-table-container">
                         <table class="input tab content nested-table">
                             <tr>
-                                <td><input type="text" placeholder="0" onkeypress='return event.charCode >= 48 && event.charCode <= 57' name="usertable-westbound-left"></td>
-                                <td><input type="text" placeholder="0" onkeypress='return event.charCode >= 48 && event.charCode <= 57' name="usertable-westbound-through"></td>
-                                <td><input type="text" placeholder="0" onkeypress='return event.charCode >= 48 && event.charCode <= 57' name="usertable-westbound-right"></td>
+                                <td><input class="vol-input" type="text" placeholder="0" onkeypress='return isValidVolumeCharacter(event, this)' name="usertable-westbound-left"></td>
+                                <td><input class="vol-input" type="text" placeholder="0" onkeypress='return isValidVolumeCharacter(event, this)' name="usertable-westbound-through"></td>
+                                <td><input class="vol-input" type="text" placeholder="0" onkeypress='return isValidVolumeCharacter(event, this)' name="usertable-westbound-right"></td>
                             </tr>
                         </table>
                     </td>
-                    <td class="perc-input"><input type="text" placeholder="0" onkeypress='return event.charCode >= 48 && event.charCode <= 57' name="usertable-westbound-gentruckperc"></td>
+                    <td class="input tab content nested-table-container">
+                        <table class="input tab content nested-table">
+                            <tr>
+                                <td><input class="perc-input" type="text" placeholder="0" onkeypress='return isValidPercentageCharacter(event, this)' name="usertable-westbound-left-truckperc"></td>
+                                <td><input class="perc-input" type="text" placeholder="0" onkeypress='return isValidPercentageCharacter(event, this)' name="usertable-westbound-through-truckperc"></td>
+                                <td><input class="perc-input" type="text" placeholder="0" onkeypress='return isValidPercentageCharacter(event, this)' name="usertable-westbound-right-truckperc"></td>
+                            </tr>
+                        </table>
+                    </td>
                 </tr>
                 <tr>
                     <td>Southbound</td>
                     <td class="input tab content nested-table-container">
                         <table class="input tab content nested-table">
                             <tr>
-                                <td><input type="text" placeholder="0" onkeypress='return event.charCode >= 48 && event.charCode <= 57' name="usertable-southbound-left"></td>
-                                <td><input type="text" placeholder="0" onkeypress='return event.charCode >= 48 && event.charCode <= 57' name="usertable-southbound-through"></td>
-                                <td><input type="text" placeholder="0" onkeypress='return event.charCode >= 48 && event.charCode <= 57' name="usertable-southbound-right"></td>
+                                <td><input class="vol-input" type="text" placeholder="0" onkeypress='return isValidVolumeCharacter(event, this)' name="usertable-southbound-left"></td>
+                                <td><input class="vol-input" type="text" placeholder="0" onkeypress='return isValidVolumeCharacter(event, this)' name="usertable-southbound-through"></td>
+                                <td><input class="vol-input" type="text" placeholder="0" onkeypress='return isValidVolumeCharacter(event, this)' name="usertable-southbound-right"></td>
                             </tr>
                         </table>
                     </td>
-                    <td class="perc-input"><input type="text" placeholder="0" onkeypress='return event.charCode >= 48 && event.charCode <= 57' name="usertable-southbound-gentruckperc"></td>
+                    <td class="input tab content nested-table-container">
+                        <table class="input tab content nested-table">
+                            <tr>
+                                <td><input class="perc-input" type="text" placeholder="0" onkeypress='return isValidPercentageCharacter(event, this)' name="usertable-southbound-left-truckperc"></td>
+                                <td><input class="perc-input" type="text" placeholder="0" onkeypress='return isValidPercentageCharacter(event, this)' name="usertable-southbound-through-truckperc"></td>
+                                <td><input class="perc-input" type="text" placeholder="0" onkeypress='return isValidPercentageCharacter(event, this)' name="usertable-southbound-right-truckperc"></td>
+                            </tr>
+                        </table>
+                    </td>
                 </tr>
                 <tr>
                     <td>Northbound</td>
                     <td class="input tab content nested-table-container">
                         <table class="input tab content nested-table">
                             <tr>
-                                <td><input type="text" placeholder="0" onkeypress='return event.charCode >= 48 && event.charCode <= 57' name="usertable-northbound-left"></td>
-                                <td><input type="text" placeholder="0" onkeypress='return event.charCode >= 48 && event.charCode <= 57' name="usertable-northbound-through"></td>
-                                <td><input type="text" placeholder="0" onkeypress='return event.charCode >= 48 && event.charCode <= 57' name="usertable-northbound-right"></td>
+                                <td><input class="vol-input" type="text" placeholder="0" onkeypress='return isValidVolumeCharacter(event, this)' name="usertable-northbound-left"></td>
+                                <td><input class="vol-input" type="text" placeholder="0" onkeypress='return isValidVolumeCharacter(event, this)' name="usertable-northbound-through"></td>
+                                <td><input class="vol-input" type="text" placeholder="0" onkeypress='return isValidVolumeCharacter(event, this)' name="usertable-northbound-right"></td>
                             </tr>
                         </table>
                     </td>
-                    <td class="perc-input"><input type="text" placeholder="0" onkeypress='return event.charCode >= 48 && event.charCode <= 57' name="usertable-northbound-gentruckperc"></td>
+                    <td class="input tab content nested-table-container">
+                        <table class="input tab content nested-table">
+                            <tr>
+                                <td><input class="perc-input" onkeypress='return isValidPercentageCharacter(event, this)' type="text" placeholder="0" name="usertable-northbound-left-truckperc"></td>
+                                <td><input class="perc-input" onkeypress='return isValidPercentageCharacter(event, this)' type="text" placeholder="0" name="usertable-northbound-through-truckperc"></td>
+                                <td><input class="perc-input" onkeypress='return isValidPercentageCharacter(event, this)' type="text" placeholder="0" name="usertable-northbound-right-truckperc"></td>
+                            </tr>
+                        </table>
+                    </td>
                 </tr>
             </tbody>
         </table>
+
     </div>
 
     <div class="input tab content intersection table-extended">
@@ -504,17 +588,17 @@
 
             <tbody>
                 <tr>
-                    <td>Adjustment Factor</td>
+                    <td>Adjustment Factor (%)</td>
                     <td>
                         <table class="input tab content nested-table-extended">
                             <tr>
-                                <td><input type="text" placeholder="0.85" onkeypress='return event.charCode >= 48 && event.charCode <= 57' name="userextendedtable-uturn-factor"></td>
-                                <td><input type="text" placeholder="0.95" onkeypress='return event.charCode >= 48 && event.charCode <= 57' name="userextendedtable-left-factor"></td>
+                                <td><input type="text" placeholder="85" onkeypress='return isValidPercentageCharacter(event, this)' name="userextendedtable-uturn-factor"></td>
+                                <td><input type="text" placeholder="95" onkeypress='return isValidPercentageCharacter(event, this)' name="userextendedtable-left-factor"></td>
                             </tr>
                         </table>
                     </td>
                     <td style="background-color: #BBBBBB"></td>
-                    <td><input type="text" placeholder="0.85" onkeypress='return event.charCode >= 48 && event.charCode <= 57' name="userextendedtable-right-factor"></td>
+                    <td><input type="text" placeholder="85" onkeypress='return isValidPercentageCharacter(event, this)' name="userextendedtable-right-factor"></td>
                     <td style="background-color: #BBBBBB"></td>
                 </tr>
                 <tr>
