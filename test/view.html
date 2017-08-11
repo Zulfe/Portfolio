@@ -9,7 +9,6 @@
         <script type="text/javascript" src="js/semantic.js"></script>
         <script src="js/vjust/functions.js"></script>
         <script src="js/vjust/classes.js"></script>
-        <script src="js/vjust/calcs.js"></script>
         <script src="js/vjust/globals.js"></script>
         <script src="js/contextMenu.js"></script>
         <script src="js/vjust/arrow_layout.js"></script>
@@ -72,9 +71,11 @@
 
             <div class="ui bottom attached tab segment" data-tab="testtab">This is some text for the test tab.</div>
 
-            <div class="ui bottom attached tab segment" data-tab="add_tab" style="width: 98%; margin: center;">
-                <img src="assets/intersections/conventional.svg" data-intersection-type="conventional" style="height: auto; width: 20%;">
-
+            <div class="ui bottom attached tab segment" data-tab="add_tab" style="height: 100%; width: 100%;">
+                <div data-intersection-type="conventional">
+                    <img src="assets/intersections/conventional.svg" \>
+                    <p>Conventional</p>
+                </div>
             </div>
 
         </div>     
@@ -160,8 +161,6 @@
         // [BEGIN] ////////// [I DON'T HAVE A NAME FOR THIS YET] /\/\/\/\/\/\/\
 
         project = new Project("Test Project", "Damon", "Broad and 14th", "Broad", "14th", "Broad", "14th", "Hospital", "VDOT", "Gas Station", "VACU");
-        var COOKIETOOL = new CookiesUtility();
-        //document.getElementById("files").addEventListener('change', buildImportFilelist, false);
 
         // Hide all of the page's contents.
         $("#init_loader").children().slice(1).hide();
@@ -183,10 +182,8 @@
         acquireResources().done(function(){
             killLoader().done(function(){
                 awakenContent().done(function(){
-                    $(".tab.segment.active").trigger("elementsVisible");
                     $(document).trigger("contentLoaded");
-                    if(COOKIETOOL.cookiesFoundOnStartup() && COOKIETOOL.isCookieLatestBackup())
-                        $("#cookies_found").modal("show");
+                    $(".tab.segment.active").trigger("elementsVisible");
                 });
             });
         });
@@ -194,8 +191,6 @@
         //if(isFrstTimeUser())
 
         $(".ui.bottom.attached.tab.segment[data-tab='primary-view']").load("input_form.html");
-
-        console.log(project);
     });
     </script>
 

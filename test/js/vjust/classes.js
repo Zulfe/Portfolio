@@ -14,8 +14,8 @@ class Project {
      * @param {string} project_ID The name or identifier of the current configuration
      * @param {string} intersection_name The name or identifier of the intersection being evaluated
      * in the current project
-     * @param {string} ns_route_name The name of the intersecting route that travels north and south
-     * @param {string} ew_route_name The name of the intersecting route that travels east and west
+     * @param {string} ns_route_name The name of the intersecting route that travels southbound and northbound
+     * @param {string} ew_route_name The name of the intersecting route that travels westbound and eastbound
      * @param {string} cp_one The name of the first context point.
      * @param {string} cp_two The name of the second context point.
      * @param {string} cp_three The name of the third context point.
@@ -38,6 +38,9 @@ class Project {
 
         this._cookies_utility   = new CookiesUtility();
 
+        this.initializeUserVolumeDefinitions();
+        this.initializeGeneralVolumes();
+
         this._intersections = new Array();
         for(var interNum = 0; interNum < NUM_INTERSECTION_CONFIGS; interNum++)
             this._intersections.push(new Intersection(interNum, 6));
@@ -54,15 +57,167 @@ class Project {
         )
     }
 
-    /**
-     * Sets the entries of every direction of every zone of every intersection to 0.
-     */
-    resetConfig() {
-        for(var i = 0; i < 50; i++)
-            for(var z = 0; z < 6; z++)
-                for(var d = 0; d < 4; d++)
-                    this._intersections[i].getZoneByIndex(z).getDirectionByIndex(d).setEntryArray([0, 0, 0, 0, 0, 0]);
+    initializeUserVolumeDefinitions() {
+        /**
+         * Creates the UserVolumeDefinition object of the Project object and initializes to zeroes
+         * Creates the master PCETable object used to derive ZonePCEs and initializes to zeroes
+         */
+        var southbound_detvol  = new BoundedDetailedVolume("southbound" , 0, 0, 0);
+        var westbound_detvol   = new BoundedDetailedVolume("westbound" , 0, 0, 0);
+        var northbound_detvol  = new BoundedDetailedVolume("northbound" , 0, 0, 0);
+        var eastbound_detvol   = new BoundedDetailedVolume("eastbound" , 0, 0, 0);
+        var southbound_detperc = new DetailedPercentage("southbound" , 0, 0, 0);
+        var westbound_detperc  = new DetailedPercentage("westbound" , 0, 0, 0);
+        var northbound_detperc = new DetailedPercentage("northbound" , 0, 0, 0);
+        var eastbound_detperc  = new DetailedPercentage("eastbound" , 0, 0, 0);
+        
+        this._user_volume_definitions = new UserVolumeDefinitions(
+            southbound_detvol   
+            ,westbound_detvol   
+            ,northbound_detvol    
+            ,eastbound_detvol    
+            ,southbound_detperc  
+            ,westbound_detperc   
+            ,northbound_detperc  
+            ,eastbound_detperc   		
+            ,false
+        );
+        
+        this._master_PCE_table = new PCETable(
+            this._user_volume_definitions.getDirectionByIndex(0).getPassengerCarEquivalentWithDetailedPercentObject("southbound", this._user_volume_definitions._user_defined_southbound_truck_perc),
+            this._user_volume_definitions.getDirectionByIndex(1).getPassengerCarEquivalentWithDetailedPercentObject("westbound", this._user_volume_definitions._user_defined_westbound_truck_perc),
+            this._user_volume_definitions.getDirectionByIndex(2).getPassengerCarEquivalentWithDetailedPercentObject("northbound", this._user_volume_definitions._user_defined_northbound_truck_perc),
+            this._user_volume_definitions.getDirectionByIndex(3).getPassengerCarEquivalentWithDetailedPercentObject("eastbound", this._user_volume_definitions._user_defined_eastbound_truck_perc)
+        );
     }
+    
+    initializeGeneralVolumes() {
+        /**
+         * Creates GeneralVolume objects for running Fratar and storing Fratar inputs; initializes to zeroes
+         * Creates GeneralVolumeSplitDirection objects for running Fratar and storing Fratar inputs; initializes to zeroes
+         */
+        this._north_genvol = new GeneralVolume("north", 0, 0.5, 1, 0);
+        this._east_genvol = new GeneralVolume("east", 0, 0.5, 1, 0);
+        this._south_genvol = new GeneralVolume("south", 0, 0.5, 1, 0);
+        this._west_genvol = new GeneralVolume("west", 0, 0.5, 1, 0);
+        
+        this._general_volumes = [this._north_genvol,
+                                 this._east_genvol,
+                                 this._south_genvol,
+                                 this._west_genvol]
+        
+        this._north_split_genvol = new GeneralVolumeSplitDirection("north", 0, 0, 1, 0, 0);
+        this._east_split_genvol = new GeneralVolumeSplitDirection("east", 0, 0, 1, 0, 0);
+        this._south_split_genvol = new GeneralVolumeSplitDirection("south", 0, 0, 1, 0, 0);
+        this._west_split_genvol = new GeneralVolumeSplitDirection("west", 0, 0, 1, 0, 0);
+        
+        this._general_split_volumes = [this._north_split_genvol,
+                                       this._east_split_genvol, 
+                                       this._south_split_genvol,
+                                       this._west_split_genvol,
+                                       ];
+    }
+    
+    updateGeneralVolume(cardinal_direction, volume, d_factor, k_factor, truck_percent) {
+        /**
+         * Receives user input in Fratar general volume table, updates the appropriate GeneralVolume object and re-runs Fratar
+         * @param {string} cardinal_direction The approach direction relative to the intersection (eg. "north" is the approach north of the intersection)
+         * @param {number} volume The 2-way link volume (AADT or Peak Hour) of the subject approach
+         * @param {float} d_factor The directional distribution of the subject link volume
+         * @param {float} k_factor A factor indicating what percentage of volume occurs in the peak hour (k_factor == 1 implies volume is a peak hour volume)
+         * @param {float} truck_percent The percentage of volume comprising trucks
+         */
+        var direction = parseInt(objectKeyByValue(UnboundDirectionEnum, cardinal_direction));
+        this._general_volumes[direction].setGeneralVolumeArray([volume, d_factor, k_factor, truck_percent]);
+        var run_fratar = new VolumeTool(this._north_genvol, this._east_genvol, this._south_genvol, this._west_genvol, true);
+    }
+    
+    getGeneralVolumes(cardinal_direction, selector) {
+        /**
+         * Returns selected attributes of a GeneralVolume object
+         * @param {string} cardinal_direction The approach direction relative to the intersection (eg. "north" is the approach north of the intersection)
+         * @param {string} selector Identifies which attribute of the GeneralVolume object the user wants returned
+         * @returns {object[]} An array of four GeneralVolume objects if cardinal_direction is undefined
+         * @returns {object} A single GeneralVolume objects if cardinal_direction defined and selector is undefined
+         * @returns {var} A string, integer, or float depending on the value of selector when both cardinal_direction and selector are defined
+         */
+        if (cardinal_direction === undefined && selector === undefined) 
+            return this._general_volumes;
+        else {
+            var direction = parseInt(objectKeyByValue(UnboundDirectionEnum, cardinal_direction));
+            this._general_volumes[direction].getAttributeBySelector(selector);
+        }
+    } 
+    
+    updateGeneralSplitVolume(cardinal_direction, volume_in, volume_out, k_factor, truck_perc_in, truck_perc_out) {/**
+         * Receives user input in Fratar general volume table, updates the appropriate GeneralVolume object and re-runs Fratar
+         * @param {string} cardinal_direction The approach direction relative to the intersection (eg. "north" is the approach north of the intersection)
+         * @param {number} volume_in The 1-way link volume (AADT or Peak Hour) of the subject approach entering the intersection (eg. southbound traffic north of the intersection)
+         * @param {number} volume_out The 1-way link volume (AADT or Peak Hour) of the subject approach exiting the intersection (eg. northbound traffic north of the intersection)
+         * @param {float} k_factor A factor indicating what percentage of volume occurs in the peak hour (k_factor == 1 implies volume is a peak hour volume)
+         * @param {float} truck_perc_in The percentage of volume_in comprising trucks
+         * @param {float} truck_perc_out The percentage of volume_out comprising trucks
+         */
+        var direction = parseInt(objectKeyByValue(UnboundDirectionEnum, cardinal_direction));
+        this._general_volumes[direction].setGeneralVolumeArray([volume, d_factor, k_factor, truck_percent]);
+        var run_fratar = new VolumeTool(this._north_split_genvol, this._east_split_genvol, this._south_split_genvol, this._west_split_genvol, true);
+    }
+    
+    getGeneralSplitVolumes(cardinal_direction, selector) {
+        /**
+         * Returns selected attributes of a GeneralVolumeSplitDirection object
+         * @param {string} cardinal_direction The approach direction relative to the intersection (eg. "north" is the approach north of the intersection)
+         * @param {string} selector Identifies which attribute of the GeneralVolumeSplitDirection object the user wants returned
+         * @returns {object[]} An array of four GeneralVolumeSplitDirection objects if cardinal_direction is undefined
+         * @returns {object} A single GeneralVolumeSplitDirection objects if cardinal_direction defined and selector is undefined
+         * @returns {var} A string, integer, or float depending on the value of selector when both cardinal_direction and selector are defined
+         */
+        if (cardinal_direction === undefined && selector === undefined) 
+            return this._general_split_volumes;
+        else {
+            var direction = parseInt(objectKeyByValue(UnboundDirectionEnum, cardinal_direction));
+            this._general_split_volumes[direction].getAttributeBySelector(selector);
+        }
+    }
+        
+    updateUserVolumeDefinitions(southbound_totvol_bounded, westbound_totvol_bounded, northbound_totvol_bounded, eastbound_totvol_bounded, southbound_truckperc, westbound_truckperc, northbound_truckperc, eastbound_truckperc, using_fratar) {
+        /** Replaces the values in this._user_volume_definitions, a UserVolumeDefinitions object, and updates this._master_PCE_table, a PCETable object
+         * @param {object} southbound_totvol_bounded A BoundedDetailedVolume representing the total entering volume (cars + trucks) at the southbound approach
+         * @param {object} westbound_totvol_bounded A BoundedDetailedVolume representing the total entering volume (cars + trucks) at the westbound approach
+         * @param {object} northbound_totvol_bounded A BoundedDetailedVolume representing the total entering volume (cars + trucks) at the northbound approach
+         * @param {object} eastbound_totvol_bounded A BoundedDetailedVolume representing the total entering volume (cars + trucks) at the eastbound approach
+         * @param {object} southbound_truckperc A DetailedPercentage representing the truck percentage of the southbound approach
+         * @param {object} westbound_truckperc A DetailedPercentage representing the truck percentage of the westbound approach
+         * @param {object} northbound_truckperc A DetailedPercentage representing the truck percentage of the northbound approach
+         * @param {object} eastbound_truckperc A DetailedPercentage representing the truck percentage of the eastbound approach
+         * @param {bool} using_fratar A boolean value indicating whether the turning movements were generated by the Fratar method or not
+         */
+        this._user_volume_definitions.updateUserVolumeDefinitions(
+            southbound_totvol_bounded,
+            westbound_totvol_bounded,
+            northbound_totvol_bounded,
+            eastbound_totvol_bounded,
+            southbound_truckperc,
+            westbound_truckperc,
+            northbound_truckperc,
+            eastbound_truckperc,
+            using_fratar
+        );
+
+        this._master_PCE_table.updatePCETable(
+            this._user_volume_definitions.getDirectionByIndex(0).getPassengerCarEquivalentWithDetailedPercentObject("southbound", this._user_volume_definitions._user_defined_southbound_truck_perc),
+            this._user_volume_definitions.getDirectionByIndex(1).getPassengerCarEquivalentWithDetailedPercentObject("westbound", this._user_volume_definitions._user_defined_westbound_truck_perc),
+            this._user_volume_definitions.getDirectionByIndex(2).getPassengerCarEquivalentWithDetailedPercentObject("northbound", this._user_volume_definitions._user_defined_northbound_truck_perc),
+            this._user_volume_definitions.getDirectionByIndex(3).getPassengerCarEquivalentWithDetailedPercentObject("eastbound", this._user_volume_definitions._user_defined_eastbound_truck_perc)
+        );
+
+        this._master_PCE_table.updateAllZones();			
+    }
+    
+    getMasterPCETable() {
+        return this._master_PCE_table;
+    }
+
 
     /**
      * Retreive an Intersection object by its position in the Project's Intersection array.
@@ -79,9 +234,13 @@ class Project {
      * @returns {Object} The Intersection object with the specified ID number
      */
     getIntersectionByID(config_ID) {
-        return this._intersections[config_ID - 1];
+        return this._intersections[config_ID];
     }
 
+    /**
+     * Retreive an array containing every Intersection object in the Project object
+     * @returns {Object[]} The an array of Intersection objects
+     */
     getIntersectionArray() {
         return this._intersections;
     }
@@ -104,8 +263,9 @@ class Project {
     /**
      * Use a given configuration matrix to update the configuration, from the Intersections down to the Direction(al) entries.
      * @param {int[][][][]} config_matrix A four-dimensional matrix where the first dimension represents Intersections, the second dimension
-     * represents Zones, the third dimensions represents Directions, and the fourth dimension represents the Direction's entries.
+     * represents Zones, the third dimension represents Directions, and the fourth dimension represents the Direction's entries.
      * The first entry on the second and third dimensions are reserved for flags to detail if the above dimension is active.
+     * @deprecated
      */
     importConfigFromMatrix(config_matrix) {
         for(var config_index = 0; config_index < config_matrix.length; config_index++) {
@@ -128,6 +288,7 @@ class Project {
      * Create a four-dimensional matrix from the current configuration settings such that zero'th entry is a flag representing
      * if the above dimension is interpretated as active.
      * @returns {int[][][][]} A four-dimensional matrix 
+     * @deprecated
      */
     exportConfigToMatrix() {
         // Needs refactoring...
@@ -165,7 +326,7 @@ class Project {
      * Automatically initiate a download for the completed CSV contents.
      */
     exportConfigToCSV() {
-        var headers = ["configuration", "zone", "direction", "left lanes", "through lanes", "right lanes", "shared left", "shared right", "channeled right"];
+        var headers = ["configuration", "zone", "direction", "left lanes", "through lanes", "right lanes", "shared left", "shared right", "channelized right"];
         var csvContent = "data:text/csv;charset=utf-8,";
 
         // For each header string in the headers array, add it to the CSV content with a comma appended as long as it's not the last element. If it is the 
@@ -190,7 +351,7 @@ class Project {
                 for(var dir = MIN_EFFECTIVE_DIR; dir < NUM_DIRS; dir++) {
                    
                     // Write the intersection's name in the first column, the zone number in the second, and the cardinal direction in the third.
-                    csvContent += IntersectionEnum[config.toString()] + "," + (zone + 1) + "," + DirectionEnum[dir.toString()] + ",";
+                    csvContent += IntersectionEnum[config.toString()] + "," + (zone + 1) + "," + DirectionEnum[dir.toString()].toUpperCase() + ",";
                     
                     for(var entry = MIN_EFFECTIVE_ENTRY; entry < NUM_ENTRIES; entry++) {
                         var data_entry = this.getIntersectionByIndex(config).getZoneByIndex(zone).getDirectionByIndex(dir).getEntryByIndex(entry); 
@@ -242,7 +403,7 @@ class Project {
             for(var row = 1; row < csv_data.length; row++) {
                 _this._intersections[objectKeyByValue(IntersectionEnum, csv_data[row][0])]
                     .getZoneByIndex(csv_data[row][1] - 1)
-                    .getDirectionByIndex(objectKeyByValue(DirectionEnum, csv_data[row][2]))
+                    .getDirectionByIndex(objectKeyByValue(DirectionEnum.toLowerCase(), csv_data[row][2]))
                     .setEntryArray([parseInt(csv_data[row][3]), parseInt(csv_data[row][4]), parseInt(csv_data[row][5]), parseInt(csv_data[row][6]), parseInt(csv_data[row][7]), parseInt(csv_data[row][8])]);
             }
         });
@@ -274,9 +435,73 @@ class Intersection {
         this._enabled = 1;
         this._effective_zones = effective_zones;
 
+        this._config_arr = [];
+        if (CONFIGROUTE.length < this._config_ID + 1) {
+            this._enabled = 0;
+        } else {
+            this._config_arr = CONFIGROUTE[this._config_ID];
+        }
+        
         this._zones = new Array();
-        for(var zone_num = 0; zone_num < effective_zones; zone_num++)
-            this._zones.push(new Zone(zone_num + 1, config_ID));
+        this._enabled_zones = new Array();
+        
+        for (var zone_num = 0; zone_num < effective_zones; zone_num++)
+            this._enabled_zones[zone_num] = 0;
+        
+        for (var record = 0; record < this._config_arr.length; record++) {
+			var enabled_zone = this._config_arr[record][1] - 1;
+            if (enabled_zone >= 0)
+                this._enabled_zones[enabled_zone] = 1;
+        }
+        
+        for(zone_num = 0; zone_num < effective_zones; zone_num++)
+            this._zones.push(new Zone(zone_num + 1, config_ID, this._enabled_zones[zone_num]));
+    }
+
+     /**
+     * Resets the BoundedDetailedVolume object in each Direction and calculates their new values based on updates to Project._master_PCE_table
+     */
+    updateZonePCEs() {
+		for (var zone = MIN_EFFECTIVE_ZONE; zone < NUM_ZONES; zone++) {
+			for (var direction = 0; direction < 4; direction++) {
+                var subjectZone = this.getZoneByIndex(zone);
+                if (subjectZone.isEnabled())
+				    subjectZone.getZonePCEs().getDirectionByIndex(direction).setMovementArray([-1,-1,-1]);
+			}
+		}
+		this.setZonePCEs();
+    }
+
+     /**
+     * Updates the BoundedDetailedVolume object in each Direction object when a new zone is instantiated
+     * or if UserVolumeDefinitions change
+     */
+    setZonePCEs() {
+			
+		for (var record = 0; record < this._config_arr.length; record++) {
+			var route = this._config_arr[record][0];
+			if (this._config_arr[record][1] == 0) {
+				var masterDirection = this._config_arr[record][2];
+				var masterMovement = this._config_arr[record][3];
+				var volume = PROJECT.getMasterPCETable().getDirectionByIndex(masterDirection).getMovementByIndex(masterMovement);
+			}
+			else if (this._config_arr[record][1] == -1) {
+				1 == 1;
+			}
+			else {
+				var subjectZone = this._config_arr[record][1];
+				var subjectDirection = this._config_arr[record][2];
+				var subjectMovement = this._config_arr[record][3];
+				this.getZoneByIndex(subjectZone - 1).addPCEtoZone(volume, subjectDirection, subjectMovement);
+                //this.getZoneByIndex(subjectZone - 1).setEnabled(true);
+			}
+		}
+        this.setEffectiveZones(0);
+        for (subjectZone = 0; subjectZone < 6; subjectZone++) {
+            if (this.getZoneByIndex(subjectZone).isEnabled())
+                this.getZoneByIndex(subjectZone).createDirections();
+                this.setEffectiveZones(1 + this.getEffectiveZones());
+        }
     }
 
     /**
@@ -355,7 +580,7 @@ class Zone {
      * when initialized, creates four instances of Direction objects, one for each cardinal direction.
      * @param {int} zone_ID The identification number for this zone. This number should always be between 1 and 6.
      */
-    constructor(zone_ID, intersection_ID) {
+    constructor(zone_ID, intersection_ID, active_flag) {
         if(zone_ID > 6) {
             console.warn("Invalid Zone construction: zone ID cannot be greater than 6. Skipping...");
         }
@@ -371,87 +596,102 @@ class Zone {
         this.CONTROL_TWSC       = 1;
         this.CONTROL_ROUNDABOUT = 2;
         //this.CONTROL_AWSC       = 3;
-
+		
         this._intersection_ID   = intersection_ID;
         this._zone_ID           = zone_ID;
-        this._active_flag       = 1;
-        this._southbound        = new Direction("southbound", intersection_ID, zone_ID, 0);
-        this._westbound         = new Direction("westbound" , intersection_ID, zone_ID, 1);
-        this._northbound        = new Direction("northbound", intersection_ID, zone_ID, 2);
-        this._eastbound         = new Direction("eastbound" , intersection_ID, zone_ID, 3);
-        this._direction_array   = [this._north, this._south, this._east, this._west];
+        this._active_flag       = active_flag;
         this._control_type      = this.CONTROL_SIGNAL;
+		
+        this._southbound_PCEs   = new BoundedDetailedVolume("southbound",-1,-1,-1);
+		this._westbound_PCEs    = new BoundedDetailedVolume("westbound",-1,-1,-1);
+		this._northbound_PCEs   = new BoundedDetailedVolume("northbound",-1,-1,-1);
+		this._eastbound_PCEs    = new BoundedDetailedVolume("eastbound",-1,-1,-1);
+		
+		this._southbound_PCEs.setPCEState(true);
+		this._westbound_PCEs.setPCEState(true);
+        this._northbound_PCEs.setPCEState(true);
+        this._eastbound_PCEs.setPCEState(true);		
 
-        //TEMPORARILY FILL CONFIG ARRAY AS CONVENTIONAL INTERSECTION
-        this._config_arr = [];
-        for (var x = 0; x < 24; x++) {
-            this._config_arr[x] = [];
-            this._config_arr[x][0] = Math.floor(x / 2);
-            this._config_arr[x][1] = x % 2;
-            this._config_arr[x][2] = Math.floor(x / 6);
-            this._config_arr[x][3] = Math.floor((x % 6) / 2);
-
-            this._config_arr[x][4] = x % 2 - 1;
-            this._config_arr[x][5] = Math.floor(x / 6) * (x % 2) + (x % 2) - 1;
-            this._config_arr[x][6] = Math.floor((x % 6) / 2) * (x % 2) + (x % 2) - 1;
-        }
-
-        for (x = 0; x < 24; x++) {
-            var str = "";
-            for (var y = 0; y < 7; y++) {
-                str = str + this._config_arr[x][y] + ",";
-            }
-        }
-        //END TEMPORARY FILL
-            
-       this.updateZonePCEs;
-        
+		this.initializeZonePCEs();
+	}
+	
+	initializeZonePCEs() {
+        if (this._active_flag) 
+			this._zone_PCEs = new PCETable(this._southbound_PCEs, this._westbound_PCEs, this._northbound_PCEs, this._eastbound_PCEs);
+	}
+	
+	/**
+	 *
+	 */
+	addPCEtoZone(volume, subjectDirection, subjectMovement) {
+		
+		var subjectVol = this.getZonePCEs().getDirectionByIndex(subjectDirection).getMovementByIndex(subjectMovement);
+		if ( subjectVol == -1) {
+			this.getZonePCEs().getDirectionByIndex(subjectDirection).setMovementByIndex(subjectMovement, volume);
+		}
+		else {
+			this.getZonePCEs().getDirectionByIndex(subjectDirection).setMovementByIndex(subjectMovement, subjectVol + volume);
+		}
+        this.sync();
+	}
+	
+    sync() {
+        this._southbound_PCEs = this.getZonePCEs().getDirectionByIndex(0);
+        this._westbound_PCEs  = this.getZonePCEs().getDirectionByIndex(1);
+        this._northbound_PCEs = this.getZonePCEs().getDirectionByIndex(2);
+        this._eastbound_PCEs  = this.getZonePCEs().getDirectionByIndex(3); 
     }
-
-    /**
-     * Updates the BoundedDetailedVolume object in each Direction object when a new zone is instantiated
-     * or if UserVolumeDefinitions change
-     */
-    updateZonePCEs() {
-        for (x = 0; x < this._config_arr.length; x++) {
-        
-        }
+    
+	getZonePCEs () {
+		return this._zone_PCEs;
+	}
+	
+    getZoneTCUs () {
+        return this._zone_TCUs;
     }
-
-    /**
-     * Returns the Direction object in which traffic is traveling through this Zone northbound.
-     * @returns {Direction} The Direction object for northbound traffic
-     */
-    getNorthbound() {
-        return this._northbound;
+    
+    createDirections() {
+        this._southbound        = new Direction("southbound", this._zone_PCEs, this._intersection_ID, this._zone_ID, 0);
+        this._westbound         = new Direction("westbound" , this._zone_PCEs, this._intersection_ID, this._zone_ID, 1);
+        this._northbound        = new Direction("northbound", this._zone_PCEs, this._intersection_ID, this._zone_ID, 2);
+        this._eastbound         = new Direction("eastbound" , this._zone_PCEs, this._intersection_ID, this._zone_ID, 3);
+        this._direction_array   = [this._southbound, this._westbound, this._northbound, this._eastbound];
+        this._zone_TCUs         = new TCUTable(this._zone_ID, this._intersection_ID);
     }
-
     /**
-     * Returns the Direction object in whcih traffic is traveling through this Zone southbound.
+     * Returns the Direction object in which traffic is traveling through this Zone southbound.
      * @returns {Direction} The Direction object for southbound traffic
      */
-    getSouthbound() {
+    getsouthbound() {
         return this._southbound;
     }
 
     /**
-     * Returns the Direction object in which traffic is traveling through this Zone eastbound.
-     * @returns {Direction} The Direction object for eastbound traffic
+     * Returns the Direction object in whcih traffic is traveling through this Zone northbound.
+     * @returns {Direction} The Direction object for northbound traffic
      */
-    getEastbound() {
-        return this._eastbound;
+    getnorthbound() {
+        return this._northbound;
     }
 
     /**
      * Returns the Direction object in which traffic is traveling through this Zone westbound.
      * @returns {Direction} The Direction object for westbound traffic
      */
-    getWestbound() {
+    getwestbound() {
         return this._westbound;
     }
 
     /**
-     * Returns the array of Direction objects for the Zone in the order: North, South, East, West
+     * Returns the Direction object in which traffic is traveling through this Zone eastbound.
+     * @returns {Direction} The Direction object for eastbound traffic
+     */
+    geteastbound() {
+        return this._eastbound;
+    }
+
+    /**
+     * Returns the array of Direction objects for the Zone in the order: southbound, westbound, northbound, eastbound
      * @returns {Direction[]} An array of Direction objects
      */
     getDirectionArray() {
@@ -499,14 +739,14 @@ class Zone {
     /** Returns the control type of this zone as an integer
       * @returns {integer} 0 for Signalized, 1 for TWSC, 2 for Roundabout, or 3 for AWSC
       */
-     getControlVal() {
+    getControlVal() {
          return this._control_type;
      }
 
     /** Returns the control type of this zone as a string
       * @returns {string} A string describing the zone control type
       */
-     getControlType() {
+    getControlType() {
         return this._ControlEnum[this._control_type.toString()];
      }
 }
@@ -518,33 +758,63 @@ class Zone {
 class Direction {
     /**
      * The lowest level of the Project data structure. The Direction object contains information about its cardinal direction and
-     * the number of (left, through, right, shared left, shared right, and channeled right) lanes for said cardinal direction.
+     * the number of (left, through, right, shared left, shared right, and channelized right) lanes for said cardinal direction.
      * @constructor
-     * @param {string} cardinal_direction The cardinal direction (northbound, eastbound, southbound, or westbound) for this Direction object.
+     * @param {string} cardinal_direction The cardinal direction (southbound, westbound, northbound, or eastbound) for this Direction object.
      */
-    constructor(cardinal_direction, intersection_id, zone_id, direction_id) {
+    constructor(cardinal_direction, user_volumes, intersection_id, zone_id, direction_id) {
         this._cardinal_direction   = cardinal_direction;
-        this._left_turn            = 0;
-        this._through              = 0;
-        this._right_turn           = 0;
+    //    this._all_volumes          = user_volumes;
+    //    this._user_movement_vols   = user_volumes.getDirectionByIndex(direction_id);
+        if (user_volumes.getDirectionByIndex(direction_id).getLeft() == -1) {
+            this._left_turn        = 0;
+        } else {
+            this._left_turn        = 1;
+        }
+        if (user_volumes.getDirectionByIndex(direction_id).getThrough() == -1) {
+            this._through          = 0;
+        } else {
+            this._through          = Math.max(Math.floor(user_volumes.getDirectionByIndex(direction_id).getThrough() / 800), 1);
+        }
+        if (user_volumes.getDirectionByIndex(direction_id).getThrough() == -1) {
+            this._right_turn       = 0;
+        } else {
+            this._right_turn       = 1;
+        }
         this._shared_left          = 0;
         this._shared_right         = 0;
-        this._channeled_right      = 0;
-        this._entry_array          = [this._left_turn, this._through, this._right_turn, this._shared_left, this._shared_right, this._channeled_right];
-        this._user_movement_vols   = new BoundedDetailedVolume(this._cardinal_direction, -1, -1, -1);
-        this._TCU_vols             = new BoundedDetailedVolume(this._cardinal_direction, -1, -1, -1);
+        this._channelized_right    = 0;
+        this._entry_array          = [this._left_turn, this._through, this._right_turn, this._shared_left, this._shared_right, this._channelized_right];
         this._address              = [intersection_id, zone_id, direction_id];
-
-        //this._route                = new Object();
-        //this._route.left           = new MovementRoute(this._address.push(0));
-        //this._route.through        = new MovementRoute(this._address.push(1));
-        //this._route.right          = new MovementRoute(this._address.push(2));
-        // experimentation
-        //this.randomizeEntries();
+        
+//        this.adjustFlowRatesByLaneConfiguration();
     }
 
+    getCardinalDirection() {
+        return this._cardinal_direction;
+    }
+    
+    getCardinalDirectionAsInteger() {
+        var dir_int;
+        switch(this._cardinal_direction) {
+            case "southbound":
+                dir_int = 0;
+                break;
+            case "westbound":
+                dir_int = 1;
+                break;
+            case "northbound":
+                dir_int = 2;
+                break;
+            case "eastbound":
+                dir_int = 3;
+                break;
+        }
+        return dir_int;
+    }
+    
     /**
-     * Returns a lane data entry based on the specified index. Shared left (3), shared right (4), and channeled right (5) are flags.
+     * Returns a lane data entry based on the specified index. Shared left (3), shared right (4), and channelized right (5) are flags.
      * @returns {int} The entry at the given index
      */
     getEntryByIndex(entry_pos) {
@@ -562,7 +832,7 @@ class Direction {
         this._right_turn        = this._entry_array[2];
         this._shared_left       = this._entry_array[3];
         this._shared_right      = this._entry_array[4];
-        this._channeled_right   = this._entry_array[5];
+        this._channelized_right = this._entry_array[5];
     }
 
     /**
@@ -578,7 +848,7 @@ class Direction {
 
     /**
      * Set the entire entry array to the passed array. As of version 0.0.1 the entry array consists of six entries in the order
-     * left turn lanes, through lanes, right turn lanes, shared left flag, shared right flag, channeled right flag.
+     * left turn lanes, through lanes, right turn lanes, shared left flag, shared right flag, channelized right flag.
      * @param {int[]} An array of entry values
      */
     setEntryArray(entry_array) {
@@ -637,8 +907,8 @@ class Direction {
      * Returns the state of the channelized right flag for this Direction object.
      * @returns {int} state flag
      */
-    getChanneledRight() {
-        return this._channeled_right;
+    getChannelizedRight() {
+        return this._channelized_right;
     }
 
     /**
@@ -648,29 +918,7 @@ class Direction {
     getEntryArray() {
         return this._entry_array;
     }
-
-    /**
-     * Set all of the entry values to random values within reasonable values relative to the variable.
-     * Left and right turns should be between 0 and 3. Through lanes should be between 0 and 5.
-     * Shared left, shared right, and channelized right flags should be between 0 and 1.
-     * All values are integers.
-     * This is used exclusively for testing.
-     */
-    randomizeEntries() {
-        var getRandomInt = function(min, max) {
-            var rand = Math.floor(Math.random() * (max - min + 1)) + min;
-            return rand;
-        }
-
-        this._left_turn         = getRandomInt(0,3);
-        this._through           = getRandomInt(0,5);
-        this._right_turn        = getRandomInt(0,3);
-        this._shared_left       = getRandomInt(0,1);
-        this._shared_right      = getRandomInt(0,1);
-        this._channeled_right   = getRandomInt(0,1);
-        this.sync();
-    }
-
+/*
     getVolumes() {
         return this._user_movement_vols;
     }
@@ -679,7 +927,8 @@ class Direction {
      * Adjust movement volumes based on the number and configuration of lanes. If three exclusive right turn lanes and a single shared right
      * lane exist, move one-fourth of the general right volume to the shared right lane. When the channelized right lane exists, consider 
      *
-     */
+     */ 
+    /*
     adjustFlowRatesByLaneConfiguration() {
         // Ensure that the TCU volumes are up to date. Here we are assuming the user movement volumes have already been converted to their PCE.
         this._TCU_vols.setLeft(this._user_movement_vols.getLeft());
@@ -689,14 +938,1420 @@ class Direction {
         var right_vol = this._TCU_vols.getRight();
         var right_vol_splitfrac = ( (1 + (this._right_turn - this._shared_right)) / (this._right_turn + 1) );
         this._TCU_vols.setThrough(Math.round(this._TCU_vols.getThrough() + ((right_vol / UNIVERSAL_RIGHT_TURN_ADJUSTMENT_FACTOR ) * (1 - right_vol_splitfrac) ) ));
-        this._TCU_vols.setRight(Math.round(right_vol * (right_vol_splitfrac * (1 - this._channeled_right))));
+        this._TCU_vols.setRight(Math.round(right_vol * (right_vol_splitfrac * (1 - this._channelized_right))));
 
         // This needs to be adjusted for phase effect.
         var left_vol = this._TCU_vols.getLeft();
         var left_vol_splitfrac = ( (1 + (this._left_turn - this._shared_left)) / (this._left_turn + 1) );
         this._TCU_vols.setThrough(this._TCU_vols.getThrough() + (left_vol * (1 - left_vol_splitfrac) ));
         this._TCU_vols.setLeft(left_vol * left_vol_splitfrac);
+    } */
+}
+
+class BoundedCapacity {
+    /**
+	 * A class for storing calculated capacities for turning movements from a bounded (eg. southbound) point of view.
+	 * @param {string} bound_direction The cardinal direction of the bounded capacity
+	 * @param {int} left The value of bounded capacity for left-turn movements
+	 * @param {int} through The value of bounded capacity for through movements
+	 * @param {int} right The value of bounded capacity for right-turn movements
+	 * @constructor
+	 */
+    constructor(bound_direction, left, through, right) {
+        this._bound_direction = bound_direction;
+        this._left            = left;
+        this._through         = through;
+        this._right           = right;
+		
+		this._movement_array = [
+			this._left,
+			this._through,
+			this._right
+		];
     }
+	
+	setMovementByIndex(index, new_value) {
+		this._movement_array[index] = new_value;
+		this.sync();
+	}
+	
+	setMovementArray(new_array) {
+		this._movement_array = new_array;
+		this.sync();
+	}
+
+	sync() {
+		this._left    = this._movement_array[0];
+		this._through = this._movement_array[1];
+		this._right   = this._movement_array[2];
+	}
+	/**
+     * Sets the capacity of movement in the left lane.
+     * @param {int} left lane capacity
+     */
+    setLeft(capacity) {
+        this._left = capacity;
+    }
+
+    /**
+     * Sets the capacity of movement in the through lane.
+     * @param {int} through lane capacity
+     */
+    setThrough(capacity) {
+        this._through = capacity;
+    }
+
+    /**
+     * Sets the capacity of movement in the right lane.
+     * @param {int} right lane capacity
+     */
+    setRight(capacity) {
+        this._right = capacity;
+    }
+	/**
+	 * Gets each movement capacity by index (0 for Left, 1 for Through, 2 for Right)
+	 * @param {int} capacity index
+	 */
+	getMovementByIndex(index) {
+		return this._movement_array[index];	
+	}
+	
+    /**
+     * Returns the capacity of movement in the left lane.
+     * @returns {int} left lane capacity
+     */
+    getLeft() {
+        return this._left;
+    }
+
+    /**
+     * Returns the capacity of movement in the through lane.
+     * @returns {int} through lane capacity
+     */
+    getThrough() {
+        return this._through;
+    }
+
+    /**
+     * Returns the capacity of movement in the right lane.
+     * @returns {int} right lane capacity
+     */
+    getRight() {
+        return this._right;
+    }
+}
+
+class TCUTable {
+    constructor (zone_ID, intersection_ID) {
+        this._zone_ID = zone_ID;
+        this._intersection_ID = intersection_ID;
+        this._TCUs = new PCETable(
+            PROJECT.getIntersectionByID(this._intersection_ID).getZoneByIndex(this._zone_ID - 1).getZonePCEs().getDirectionByIndex(0),
+            PROJECT.getIntersectionByID(this._intersection_ID).getZoneByIndex(this._zone_ID - 1).getZonePCEs().getDirectionByIndex(1),
+            PROJECT.getIntersectionByID(this._intersection_ID).getZoneByIndex(this._zone_ID - 1).getZonePCEs().getDirectionByIndex(2),
+            PROJECT.getIntersectionByID(this._intersection_ID).getZoneByIndex(this._zone_ID - 1).getZonePCEs().getDirectionByIndex(3),
+        )
+        this._north_south_split_phase = false;
+        this._north_south_split_override = false;
+        this._east_west_split_phase = false;
+        this._east_west_split_override = false;
+        this._protected_lefts = [false, false, false, false];
+        
+        this.calculateTCUs();
+        
+    }
+    
+    updateTCUs() {
+        this.calculateTCUs;
+    }
+    calculateTCUs () {
+    // Ensure that the TCU volumes are up to date. Here we are assuming the user movement volumes have already been converted to their PCE.
+        var direction_array = PROJECT.getIntersectionByID(this._intersection_ID).getZoneByIndex(this._zone_ID - 1).getDirectionArray();
+        var PCE_table = PROJECT.getIntersectionByID(this._intersection_ID).getZoneByIndex(this._zone_ID - 1).getZonePCEs().getPCEArray();
+        
+        for (var direction = 0; direction < 4; direction++) {
+            
+            var right_vol = PCE_table[direction].getRight();
+            var through_vol = PCE_table[direction].getThrough();
+            var left_vol = PCE_table[direction].getLeft();
+            
+            var right_turn_lanes = direction_array[direction].getRightTurn();
+            var through_lanes = direction_array[direction].getThrough();
+            var left_turn_lanes = direction_array[direction].getLeftTurn();
+            var shared_right = direction_array[direction].getSharedRight();
+            var shared_left = direction_array[direction].getSharedLeft();
+            var chan_right = direction_array[direction].getChannelizedRight();
+            
+            // Gets the direction exactly 2 away from 'direction'; masking by three returns only the 1s and 2s bits (0 - 3)
+            var opposing_throughs_vol = PCE_table[(direction + 2) & 3].getThrough();
+            var opposing_right_vol = PCE_table[(direction + 2) & 3].getRight();
+            var opposing_through_lanes = direction_array[(direction + 2) & 3].getThrough();
+            var opposing_right_lanes = direction_array[(direction + 2) & 3].getRightTurn();
+            var opposing_chan_right = direction_array[(direction + 2) & 3].getChannelizedRight();
+            var opposing_left_lanes = direction_array[(direction + 2) & 3].getLeftTurn();
+            var opposing_shared_left = direction_array[(direction + 2) & 3].getSharedLeft();
+            
+            var this_phase_split;
+            
+            if (direction % 2 === 0 && !this._north_south_split_override) {
+                this._north_south_split_phase = (left_turn_lanes > 0 && shared_left) ? true : 
+                (opposing_left_lanes > 0 && opposing_shared_left) ? true : false;
+                this_phase_split = this._north_south_split_phase;
+            } else if (!this._east_west_split_override) {
+                this._east_west_split_phase = (left_turn_lanes > 0 && shared_left) ? true : 
+                (opposing_left_lanes > 0 && opposing_shared_left) ? true : false;
+                this_phase_split = this._east_west_split_phase;
+            }
+            
+            if (this_phase_split) {
+                this._protected_lefts[direction] = false;
+            } else {
+                this._protected_lefts[direction] = left_turn_lanes > 1 ? true : 
+                    (left_vol >= 240 && left_turn_lanes == 1) ? true : 
+                    (opposing_through_lanes == 1 && (left_vol * ( opposing_throughs_vol + opposing_right_vol * (1 - opposing_chan_right) ) ) > 50000) ? true :
+                    (opposing_through_lanes == 2 && (left_vol * ( opposing_throughs_vol + opposing_right_vol * (1 - opposing_chan_right) ) ) > 90000) ? true :
+                    (opposing_through_lanes == 3 && (left_vol * ( opposing_throughs_vol + opposing_right_vol * (1 - opposing_chan_right) ) ) > 110000) ? true :
+                    (opposing_through_lanes >  3 && left_turn_lanes > 0) ? true:
+                    false;
+            }
+            
+            var throughs = through_vol;
+            var rights = 0;
+            var lefts = 0;
+            
+            if (!chan_right) {
+                // Calculates % of right-turn volume in exclusive right-turn lanes and shared through-right
+                var right_vol_splitfrac = ( (1 + (right_turn_lanes - shared_right)) / (right_turn_lanes + 1) );
+
+                // Add shared rights to through volume
+                throughs = Math.round(throughs + ((right_vol / UNIVERSAL_RIGHT_TURN_ADJUSTMENT_FACTOR ) * (1 - right_vol_splitfrac) ) );
+
+                // Will be zero if no exclusive lanes; = right_vol if no shared right; something between 0 and right_vol if shared and exclusive rights exist for this approach
+                rights = Math.round(right_vol * right_vol_splitfrac / right_turn_lanes) * (1 - chan_right);
+                // Old version of this line; allows rights to be channelized AND shared. Probably an unnecessary case
+                // rights = Math.round(right_vol * (right_vol_splitfrac * (1 - chan_right)) / right_turn_lanes);
+            }
+            
+            // This needs to be adjusted for phase effect.
+            var left_turn_factor = 5;
+            var left_vol_splitfrac = (1 + (left_turn_lanes - shared_left)) / (left_turn_lanes + 1);
+            
+            throughs = throughs + (((left_vol * left_turn_factor) / UNIVERSAL_LEFT_TURN_ADJUSTMENT_FACTOR ) * (1 - left_vol_splitfrac) );
+            var lefts = Math.round(left_vol * left_vol_splitfrac / left_turn_lanes);
+            
+            // Convert through volume to a flow rate
+            throughs = Math.round(throughs / through_lanes);
+            
+            /////// NOW SET THE VOLUMES IN this._TCUs
+            this._TCUs.getDirectionByIndex(direction).setLeft(lefts);
+            this._TCUs.getDirectionByIndex(direction).setThrough(throughs);
+            this._TCUs.getDirectionByIndex(direction).setRight(rights);
+        }   
+    }
+}
+
+class PCETable {
+	constructor (southbound_PCEs, westbound_PCEs, northbound_PCEs, eastbound_PCEs) {
+		this._southbound_PCEs = southbound_PCEs;
+		this._westbound_PCEs = westbound_PCEs;
+		this._northbound_PCEs = northbound_PCEs;
+		this._eastbound_PCEs = eastbound_PCEs;
+		
+		this._southbound_PCEs.setPCEState(true);
+		this._westbound_PCEs.setPCEState(true);
+		this._northbound_PCEs.setPCEState(true);
+		this._eastbound_PCEs.setPCEState(true);
+		
+		this._PCE_array = [
+			this._southbound_PCEs,
+			this._westbound_PCEs, 
+			this._northbound_PCEs,
+			this._eastbound_PCEs 
+		];
+	}
+	
+    getPCEArray() {
+        return this._PCE_array;
+    }
+    
+	getDirectionByIndex(index) {
+		return this._PCE_array[index];
+	}
+	
+	setDirectionByIndex(index, detvolume) {
+		this._PCE_array[index] = detvolume;
+		this.sync;
+	}
+	
+	sync() {
+		this._southbound_PCEs = this._PCE_array[0];
+		this._westbound_PCEs  = this._PCE_array[1]; 
+		this._northbound_PCEs = this._PCE_array[2];
+		this._eastbound_PCEs  = this._PCE_array[3];
+	}
+	
+	syncArray() {
+		this._PCE_array[0] = this._southbound_PCEs;
+		this._PCE_array[1] = this._westbound_PCEs; 
+		this._PCE_array[2] = this._northbound_PCEs;
+		this._PCE_array[3] = this._eastbound_PCEs;
+	}
+
+	updatePCETable(southbound_detvol, westbound_detvol, northbound_detvol, eastbound_detvol) {
+		this._southbound_PCEs = southbound_detvol;
+		this._westbound_PCEs = westbound_detvol;
+		this._northbound_PCEs = northbound_detvol;
+		this._eastbound_PCEs = eastbound_detvol;
+		
+		this.syncArray();
+	}
+	
+	/**
+	 *
+	 */
+	updateAllZones() {
+		for (var config = 0; config < NUM_INTERSECTION_CONFIGS; config++) {
+			if (PROJECT.getIntersectionByIndex(config).isEnabled) 
+				PROJECT.getIntersectionByIndex(config).updateZonePCEs();
+		}
+	}
+}
+
+class UserVolumeDefinitions {
+    /**
+     * A class to store and organize the user-defined data pulled from the initial volume table. Supports the storage of Fratar data alongside
+     * user data.
+     * @param {BoundedDetailedVolume} southbound_detvol A BoundedDetailedVolumeDetailedVolume object containing volumes for movements southbound of the intersection
+     * @param {BoundedDetailedVolume} westbound_detvol A BoundedDetailedVolume object containing volumes for movements westbound of the intersection
+     * @param {BoundedDetailedVolume} northbound_detvol A BoundedDetailedVolume object containing volumes for movements northbound of the intersection
+     * @param {BoundedDetailedVolume} eastbound_detvol A BoundedDetailedVolume object containing volumes for movements eastbound of the intersection.
+     * @param {DetailedTruckPercent} southbound_truckperc A DetailedTruckPercent representing the percentage of trucks for all movements southbound of the intersection
+     * @param {DetailedTruckPercent} westbound_truckperc A DetailedTruckPercent representing the percentage of trucks for all movements westbound of the intersection
+     * @param {DetailedTruckPercent} northbound_truckperc A DetailedTruckPercent representing the percentage of trucks for all omvements northbound of the intersection
+     * @param {DetailedTruckPercent} eastbound_truckperc A DetailedTruckPercent representing the percentage of trucks for all movements eastbound of the intersection
+     */
+    constructor(southbound_detvol, westbound_detvol, northbound_detvol, eastbound_detvol, southbound_truckperc, westbound_truckperc, northbound_truckperc, eastbound_truckperc, using_fratar) {
+        this._user_defined_southbound_volumes = southbound_detvol;
+        this._user_defined_westbound_volumes  = westbound_detvol;
+        this._user_defined_northbound_volumes = northbound_detvol;
+        this._user_defined_eastbound_volumes  = eastbound_detvol;
+
+        this._user_defined_southbound_truck_perc = southbound_truckperc;
+        this._user_defined_westbound_truck_perc  = westbound_truckperc;
+        this._user_defined_northbound_truck_perc = northbound_truckperc;
+        this._user_defined_eastbound_truck_perc  = eastbound_truckperc;
+
+        // A flag that, when true, signifies that Fratar volumes should be provided when getting object data. This is set to true whenever
+        // Fratar volumes are defined.
+        this._using_fratar = using_fratar;
+		if (this._using_fratar) {
+			this.defineFratarSpecificTruckPercentages();
+			this.setFratarParameters();
+		}
+		
+		this._direction_array = [
+			this._user_defined_southbound_volumes,
+			this._user_defined_westbound_volumes,
+			this._user_defined_northbound_volumes,
+			this._user_defined_eastbound_volumes
+		];
+	}
+	
+	setDirectionArray(new_array) {
+		this._direction_array = new_array;
+		this.sync();
+	}
+
+	sync() {
+		this._user_defined_southbound_volumes = this._direction_array[0];
+		this._user_defined_westbound_volumes  = this._direction_array[1];
+		this._user_defined_northbound_volumes = this._direction_array[2];
+		this._user_defined_eastbound_volumes  = this._direction_array[3];
+	}
+	
+	syncArray() {
+		this._direction_array[0] = this._user_defined_southbound_volumes;
+		this._direction_array[1] = this._user_defined_westbound_volumes;
+		this._direction_array[2] = this._user_defined_northbound_volumes;
+		this._direction_array[3] = this._user_defined_eastbound_volumes;
+	}
+	
+    /**
+     * Add to this object variables storing user-defined per-lane truck percentages. This will also enable the flag for specific percentages.
+     * @param {DetailedPercentage} southbound_detperc The DetailedPercentage object containing percentages for movements southbound of the intersection
+     * @param {DetailedPercentage} westbound_detperc The DetailedPercentage object containing percentages for movements westbound of the intersection
+     * @param {DetailedPercentage} northbound_detperc The DetailedPercentage object containing percentages for movements northbound of the intersection
+     * @param {DetailedPercetnage} eastbound_detperc The DetailedPercentage object containing percentages for movements eastbound of the intersection 
+	 * @deprecated object now requires detailed percentages
+     */
+    defineUserSpecificTruckPercentages(southbound_detperc, westbound_detperc, northbound_detperc, eastbound_detperc) {
+        this._user_defined_southbound_truck_perc = southbound_detperc;
+        this._user_defined_westbound_truck_perc  = westbound_detperc;
+        this._user_defined_northbound_truck_perc = northbound_detperc;
+        this._user_defined_eastbound_truck_perc  = eastbound_detperc;
+    }
+
+    /**
+     * Add to this object variables storing Fratar-defined per-lane truck percentages. This will also enable the flag for specific percentages.
+     * @param {DetailedPercentage} southbound_detperc The DetailedPercentage object containing percentages for movements southbound of the intersection
+     * @param {DetailedPercentage} westbound_detperc The DetailedPercentage object containing percentages for movements westbound of the intersection
+     * @param {DetailedPercentage} northbound_detperc The DetailedPercentage object containing percentages for movements northbound of the intersection
+     * @param {DetailedPercetnage} eastbound_detperc The DetailedPercentage object containing percentages for movements eastbound of the intersection
+     */
+    defineFratarSpecificTruckPercentages(southbound_detperc, westbound_detperc, northbound_detperc, eastbound_detperc) {
+        this._fratar_defined_southbound_truck_perc = southbound_detperc;
+        this._fratar_defined_westbound_truck_perc  = westbound_detperc;
+        this._fratar_defined_northbound_truck_perc = northbound_detperc;
+        this._fratar_defined_eastbound_truck_perc  = eastbound_detperc;
+    }
+
+    /**
+     * Return the percentage of trucks to this object's most specific knowledge. If specific values have been defined, those will
+     * be returned. If not, the general percentages will
+     *
+     */
+    getTruckPercentages() {
+        if(this.isUsingFratar()) {
+			// return fratar-defined specific truck percentages
+			return [this._fratar_defined_southbound_truck_perc,
+					this._fratar_defined_westbound_truck_perc,
+					this._fratar_defined_northbound_truck_perc,
+					this._fratar_defined_eastbound_truck_perc
+			];
+        }
+        else {
+			// return user-defined specific truck percentages
+			return [this._user_defined_southbound_truck_perc,
+					this._user_defined_westbound_truck_perc,
+					this._user_defined_northbound_truck_perc,
+					this._user_defined_eastbound_truck_perc
+			];
+		}
+    }
+
+	/**
+	 *
+	 */
+	getDetailedVolumeByBoundedDirection(direction) {
+		switch (direction) {
+			case "southbound":
+				return this._user_defined_southbound_volumes;
+				break;
+			case "westbound":
+				return this._user_defined_westbound_volumes;
+				break;
+			case "northbound":
+				return this._user_defined_northbound_volumes;
+				break;
+			case "eastbound":
+				return this._user_defined_eastbound_volumes;
+				break;
+		}
+	}
+	
+    /**
+     * Enable or disable the use of Fratar volumes.
+     * @param {boolean} state <tt>true</tt> for using Fratar volumes; <tt>false</tt> for using user-defined volumes
+     * Note: This function currently does not have any support for undefined variable error control. If no Fratar volumes have been defined
+     * and this is set to true, this object will attempt to return an undefined variable. Error control needs to be added!
+     */
+    setUsingFratarVolumes(state) {
+        this._using_fratar = state;
+    }
+
+    /**
+     *
+     *
+     */
+    setFratarParameters(southbound_detvol, westbound_detvol, northbound_detvol, eastbound_detvol, southbound_truckperc, westbound_truckperc, northbound_truckperc, eastbound_truckperc) {
+        this._fratar_defined_southbound_volumes = southbound_detvol;
+        this._fratar_defined_westbound_volumes  = westbound_detvol;
+        this._fratar_defined_northbound_volumes = northbound_detvol;
+        this._fratar_defined_eastbound_volumes  = eastbound_detvol;
+
+        this._fratar_defined_southbound_truck_perc = southbound_truckperc;
+        this._fratar_defined_westbound_truck_perc  = westbound_truckperc;
+        this._fratar_defined_northbound_truck_perc = northbound_truckperc;
+        this._fratar_defined_eastbound_truck_perc  = eastbound_truckperc;
+    }
+
+    /**
+     * Return a state value stating if Fratar values are the current focus of the 
+     *
+     */
+    isUsingFratar() {
+        return this._using_fratar;
+    }
+	
+	getDirectionByIndex(index) {
+		return this._direction_array[index];	
+	}
+	
+	getVolumeByAddress(direction, movement) {
+		return (this.getDirectionByIndex(direction).getMovementByIndex(movement));
+	}
+	
+	updateUserVolumeDefinitions (southbound_detvol, westbound_detvol, northbound_detvol, eastbound_detvol, southbound_truckperc, westbound_truckperc, northbound_truckperc, eastbound_truckperc, update_using_fratar) {
+        /** Replaces the values in this._user_volume_definitions, a UserVolumeDefinitions object, and updates this._master_PCE_table, a PCETable object
+         * @param {object} southbound_detvol A BoundedDetailedVolume representing the total entering volume (cars + trucks) at the southbound approach
+         * @param {object} westbound_detvol A BoundedDetailedVolume representing the total entering volume (cars + trucks) at the westbound approach
+         * @param {object} northbound_detvol A BoundedDetailedVolume representing the total entering volume (cars + trucks) at the northbound approach
+         * @param {object} eastbound_ A BoundedDetailedVolume representing the total entering volume (cars + trucks) at the eastbound approach
+         * @param {object} southbound_truckperc A DetailedPercentage representing the truck percentage of the southbound approach
+         * @param {object} westbound_truckperc A DetailedPercentage representing the truck percentage of the westbound approach
+         * @param {object} northbound_truckperc A DetailedPercentage representing the truck percentage of the northbound approach
+         * @param {object} eastbound_truckperc A DetailedPercentage representing the truck percentage of the eastbound approach
+         * @param {bool} update_using_fratar A boolean value indicating whether the turning movements were generated by the Fratar method or not
+         */
+		if (update_using_fratar) {
+			this._fratar_defined_southbound_volumes = southbound_detvol;
+			this._fratar_defined_westbound_volumes  = westbound_detvol;
+			this._fratar_defined_northbound_volumes = northbound_detvol;
+			this._fratar_defined_eastbound_volumes  = eastbound_detvol;
+
+			this._fratar_defined_southbound_truck_perc = southbound_truckperc;
+			this._fratar_defined_westbound_truck_perc  = westbound_truckperc;
+			this._fratar_defined_northbound_truck_perc = northbound_truckperc;
+			this._fratar_defined_eastbound_truck_perc  = eastbound_truckperc;
+		}
+		this._user_defined_southbound_volumes = southbound_detvol;
+		this._user_defined_westbound_volumes  = westbound_detvol;
+		this._user_defined_northbound_volumes = northbound_detvol;
+		this._user_defined_eastbound_volumes  = eastbound_detvol;
+
+		this._user_defined_southbound_truck_perc = southbound_truckperc;
+		this._user_defined_westbound_truck_perc  = westbound_truckperc;
+		this._user_defined_northbound_truck_perc = northbound_truckperc;
+		this._user_defined_eastbound_truck_perc  = eastbound_truckperc;
+		
+		this.syncArray();
+	}
+    
+    setComponentValue(direction, movement, volume) {
+        var dir_int = typeof direction == "number" ? direction : parseInt(objectKeyByValue(DirectionEnum,direction));
+        
+        if (typeof movement == "number") {
+            this._direction_array[dir_int].getMovementByIndex(movement) = volume;
+        } else {
+            switch(movement) {
+                case "left":
+                    this._direction_array[dir_int].getMovementByIndex(0) = volume;
+                    break;
+                case "through":
+                    this._direction_array[dir_int].getMovementByIndex(1) = volume;
+                    break;
+                case "right":
+                    this._direction_array[dir_int].getMovementByIndex(2) = volume;
+                    break;
+            }
+        }
+    }
+}
+
+class BoundedDetailedVolume {
+/**
+ * A class for storing and organizing volumes for turning movements from a bounded (southbound) point of view.
+ * @param {string} bound_direction The cardinal direction of the bounded movement
+ * @param {int} left The value of bounded movement in the left lane
+ * @param {int} through The value of bounded movement in the through lane
+ * @param {int} right The value of the bounded movement in the right lane
+ * @constructor
+ */
+    constructor(bound_direction, left, through, right) {
+        this._bound_direction = bound_direction;
+        this._left            = left;
+        this._through         = through;
+        this._right           = right;
+        this._pce_enabled     = false;
+		
+		this._movement_array = [
+			this._left,
+			this._through,
+			this._right
+		];
+    }
+	
+	setMovementByIndex(index, new_value) {
+		this._movement_array[index] = new_value;
+		this.sync();
+	}
+	
+	setMovementArray(new_array) {
+		this._movement_array = new_array;
+		this.sync();
+	}
+
+	sync() {
+		this._left    = this._movement_array[0];
+		this._through = this._movement_array[1];
+		this._right   = this._movement_array[2];
+	}
+	/**
+     * Sets the volume of movement in the left lane.
+     * @param {int} left lane volume
+     */
+    setLeft(volume) {
+        this._left = volume;
+    }
+
+    /**
+     * Sets the volume of movement in the through lane.
+     * @param {int} through lane volume
+     */
+    setThrough(volume) {
+        this._through = volume;
+    }
+
+    /**
+     * Sets the volume of movement in the right lane.
+     * @param {int} right lane volume
+     */
+    setRight(volume) {
+        this._right = volume;
+    }
+	/**
+	 * Gets each movement volume by index (0 for Left, 1 for Through, 2 for Right)
+	 * @param {int} volume index
+	 */
+	getMovementByIndex(index) {
+		return this._movement_array[index];	
+	}
+	
+    /**
+     * Returns the volume of movement in the left lane.
+     * @returns {int} left lane volume
+     */
+    getLeft() {
+        return this._left;
+    }
+
+    /**
+     * Returns the volume of movement in the through lane.
+     * @returns {int} through lane volume
+     */
+    getThrough() {
+        return this._through;
+    }
+
+    /**
+     * Returns the volume of movement in the right lane.
+     * @returns {int} right lane volume
+     */
+    getRight() {
+        return this._right;
+    }
+
+    /**
+     * Given the truck percentages for each movement, calculate the Passenger Car Equivalent (PCE) assuming that one truck equals two passenger
+     * cars. Return a new BoundedDetailedVolume object with the modified values. To perform this calculation, the number of trucks is added to
+     * the existing volume.
+     * @param {float} left_truck_per The percentage of vehicles in the left turn lane that are trucks
+     * @param {float} through_truck_per The percentage of vehicles in the through lane that are trucks
+     * @param {float} right_truck_per The percentage of vehicles in the right turn lane that are trucks
+     * @returns {BoundedDetailedVolume} A new BoundedDetailedVolume object with updated lane volumes
+     *
+     * @example
+     * // Convert an existing BoundedDetailedVolume object into a PCE-Enabled BoundedDetailedVolume object based on the original object's values
+     * myBoundedDetailedVolume.getLeft() // â†’ 500
+     * myBoundedDetailedVolume = myBoundedDetailedVolume.getPassengerCarEquivalent(0.05, 0.10, 0.15);
+     * myBoundedDetailedVolume.getLeft() // â†’ 525
+     */
+    getPassengerCarEquivalent(left_truck_per, through_truck_per, right_truck_per) {
+        var new_bdetvol = new BoundedDetailedVolume(this._direction, (this._left + (this._left * left_truck_per)), (this._through + (this._through * through_truck_per)), (this._right + (this._right * right_truck_per)));
+        new_bdetvol.enablePCE();
+        return new_bdetvol;
+    }
+    
+	 /**
+     * Given the truck percentages for each movement, calculate the Passenger Car Equivalent (PCE) assuming that one truck equals two passenger
+     * cars. Return a new BoundedDetailedVolume object with the modified values. To perform this calculation, the number of trucks is added to
+     * the existing volume.
+     * @param {float} left_truck_per The percentage of vehicles in the left turn lane that are trucks
+     * @param {float} through_truck_per The percentage of vehicles in the through lane that are trucks
+     * @param {float} right_truck_per The percentage of vehicles in the right turn lane that are trucks
+     * @returns {BoundedDetailedVolume} A new BoundedDetailedVolume object with updated lane volumes
+     *
+     * @example
+     * // Convert an existing BoundedDetailedVolume object into a PCE-Enabled BoundedDetailedVolume object based on the original object's values
+     * myBoundedDetailedVolume.getLeft() // â†’ 500
+     * myBoundedDetailedVolume = myBoundedDetailedVolume.getPassengerCarEquivalent(0.05, 0.10, 0.15);
+     * myBoundedDetailedVolume.getLeft() // â†’ 525
+     */
+    getPassengerCarEquivalentWithDetailedPercentObject(direction, detailedPercentObject) {
+        var new_bdetvol = new BoundedDetailedVolume(direction, (this._left + (this._left * detailedPercentObject.getLeft())), (this._through + (this._through * detailedPercentObject.getThrough())), (this._right + (this._right * detailedPercentObject.getRight())));
+        new_bdetvol.enablePCE();
+        return new_bdetvol;
+    }
+	
+    /**
+     * Manually set the PCE state to a passed boolean value.
+     * @param {boolean} state <tt>true</tt> for enabled; <tt>false</tt> for disabled
+     */
+    setPCEState(state) {
+        this._pce_enabled = state;
+    }
+
+    /**
+     * Set the PCE-Enabled state to on, or true.
+     */
+    enablePCE() {
+        this.setPCEState(true);
+    }
+
+    /**
+     * Set the PCE-Enabled state to off, or false.
+     */
+    disablePCE() {
+        this.setPCEState(false);
+    }
+
+    /**
+     * Return if Passenger Car Equivalence is on or off.
+     * @returns {boolean} <tt>true</tt> if PCE is enabled; </tt>false</tt> if PCE is disabled
+     */
+    isPCEEnabled() {
+        return this._pce_enabled;
+    }
+}
+
+class DetailedPercentage {
+    constructor(direction, left_perc, through_perc, right_perc) {
+        this._direction = direction;
+        this._left_perc = left_perc;
+        this._through_perc = through_perc;
+        this._right_perc = right_perc;
+    }
+
+    getLeft() {
+        return this._left_perc;
+    }
+
+    getThrough() {
+        return this._through_perc;
+    }
+
+    getRight() {
+        return this._right_perc;
+    }
+}
+
+class VolumetricIntersection {
+    /**
+     * This is a class to organize and contain VolumeTool output data. It accepts BoundedDetailedVolume objects
+     * @param {BoundedDetailedVolume} southbound_carvol A BoundedDetailedVolume for car volumes southbound or north of the intersection
+     * @param {BoundedDetailedVolume} westbound_carvol A BoundedDetailedVolume for car volumes westbound or east of the intersection
+     * @param {BoundedDetailedVolume} northbound_carvol A BoundedDetailedVolume for car volumes northbound or south of the intersection
+     * @param {BoundedDetailedVolume} eastbound_carvol A BoundedDetailedVolume for car volumes eastbound or west of the intersection
+     * @param {BoundedDetailedVolume} southbound_truckvol A BoundedDetailedVolume for truck volumes southbound or south of the intersection
+     * @param {BoundedDetailedVolume} westbound_truckvol A BoundedDetailedVolume for truck volumes westbound or east of the intersection
+     * @param {BoundedDetailedVolume} northbound_truckvol A BoundedDetailedVolume for truck volumes northbound or south of the intersection
+     * @param {BoundedDetailedVolume} eastbound_truckvol A BoundedDetailedVolume for truck volumes eastbound or west of the intersection
+     * @param {boolean} override_user_volumes A flag indicating whether the volumes in this object should be used to overwrite the values in PROJECT.getUserVolumeDefinitions()
+     * @constructor
+     */
+    constructor(southbound_carvol, westbound_carvol, northbound_carvol, eastbound_carvol, southbound_truckvol, westbound_truckvol, northbound_truckvol, eastbound_truckvol, override_user_volumes) {
+
+		this._southbound_carvol_bounded   = southbound_carvol;
+		this._westbound_carvol_bounded    = westbound_carvol;
+		this._northbound_carvol_bounded   = northbound_carvol;
+		this._eastbound_carvol_bounded    = eastbound_carvol;
+		this._southbound_truckvol_bounded = southbound_truckvol;
+		this._westbound_truckvol_bounded  = westbound_truckvol;
+		this._northbound_truckvol_bounded = northbound_truckvol;
+		this._eastbound_truckvol_bounded  = eastbound_truckvol;
+		this._override_user_volumes 	  = override_user_volumes;
+		
+		this._southbound_totvol_bounded = this.sumVolumes("southbound", this._southbound_carvol_bounded, this._southbound_truckvol_bounded);		
+		this._westbound_totvol_bounded = this.sumVolumes("westbound", this._westbound_carvol_bounded, this._westbound_truckvol_bounded);
+		this._northbound_totvol_bounded = this.sumVolumes("northbound", this._northbound_carvol_bounded, this._northbound_truckvol_bounded);
+		this._eastbound_totvol_bounded = this.sumVolumes("eastbound", this._eastbound_carvol_bounded, this._eastbound_truckvol_bounded);
+		
+		this._southbound_truckperc = this.calculateDetailedTruckPercent("southbound", this._southbound_carvol_bounded,this._southbound_truckvol_bounded);
+		this._westbound_truckperc = this.calculateDetailedTruckPercent("westbound", this._westbound_carvol_bounded, this._westbound_truckvol_bounded);
+		this._northbound_truckperc = this.calculateDetailedTruckPercent("northbound", this._northbound_carvol_bounded, this._northbound_truckvol_bounded);
+		this._eastbound_truckperc = this.calculateDetailedTruckPercent("eastbound", this._eastbound_carvol_bounded, this._eastbound_truckvol_bounded);
+ 	
+		PROJECT.updateUserVolumeDefinitions(this._southbound_totvol_bounded, this._westbound_totvol_bounded, this._northbound_totvol_bounded, this._eastbound_totvol_bounded, this._southbound_truckperc, this._westbound_truckperc, this._northbound_truckperc, this._eastbound_truckperc, true);	
+	}
+		
+    /**
+     *
+     */
+    sumVolumes(direction, carvols, truckvols) {
+        return (new BoundedDetailedVolume(direction, carvols.getLeft() + truckvols.getLeft(), carvols.getThrough() + truckvols.getThrough(), carvols.getRight() + truckvols.getRight()));
+    }
+
+	/**
+	 * Create a DetailedPercentage object from passenger car volumes and truck volumes
+	 * @param {string} Bounded direction of subject approach
+	 * @param {BoundedDetailedVolume} A BoundedDetailedVolume object containing passenger car turning movement volumes for the subject approach
+	 * @param {BoundedDetailedVolume} A BoundedDetailedVolume object containing truck turning movement volumes for the subject approach
+	 * @returns {DetailedPercentage} A DetailedPercentage object for a single bound direction (eg. "southbound")
+	 */
+	calculateDetailedTruckPercent(bound_direction, boundedCarsVolume, boundedTrucksVolume) {
+		
+		var left_truck_per    = boundedTrucksVolume.getLeft() / (boundedCarsVolume.getLeft() + boundedTrucksVolume.getLeft());
+		var through_truck_per = boundedTrucksVolume.getThrough() / (boundedCarsVolume.getThrough() + boundedTrucksVolume.getThrough());
+		var right_truck_per   = boundedTrucksVolume.getRight() / (boundedCarsVolume.getRight() + boundedTrucksVolume.getRight());
+		
+		return (new DetailedPercentage(bound_direction, left_truck_per, through_truck_per, right_truck_per));
+	}
+
+    /**
+     * Return bounded detailed volumes (volume objects including information about movement volumes) about car volumes for each branch of the intersection by their
+     * bounded movement (e.g. "southbound").
+     * @returns {BoundedDetailedVolume[]} An array of car BoundedDetailedVolume objects in the order southbound, westbound, northbound, eastbound
+     */
+    getBoundedCarVolumes() {
+        return [this._southbound_carvol_bounded, this._westbound_carvol_bounded, this._northbound_carvol_bounded, this._eastbound_carvol_bounded];
+    }
+
+    /**
+     * Return bounded detailed volumes (volume objects including information about movement volumes) about truck volumes for each branch of the intersection by their
+     * bounded movement (e.g. "southbound").
+     * @returns {BoundedDetailedVolume[]} An array of truck BoundedDetailedVolume objects in the order southbound, westbound, northbound, eastbound
+     */
+    getBoundedTruckVolumes() {
+        return [this._southbound_truckvol_bounded, this._westbound_truckvol_bounded, this._northbound_truckvol_bounded, this._eastbound_truckvol_bounded];
+    }
+
+    /**
+     * Calculate and return the percentage of trucks for each movement for each direction. This will return a two dimensional array
+     * where the first row is truck percentages for the movements left, through, and right (in that order) southbound of the intersection.
+     * The second row corresponds to westboundern movements, the third to northboundern movements, and the fourth to eastboundern movements.
+     * @returns {double[][]} A two-dimensional array of decimal numbers between 0 and 1 representing percentages
+     *
+     */
+    getSpecificTruckPercentages() {
+        var carvols = this.getBoundedCarVolumes();
+        var truckvols = this.getBoundedTruckVolumes();
+
+        var southbound_specperc_left = (truckvols[0].getLeft()) / (truckvols[0].getLeft() + carvols[0].getLeft());
+        var southbound_specperc_through = (truckvols[0].getThrough()) / (truckvols[0].getThrough() + carvols[0].getThrough());
+        var southbound_specperc_right = (truckvols[0].getRight()) / (truckvols[0].getRight() + carvols[0].getRight());
+		var southboundDetailedTruckPercent = new DetailedPercentage("southbound", southbound_specperc_left, southbound_specperc_through, southbound_specperc_right);
+		
+        var westbound_specperc_left = (truckvols[1].getLeft()) / (truckvols[1].getLeft() + carvols[1].getLeft());
+        var westbound_specperc_through = (truckvols[1].getThrough()) / (truckvols[1].getThrough() + carvols[1].getThrough());
+        var westbound_specperc_right = (truckvols[1].getRight()) / (truckvols[1].getRight() + carvols[1].getRight());
+		var westboundDetailedTruckPercent = new DetailedPercentage("westbound", westbound_specperc_left, westbound_specperc_through, westbound_specperc_right);
+
+        var northbound_specperc_left = (truckvols[2].getLeft()) / (truckvols[2].getLeft() + carvols[2].getLeft());
+        var northbound_specperc_through = (truckvols[2].getThrough()) / (truckvols[2].getThrough() + carvols[2].getThrough());
+        var northbound_specperc_right = (truckvols[2].getRight()) / (truckvols[2].getRight() + carvols[2].getRight());
+		var northboundDetailedTruckPercent = new DetailedPercentage("northbound", northbound_specperc_left, northbound_specperc_through, northbound_specperc_right);
+        
+        var eastbound_specperc_left = (truckvols[3].getLeft()) / (truckvols[3].getLeft() + carvols[3].getLeft());
+        var eastbound_specperc_through = (truckvols[3].getThrough()) / (truckvols[3].getThrough() + carvols[3].getThrough());
+        var eastbound_specperc_right = (truckvols[3].getRight()) / (truckvols[3].getRight() + carvols[3].getRight());
+		var eastboundDetailedTruckPercent = new DetailedPercentage("eastbound", eastbound_specperc_left, eastbound_specperc_through, eastbound_specperc_right);
+    
+        return [
+            southboundDetailedTruckPercent,
+			westboundDetailedTruckPercent,
+			northboundDetailedTruckPercent,
+			eastboundDetailedTruckPercent
+        ];
+    }
+	
+	/**
+	 *
+	 */
+	getPassengerCarEquivalent() {
+		var southboundPCEs = this._user_defined_southbound_volumes.getPassengerCarEquivalent(this._user_defined_southbound_truck_perc);
+		var westboundPCEs = this._user_defined_westbound_volumes.getPassengerCarEquivalent(this._user_defined_westbound_truck_perc);
+		var northboundPCEs = this._user_defined_northbound_volumes.getPassengerCarEquivalent(this._user_defined_northbound_truck_perc);
+		var eastboundPCEs = this._user_defined_eastbound_volumes.getPassengerCarEquivalent(this._user_defined_eastbound_truck_perc);
+		
+		return [,
+				southboundPCEs,
+		        westboundPCEs, 
+	            northboundPCEs,
+                eastboundPCEs
+		];
+	}
+}
+
+class VolumeTool {
+    /**
+     * This class is a tool for organizing data for its use in Fratar calculations of synthetic turning movement volumes.
+     * @constructor
+     * @param {GeneralVolume} north_genvol The GeneralVolume object for the zone north of the intersection
+     * @param {GeneralVolume} east_genvol The GeneralVolume object for the zone east of the intersection
+     * @param {GeneralVolume} south_genvol The GeneralVolume object for the zone south of the intersection
+     * @param {GeneralVolume} west_genvol The GeneralVolume object for the zone west of the intersection
+     */
+    constructor(north_genvol, east_genvol, south_genvol, west_genvol, override_user_volumes) {
+        this._north_genvol 			= north_genvol;
+        this._east_genvol  			= east_genvol;
+        this._south_genvol  		= south_genvol;
+        this._west_genvol 	        = west_genvol;
+		this._override_user_volumes = override_user_volumes;
+
+        this._car_in_array  = [this._north_genvol.getVolumeCarsIn(), this._east_genvol.getVolumeCarsIn(), this._south_genvol.getVolumeCarsIn(), this._west_genvol.getVolumeCarsIn()];
+        this._car_out_array  = [this._north_genvol.getVolumeCarsOut(), this._east_genvol.getVolumeCarsOut(), this._south_genvol.getVolumeCarsOut(), this._west_genvol.getVolumeCarsOut()];
+
+        this._truck_in_array  = [this._north_genvol.getVolumeTrucksIn(), this._east_genvol.getVolumeTrucksIn(), this._south_genvol.getVolumeTrucksIn(), this._west_genvol.getVolumeTrucksIn()];
+        this._truck_out_array  = [this._north_genvol.getVolumeTrucksOut(), this._east_genvol.getVolumeTrucksOut(), this._south_genvol.getVolumeTrucksOut(), this._west_genvol.getVolumeTrucksOut()];
+
+        this._carvol_table = [
+                        [0, 1, 1, 1],
+                        [1, 0, 1, 1],
+                        [1, 1, 0, 1],
+                        [1, 1, 1, 0]
+                      ];
+
+        this._truckvol_table = [
+                        [0, 1, 1, 1],
+                        [1, 0, 1, 1],
+                        [1, 1, 0, 1],
+                        [1, 1, 1, 0]
+                      ];
+    }
+
+	/**
+	 * @deprecated
+	 */
+	 updateGeneralVolumes(north_genvol, east_genvol, south_genvol, west_genvol, override_user_volumes) {
+		this._north_genvol 			= north_genvol;
+        this._east_genvol  			= east_genvol;
+        this._south_genvol  		= south_genvol;
+        this._west_genvol 	        = west_genvol;
+		this._override_user_volumes = override_user_volumes;
+
+        this._car_in_array  = [this._north_genvol.getVolumeCarsIn(), this._east_genvol.getVolumeCarsIn(), this._south_genvol.getVolumeCarsIn(), this._west_genvol.getVolumeCarsIn()];
+        this._car_out_array  = [this._north_genvol.getVolumeCarsOut(), this._east_genvol.getVolumeCarsOut(), this._south_genvol.getVolumeCarsOut(), this._west_genvol.getVolumeCarsOut()];
+
+        this._truck_in_array  = [this._north_genvol.getVolumeTrucksIn(), this._east_genvol.getVolumeTrucksIn(), this._south_genvol.getVolumeTrucksIn(), this._west_genvol.getVolumeTrucksIn()];
+        this._truck_out_array  = [this._north_genvol.getVolumeTrucksOut(), this._east_genvol.getVolumeTrucksOut(), this._south_genvol.getVolumeTrucksOut(), this._west_genvol.getVolumeTrucksOut()];
+
+        this._carvol_table = [
+                        [0, 1, 1, 1],
+                        [1, 0, 1, 1],
+                        [1, 1, 0, 1],
+                        [1, 1, 1, 0]
+                      ];
+
+        this._truckvol_table = [
+                        [0, 1, 1, 1],
+                        [1, 0, 1, 1],
+                        [1, 1, 0, 1],
+                        [1, 1, 1, 0]
+                      ];
+	 }
+	
+    /**
+     * Given a table, calculate the totals of each row and report them.
+     * @param {int[][]} table A table of integers
+     * @returns {int[]} An array of totals for each row such that each column in the
+     * array corresponds to its index-equivalent row in the table
+     */
+    getRowTotals(table) {
+        var count = 0;
+        var rowTotals = [];
+        for(var rowCount = 0; rowCount < table.length; rowCount++) {
+            count = 0;
+            for(var i = table[rowCount].length; i--;)
+                count += table[rowCount][i];
+            rowTotals.push(count);
+        }
+        return rowTotals;
+    }
+
+    /**
+     * Given a table, calculate the totals of each column and report them.
+     * @param {int[][]} table A table of integers
+     * @returns {int[]} An array of totals for each column such that each column in the
+     * array corresponds to its index-equivalent column in the table
+     */
+    getColumnTotals(table) {
+        var count = 0;
+        var colTotals = [];
+        for(var colCount = 0; colCount < table[0].length; colCount++) {
+            count = 0;
+            for(var i = table.length; i--;)
+                count += table[i][colCount];
+            colTotals.push(count);
+        }
+        return colTotals;
+    }
+   
+    /**
+     * Uses the inputted (assuming converged) table to create BoundedDetailedVolume objects for
+     * the southbound, westbound, northbound, and eastbound volume zones. Returns an array of these new
+     * BoundedDetailedVolume objects.
+     * @param {int[][]} table A table that has been corverged
+     * @returns {int[]} An array of BoundedDetailedVolume objects such that the first element is southbound, the second
+     * is westbound, the third is northbound, and the fourth is eastbound
+     */
+    getBoundedDetailedVolumes(table) {
+        var southbound = new BoundedDetailedVolume("southbound", table[0][1], table[0][2], table[0][3]);
+        var westbound  = new BoundedDetailedVolume("westbound" , table[1][2], table[1][3], table[1][0]);
+        var northbound = new BoundedDetailedVolume("northbound", table[2][3], table[2][0], table[2][1]);
+        var eastbound  = new BoundedDetailedVolume("eastbound" , table[3][0], table[3][1], table[3][2]);
+
+        return [southbound, westbound, northbound, eastbound];
+    }
+
+    /**
+     * This performs the actual Fratar convergence on the car and truck tables using their respective volume inputs.
+     * Used by <tt>calculateSyntheticValues()</tt>
+     * @see calculateSyntheticValues
+     * @param {int[][]} table A square matrix filled with ones with zeros along the diagonal
+     * @param {int[]} in_array An array of four input volumes such that the first element is southbound, second is westbound, third
+     * is northbound, and fourth is eastbound
+     * @param {int[][]} out_array An array of four output volumes such that the first element is southbound, second is westbound, third
+     * is northbound, and fourth is eastbound
+     * @returns {int[][]} A square (4x4) matrix containing the converged values, not sorted nor organized
+     */
+    convergeTable(table, in_array, out_array) {
+
+        for(var i = 0; i < 1; i++) {
+            var rowTotals = this.getRowTotals(table);
+            var colTotals = this.getColumnTotals(table);
+            var sym_row = 0;
+            var sym_col = 0;
+
+
+                for(var row = 0; row < table.length; row++) {
+                    for(var col = 0; col < table[0].length; col++) {            
+                        sym_row = in_array[row] / rowTotals[row];
+                        sym_col = out_array[col] / colTotals[col];
+                        table[row][col] = Math.round(table[row][col] * ((sym_row + sym_col) / 2));
+                    }
+                }
+
+        }
+
+        return table;
+    }
+
+    /**
+     * Perform Fratar balancing using the car and truck volumes stored in this object and return a VolumetricIntersection object
+     * containing the bounded turn volumes for all four zones around the intersection.
+     * @returns {VolumetricIntersection} A VolumetricIntersection object containing the synthetic turn volumes for cars and trucks
+     * in the bounded and unbounded cases
+     */
+    calculateSyntheticVolumes() {
+        var car_detvols   = this.getBoundedDetailedVolumes(this.convergeTable(this._carvol_table, this._car_in_array, this._car_out_array));
+        var truck_detvols = this.getBoundedDetailedVolumes(this.convergeTable(this._truckvol_table, this._truck_in_array, this._truck_out_array));
+        
+        return (new VolumetricIntersection(car_detvols[0], car_detvols[1], car_detvols[2], car_detvols[3], truck_detvols[0], truck_detvols[1], truck_detvols[2], truck_detvols[3], this._override_user_volumes));
+    }
+
+}
+
+class GeneralVolume {
+    /**
+     * A class to contain and organize data pertaining to general volumes used in the Fratar balancing
+     * method. General volumes are those that describe only the number of vehicles that enter and leave
+     * each leg of the intersection. They do not detail the volume per movement (left, through, right).
+     * @param {string} direction The cardinal direction of the intersection branch relative to the intersection
+     * itself. A general volume describing vehicles moving southbound to enter the intersection and northbound
+     * to exit the intersection are in the south cardinal zone.
+     * @param {int} general_volume The number of vehicles traveling in and out of this branch of the intersection.
+     * @param {float} d_factor A percentage value describing the ratio between westbound and eastbound vehicles, and
+     * southbound and northbound vehicles. Being that each GeneralVolume object describes only a single branch, this value
+     * dictates the number of vehicles entering and leaving said branch. In the case of westbound and eastbound vehicles,
+     * a D factor greater than 0.50 expresses that more vehicles are moving eastbound than westbound. In the case of
+     * southbound and northbound vehicles, a D factor greater than 0.50 expresses that more vehicles are moving northbound
+     * than southbound.
+     * @param {float} k_factor NOT DEFINED YET
+     * @param {float} truck_per A percentage value describing the volume of trucks relative to the general volume. If 10 of 100
+     * vehicles in the measured general volume are trucks, there is a 10% truck percentage, represented here by 0.1.
+     * @constructor
+     */
+    constructor(direction, general_volume, d_factor, k_factor, truck_per) {
+        this._direction      = direction;
+        this._general_volume = general_volume;
+        this._d_factor       = d_factor;
+        this._k_factor       = k_factor;
+        this._truck_per      = truck_per;
+
+        this.calculateGeneralVolumes();        
+    }
+    
+    calculateGeneralVolumes() {
+        if(this._direction === "north") {
+            this._volume_in  = this._general_volume * (1 - this._d_factor);
+            this._volume_out = this._general_volume * this._d_factor;
+        }
+        if(this._direction === "east") {
+            this._volume_in  = this._general_volume * (1 - this._d_factor);
+            this._volume_out = this._general_volume * this._d_factor;
+        }
+        if(this._direction === "south") {
+            this._volume_in  = this._general_volume * this._d_factor;
+            this._volume_out = this._general_volume * (1 - this._d_factor);
+        }
+        if(this._direction === "west") {
+            this._volume_in  = this._general_volume * this._d_factor;
+            this._volume_out = this._general_volume * (1 - this._d_factor);
+        }
+
+        this._volume_cars_in  = this._volume_in * (1 - this._truck_per);
+        this._volume_cars_out = this._volume_out * (1 - this._truck_per);
+
+        this._volume_trucks_in  = this._volume_in * this._truck_per;
+        this._volume_trucks_out = this._volume_out * this._truck_per;
+    }
+
+    getAttributeBySelector(selector) {
+        if (selector == "array" || selector === undefined)
+            return [this._direction, this._general_volume, this._d_factor, this._k_factor, this._truck_per];
+        else if (selector == "direction")
+            return this._direction;
+        else if (selector == "volume")
+            return this._general_volume;
+        else if (selector == "d-factor")
+            return this._d_factor;
+        else if (selector == "k-factor")
+            return this._k_factor;
+        else if (selector == "truck percent")
+            return this._truck_per;
+    }
+    
+    setGeneralVolumeArray(volume_array) {
+        this._general_volume = volume_array[0];
+        this._d_factor = volume_array[1];
+        this._k_factor = volume_array[2];
+        this._truck_per = volume_array[3];
+        this.calculateGeneralVolumes();
+    }
+    
+    /**
+     * Returns the stored value for the general volume.
+     * @returns {int} The volume of vehicles
+     */
+    getGeneralVolume() {
+        return this._general_volume;
+    }
+
+    /**
+     * Returns the stored value for the number of cars that are entering the intersection via the specified branch. 
+     * @returns {int} The volume of cars entering
+     */
+    getVolumeCarsIn() {
+        return this._volume_cars_in;
+    }
+
+    /**
+     * Returns the stored value for the number of cars that are exiting the intersection via the specified branch.
+     * @returns {int} The volume of cars exiting
+     */
+    getVolumeCarsOut() {
+        return this._volume_cars_out;
+    }
+
+    /**
+     * Returns the stored value for the number of trucks that are entering the intersection via the specified branch.
+     * @returns {int} The volume of trucks entering
+     */
+    getVolumeTrucksIn() {
+        return this._volume_trucks_in;
+    }
+
+    /**
+     * Returns the stored value for the number of trucks that are exiting the intersection via the specified branch.
+     * @returns {int} The volume of trucks exiting
+     */
+    getVolumeTrucksOut() {
+        return this._volume_trucks_out;
+    }
+}
+
+class GeneralVolumeSplitDirection {
+    /**
+     * A class to contain and organize data pertaining to general volumes used in the Fratar balancing
+     * method. General volumes are those that describe only the number of vehicles that enter and leave
+     * each leg of the intersection. They do not detail the volume per movement (left, through, right).
+	 * GeneralVolumeSplitDirection provide the entering volume and exiting volume separately.
+     * @param {string} direction The cardinal direction of the intersection branch relative to the intersection
+     * itself. A general volume describing vehicles moving southbound to enter the intersection and northbound
+     * to exit the intersection are in the south cardinal zone.
+     * @param {int} entering_volume The number of vehicles traveling into this branch of the intersection.
+     * @param {int} exiting_volume The number of vehicles traveling out from this branch of the intersection.
+     * @param {float} k_factor NOT DEFINED YET
+     * @param {float} entering_truck_per A percentage value describing the volume of trucks entering this branch 
+	 * relative to the total entering volume. If 10 of 100 vehicles in the measured entering volume are trucks, there 
+	 * is a 30% truck percentage, represented here by 0.1.
+     * @param {float} exiting_truck_per A percentage value describing the volume of trucks exit through this branch 
+	 * relative to the total exiting volume. If 10 of 100 vehicles in the measured exiting volume are trucks, there 
+	 * is a 30% truck percentage, represented here by 0.1.
+     * @constructor
+     */
+    constructor(direction, entering_volume, exiting_volume, k_factor, entering_truck_per, exiting_truck_per) {
+        this._direction      = direction;
+        this._volume_in      = entering_volume;
+        this._volume_out     = exiting_volume;
+        this._k_factor       = k_factor;
+        this._in_truck_per   = entering_truck_per;
+        this._out_truck_per  = exiting_truck_per;
+        
+        this.calculateGeneralVolumes();
+    }
+    
+    calculateGeneralVolumes() {
+        this._general_volume = this._volume_in + this._volume_out;
+        this._volume_cars_in  = this._volume_in * (1 - this._in_truck_per);
+        this._volume_cars_out = this._volume_out * (1 - this._out_truck_per);
+
+        this._volume_trucks_in  = this._volume_in * this._in_truck_per;
+        this._volume_trucks_out = this._volume_out * this._out_truck_per;
+        
+        if (this._direction === "north")
+            this._d_factor = this._volume_out / this._general_volume;
+        else if (this._direction === "east")
+            this._d_factor = this._volume_out / this._general_volume;
+        else if (this._direction === "south")
+            this._d_factor = this._volume_in / this._general_volume;
+        else if (this._direction === "west")
+            this._d_factor = this._volume_in / this._general_volume;
+    }
+
+    getAttributeBySelector(selector) {
+        if (selector == "array" || selector === undefined)
+            return [this._direction, this._volume_in, this._volume_out, this._k_factor, this._in_truck_per, this._out_truck_per];
+        else if (selector == "direction")
+            return this._direction;
+        else if (selector == "volume in")
+            return this._volume_in;
+        else if (selector == "volume out")
+            return this._volume_out;
+        else if (selector == "k-factor")
+            return this._k_factor;
+        else if (selector == "truck percent in")
+            return this._in_truck_per;
+        else if (selector == "truck percent out")
+            return this._out_truck_per;
+    }
+    
+    setGeneralVolumeArray(volume_array) {
+        this._volume_in = volume_array[1];
+        this._volume_out = volume_array[1];
+        this._k_factor = volume_array[2];
+        this._in_truck_per = volume_array[3];
+        this._out_truck_per = volume_array[4];
+        this.calculateGeneralVolumes();
+    }
+    
+    /**
+     * Returns the stored value for the general volume.
+     * @returns {int} The volume of vehicles
+     */
+    getGeneralVolume() {
+        return this._general_volume;
+    }
+
+    /**
+     * Returns the stored value for the number of cars that are entering the intersection via the specified branch. 
+     * @returns {int} The volume of cars entering
+     */
+    getVolumeCarsIn() {
+        return this._volume_cars_in;
+    }
+
+    /**
+     * Returns the stored value for the number of cars that are exiting the intersection via the specified branch.
+     * @returns {int} The volume of cars exiting
+     */
+    getVolumeCarsOut() {
+        return this._volume_cars_out;
+    }
+
+    /**
+     * Returns the stored value for the number of trucks that are entering the intersection via the specified branch.
+     * @returns {int} The volume of trucks entering
+     */
+    getVolumeTrucksIn() {
+        return this._volume_trucks_in;
+    }
+
+    /**
+     * Returns the stored value for the number of trucks that are exiting the intersection via the specified branch.
+     * @returns {int} The volume of trucks exiting
+     */
+    getVolumeTrucksOut() {
+        return this._volume_trucks_out;
+    }
+}
+
+class ModalFactory {
+    /** 
+     * This is a class that helps with the creation of help modals on the application view. This tool will automatically
+     * store new modals in the help_modals div. An image or youtube video may be shown on the modal, but not both simultaneously.
+     * One ModalFactory object can be used to generate any number of modal elements on the HTML page. Simply modify the class's
+     * member variables and regenerate with <tt>ModalObject.injectModalHTML(ModalObject.generateModalHTML())</tt>; however, it
+     * is recommended to create a new ModalFactory object for each modal if one wishes to later manage the modal. Once a new
+     * modal is generated and injected, the previous modal cannot be modified and must be removed from the page manually via ID.
+     * @constructor
+     * @param {string} element_id The element ID to be used in the creation of the modal
+     * @param {string} header The header text that is to be shown on the modal
+     * @param {string} image An image to be shown on the help modal. If an image shouldn't be used, specify "null"
+     * @param {string} image_size The size of the image following Semantic-UI descriptors (small, medium, large, or huge). If an image wasn't used, specify "null"
+     * @param {string} youtube_import The URL of a YouTube video to be added to the modal. If a YouTube video shouldn't be used, specify "null"
+     * @param {string} description The description text to be shown in the description of the modal
+     */
+    constructor(element_id, header, image, image_size, youtube_import, description, button_text) {
+        // Header error tracer for improperly defined ModalFactory object.
+        if(header === undefined) 
+            this._header = "Undefined Header";
+        else
+            this._header = header;
+        
+        // Description error tracer for improperly defined ModalFactory object.
+        if(description === undefined)
+            this._description = "Undefined description! Check your function call.";
+        else
+            this._description = description;
+
+        // Default button text value.
+        if(button_text === undefined)
+            this._button_text = "Got it!";
+        else
+            this._button_text = button_text;
+
+        this._element_id       = element_id;
+        this._image            = image;
+        this._image_size       = image_size;
+        this._youtube_import   = youtube_import;
+        this._button_text      = button_text;
+
+        // Add the modal to the DOM upon object instantiation
+        this.injectModalHTML(this.generateModalHTML());
+    }
+
+    /**
+     * Returns the ID to be used in the generation of the modal.
+     * @returns {string} The stored ID
+     */
+    getElementID() {
+        return this._element_id;
+    }
+
+    /**
+     * Returns the header to be used in the generation of the modal.
+     * @returns {string} The stored description
+     */
+    getHeader() {
+        return this._header;
+    }
+
+    /**
+     * Returns the image data (not the URL) for the image to be used in the generation of the modal.
+     * @returns {string} The stored image data
+     */
+    getImageURI() {
+        return this._image;
+    }
+
+    /**
+     * Returns the image size descriptior to be used in the generation of the modal.
+     * @returns {string} The stored image size
+     */
+    getImageSize() {
+        return this._image_size;
+    }
+
+    /**
+     * Returns the URL of the YouTube video to be used in the generation of the modal.
+     * @returns {string} The stored YouTube video URL
+     */
+    getYoutubeImportURL() {
+        return this._youtube_import;
+    }
+
+    /**
+     * Returns the description to be used in the generation of the modal.
+     * @returns {string} The stored description text
+     */
+    getDescription() {
+        return this._description;
+    }
+
+    /**
+     * Change the element ID of the last generated modal. This function will remove the last generated modal
+     * and replace it with a new modal with the changed element ID. If you're looking for a method to change
+     * the element ID in order to create a new modal, see {@link setElementID}.
+     * @see setElementID
+     * @param {string} new_id The element ID to switch to
+     */
+    setExistingElementID() {
+        this._element_id = new_id;
+        $("#" + element_ID).remove();
+        injectModalHTML(generateModalHTML());
+    }
+
+    /**
+     * Check if a given string qualifies as a URL.
+     * @returns {boolean} <tt>true</tt> if URL; <tt>false</tt> if not
+     */
+    isURL(url) {
+            var strRegex = "^((https|http|ftp|rtsp|mms)?://)"
+                + "?(([0-9a-z_!~*'().&=+$%-]+: )?[0-9a-z_!~*'().&=+$%-]+@)?" //ftpçš„user@
+                + "(([0-9]{1,3}\.){3}[0-9]{1,3}" // IPå½¢å¼çš„URL- 199.194.52.184
+                + "|" // å…è®¸IPå’ŒDOMAINï¼ˆåŸŸåï¼‰
+                + "([0-9a-z_!~*'()-]+\.)*" // åŸŸå- www.
+                + "([0-9a-z][0-9a-z-]{0,61})?[0-9a-z]\." // äºŒçº§åŸŸå
+                + "[a-z]{2,6})" // first level domain- .com or .museum
+                + "(:[0-9]{1,4})?" // ç«¯å£- :80
+                + "((/?)|" // a slash isn't required if there is no file name
+                + "(/[0-9a-z_!~*'().;?:@&=+$,%#-]+)+/?)$";
+             var re = new RegExp(strRegex);
+             return re.test(url);
+    }
+
+    /**
+     * Generate the HTML for the modal that is to be added to the view using settings defined in this object's member variables.
+     * In order for the generated HTML, use this in conjuntion with ModalFactory's injection function.
+     * @see injectModalHTML
+     * @returns {string} The HTML code for the modal
+     */
+    generateModalHTML() {
+        var htmlInjection;
+        if(this._image === undefined || this._image === "null") {
+            if(this._youtube_import === undefined || this._image === "null") {
+                htmlInjection = "<div id='" + this._element_id + "' class='ui modal'><div class='header'>" + this._header + "</div><div class='content'><p>" +
+                                this._description + "</p></div><div class='actions'><div class='ui positive right labeled icon button'>" + this._button_text + "<i class='checkmark icon'></i></div>";
+            }
+            else {
+                if(isURL(this._youtube_import)) {
+                    htmlInjection = "<div id='" + this._element_id + "' class='ui modal'><div class='header'>" + this._header + "</div><div class='image content'>" +
+                                    "<div class='ui image large'><iframe width='390' height'220' src='" + this._youtube_import + "' frameborder='0' allowfullscreen>" +
+                                    "</iframe></div><div class='description'><p>" + this._description + "</p></div></div><div class='actions'><div class='ui positive" +
+                                    " right labeled icon button'>" + this._button_text + "</div><i class='checkmark icon'></i></div></div></div>";
+                }
+                else {
+                    this._description = this._description + " The YouTube URL wasn't recognized as a valid URL. Make sure http:// or https:// has been included.";
+                    htmlInjection = "<div id='" + this._element_id + "' class='ui modal'><div class='header'>" + this._header + "</div><div class='content'><p>" + 
+                                    this._description + "</p></div><div class='actions'><div class='ui positive right labeled icon button'>" + this._button_text + "<i class='checkmark icon'></i></div>";
+                }
+            }
+        }
+        else {
+            if(this._image_size === undefined || this._image_size === "null") {
+                htmlInjection = "<div id='" + this._element_id + "' class='ui modal'><div class='header'>" + this._header + "</div><div class='image content'>" +
+                                "<div class='ui image medium'><img src='" + this._image + "'></div><div class='description'><p>" + this._description + "</p></div></div>" +
+                                "<div class='actions'><div class='ui positive right labeled icon button'>" + this._button_text + "</div><i class='checkmark icon'></i></div></div></div>";
+            }
+            else {
+                htmlInjection = "<div id='" + this._element_id + "' class='ui modal'><div class='header'>" + this._header + "</div><div class='image content'>" +
+                                "<div class='ui image " + this._image_size + "'><img src='" + this._image + "'></div><div class='description'><p>" + this._description + "</p></div></div>" +
+                                "<div class='actions'><div class='ui positive right labeled icon button'>" + this._button_text + "</div><i class='checkmark icon'></i></div></div></div>";
+            }
+        }
+
+        return htmlInjection;
+    }
+
+    /**
+     * Append the given HTML code to the end of the #modal_wrapper div in the HTML view.
+     * @param {string} modal_html The HTML to be appended
+     */
+    injectModalHTML(modal_html) {
+        $("#modal_wrapper").append(modal_html);
+    }
+
 }
 
 class CookiesUtility {
@@ -862,12 +2517,12 @@ class CookiesUtility {
         var currentConfig, currentZone, currentDir;
         for(var config = 0; config < NUM_INTERSECTION_CONFIGS; config++) {
 
-            if(!project.getIntersectionByIndex(config).isEnabled())
+            if(!PROJECT.getIntersectionByIndex(config).isEnabled())
                 continue;
             else
                 configString += this._break_char + this.getConfigId(config);
 
-            currentConfig = project.getIntersectionByIndex(config);
+            currentConfig = PROJECT.getIntersectionByIndex(config);
             for(var zone = MIN_EFFECTIVE_ZONE; zone < NUM_ZONES; zone++) {
 
                 if(!currentConfig.getZoneByIndex(zone).isEnabled()) {
@@ -879,7 +2534,7 @@ class CookiesUtility {
                     currentDir = currentZone.getDirectionByIndex(dir);
 
                     configString += this.TMtoCHAR(zone, dir, currentDir.getSharedLeft(), currentDir.getSharedRight(),
-                                            currentDir.getChanneledRight(), currentDir.getThrough(), currentDir.getLeftTurn(),
+                                            currentDir.getchannelizedRight(), currentDir.getThrough(), currentDir.getLeftTurn(),
                                             currentDir.getRightTurn(), 0);
                 }
             }
@@ -947,7 +2602,7 @@ class CookiesUtility {
                 var configKeyEnum = this._ConfigKeyEnum;
                 var _this = this;
                 records.forEach(function(record){
-                    currentConfig = project.getIntersectionByIndex(objectKeyByValue(configKeyEnum, record.charAt(0)));
+                    currentConfig = PROJECT.getIntersectionByIndex(objectKeyByValue(configKeyEnum, record.charAt(0)));
                     // Credit to StackOverflow's David TanG
                     record.substring(1).match(/.{2}/g).forEach(function(infopack) {
                         var configDetails = _this.CHARtoTM(infopack);
@@ -959,824 +2614,4 @@ class CookiesUtility {
         }
     }
 }
-
-class GeneralVolume {
-    /**
-     * A class to contain and organize data pertaining to general volumes used in the Fratar balancing
-     * method. General volumes are those that describe only the number of vehicles that enter and leave
-     * each leg of the intersection. They do not detail the volume per movement (left, through, right).
-     * @param {string} direction The cardinal direction of the intersection branch relative to the intersection
-     * itself. A general volume describing vehicles moving southbound to enter the intersection and northbound
-     * to exit the intersection are in the north cardinal zone.
-     * @param {int} general_volume The number of vehicles traveling in and out of this branch of the intersection.
-     * @param {float} d_factor A percentage value describing the ratio between eastbound and westbound vehicles, and
-     * northbound and southbound vehicles. Being that each GeneralVolume object describes only a single branch, this value
-     * dictates the number of vehicles entering and leaving said branch. In the case of eastbound and westbound vehicles,
-     * a D factor greater than 0.50 expresses that more vehicles are moving eastbound than westbound. In the case of
-     * northbound and southbound vehicles, a D factor greater than 0.50 expresses that more vehicles are moving northbound
-     * than southbound.
-     * @param {float} k_factor NOT DEFINED YET
-     * @param {float} truck_per A percentage value describing the volume of trucks relative to the general volume. If 30 of 100
-     * vehicles in the measured general volume are trucks, there is a 30% truck percentage, represented here by 0.3.
-     * @constructor
-     */
-    constructor(direction, general_volume, d_factor, k_factor, truck_per) {
-        this._direction      = direction;
-        this._general_volume = general_volume;
-        this._d_factor       = d_factor;
-        this._k_factor       = k_factor;
-        this._truck_per      = truck_per;
-
-        if(direction === "north") {
-            this._volume_in  = this._general_volume * (1 - d_factor);
-            this._volume_out = this._general_volume * d_factor;
-        }
-        if(direction === "east") {
-            this._volume_in  = this._general_volume * (1 - d_factor);
-            this._volume_out = this._general_volume * d_factor;
-        }
-        if(direction === "south") {
-            this._volume_in  = this._general_volume * d_factor;
-            this._volume_out = this._general_volume * (1 - d_factor);
-        }
-        if(direction === "west") {
-            this._volume_in  = this._general_volume * d_factor;
-            this._volume_out = this._general_volume * (1 - d_factor);
-        }
-
-        this._volume_cars_in  = this._volume_in * (1 - this._truck_per);
-        this._volume_cars_out = this._volume_out * (1 - this._truck_per);
-
-        this._volume_trucks_in  = this._volume_in * this._truck_per;
-        this._volume_trucks_out = this._volume_out * this._truck_per;
-    }
-
-    /**
-     * Returns the stored value for the general volume.
-     * @returns {int} The volume of vehicles
-     */
-    getGeneralVolume() {
-        return this._general_volume;
-    }
-
-    /**
-     * Returns the stored value for the number of cars that are entering the intersection via the specified branch. 
-     * @returns {int} The volume of cars entering
-     */
-    getVolumeCarsIn() {
-        return this._volume_cars_in;
-    }
-
-    /**
-     * Returns the stored value for the number of cars that are exiting the intersection via the specified branch.
-     * @returns {int} The volume of cars exiting
-     */
-    getVolumeCarsOut() {
-        return this._volume_cars_out;
-    }
-
-    /**
-     * Returns the stored value for the number of trucks that are entering the intersection via the specified branch.
-     * @returns {int} The volume of trucks entering
-     */
-    getVolumeTrucksIn() {
-        return this._volume_trucks_in;
-    }
-
-    /**
-     * Returns the stored value for the number of trucks that are exiting the intersection via the specified branch.
-     * @returns {int} The volume of trucks exiting
-     */
-    getVolumeTrucksOut() {
-        return this._volume_trucks_out;
-    }
-}
-
-class DetailedVolume {
-    /**
-     * A class for containing and organizing information relative to intersection branch movement volumes in an unbounded manner. In the
-     * unbounded case, a "north" DetailedVolume object describes vehicles entering and leaving via the northern branch of the intersection
-     * (southbound entering the intersection and northbound exiting the intersection).
-     * @param {string} direction The cardinal direction of the branch relative to the intersection point
-     * @param {int} left The volume of vehicles traveling through the left turning lane of this branch
-     * @param {int} through The volume of vehicles traveling through the through movement lane of this branch
-     * @param {int} right The volume of vehicles traveling through the right turning lane of this branch
-     * @see BoundedDetailedVolume for the same organization but with direction described in terms of bounds ("northbound" being the southern branch).
-     * @constructor
-     */
-    constructor(direction, left, through, right) {
-        this._direction   = direction;
-        this._left        = left;
-        this._through     = through;
-        this._right       = right;
-        this._pce_enabled = false;
-    }
-
-    /**
-     * Returns the volume of movement in the left lane.
-     * @returns {int} left lane volume
-     */
-    getLeft() {
-        return this._left;
-    }
- 
-    /**
-     * Returns the volume of movement in the through lane.
-     * @returns {int} through lane volume
-     */
-    getThrough() {
-        return this._through;
-    }
-
-    /**
-     * Returns the volume of movement in the right lane.
-     * @returns {int} right lane volume
-     */
-    getRight() {
-        return this._right;
-    }
-
-    /**
-     * Given the truck percentages for each movement, calculate the Passenger Car Equivalent (PCE) assuming that one truck equals two passenger
-     * cars. Return a new DetailedVolume object with the modified values. To perform this calculation, the number of trucks is added to the existing
-     * volume.
-     * @param {float} left_truck_per The percentage of vehicles in the left turn lane that are trucks
-     * @param {float} through_truck_per The percentage of vehicles in the through lane that are trucks
-     * @param {float} right_truck_per The percentage of vehicles in the right turn lane that are trucks
-     * @returns {DetailedVolume} A new DetailedVolume object with updated lane volumes
-     *
-     * @example
-     * // Convert an existing DetailedVolume object into a PCE-Enabled DetailedVolume object based on the original object's values
-     * myDetailedVolume.getLeft() // â†’ 500
-     * myDetailedVolume = myDetailedVolume.getPassengerCarEquivalent(0.05, 0.10, 0.15);
-     * myDetailedVolume.getLeft() // â†’ 525
-     */
-    getPassengerCarEquivalent(left_truck_per, through_truck_per, right_truck_per) {
-        var new_detvol = new DetailedVolume(this._direction, (this._left + (this._left * left_truck_per)), (this._through * (this._through * through_truck_per)), (this._right * (this._right * right_truck_per)));
-        new_detvol.enablePCE();
-        return new_detvol;
-    }
-    
-    /**
-     * Manually set the PCE state to a passed boolean value.
-     * @param {boolean} state <tt>true</tt> for enabled; <tt>false</tt> for disabled
-     */
-    setPCEState(state) {
-        this._pce_enabled = state;
-    }
-
-    setLeft(value) {
-        this._left = value;
-    }
-
-    setThrough(value) {
-        this._through = value;
-    }
-
-    setRight(value) {
-        this._right = value;
-    }
-
-    /**
-     * Set the PCE-Enabled state to on, or true.
-     */
-    enablePCE() {
-        this.setPCEState(true);
-    }
-
-    /**
-     * Set the PCE-Enabled state to off, or false.
-     */
-    disablePCE() {
-        this.setPCEState(false);
-    }
-
-    /**
-     * Return if Passenger Car Equivalence is on or off.
-     * @returns {boolean} <tt>true</tt> if PCE is enabled; </tt>false</tt> if PCE is disabled
-     */
-    isPCEEnabled() {
-        return this._pce_enabled;
-    }
-}
-
-/**
- * A class for storing and organizing volumes for turning movements from a bounded (northbound) point of view.
- * @param {string} bound_direction The cardinal direction of the bounded movement
- * @param {int} left The value of bounded movement in the left lane
- * @param {int} through The value of bounded movement in the through lane
- * @param {int} right The value of the bounded movement in the right lane
- * @constructor
- */
-class BoundedDetailedVolume {
-    constructor(bound_direction, left, through, right) {
-        this._bound_direction = bound_direction;
-        this._left            = left;
-        this._through         = through;
-        this._right           = right;
-        this._pce_enabled     = false;
-    }
-
-    /**
-     * Returns the volume of movement in the left lane.
-     * @returns {int} left lane volume
-     */
-    getLeft() {
-        return this._left;
-    }
-
-    /**
-     * Returns the volume of movement in the through lane.
-     * @returns {int} through lane volume
-     */
-    getThrough() {
-        return this._through;
-    }
-
-    /**
-     * Returns the volume of movement in the right lane.
-     * @returns {int} right lane volume
-     */
-    getRight() {
-        return this._right;
-    }
-
-    /**
-     * Given the truck percentages for each movement, calculate the Passenger Car Equivalent (PCE) assuming that one truck equals two passenger
-     * cars. Return a new BoundedDetailedVolume object with the modified values. To perform this calculation, the number of trucks is added to
-     * the existing volume.
-     * @param {float} left_truck_per The percentage of vehicles in the left turn lane that are trucks
-     * @param {float} through_truck_per The percentage of vehicles in the through lane that are trucks
-     * @param {float} right_truck_per The percentage of vehicles in the right turn lane that are trucks
-     * @returns {BoundedDetailedVolume} A new BoundedDetailedVolume object with updated lane volumes
-     *
-     * @example
-     * // Convert an existing BoundedDetailedVolume object into a PCE-Enabled BoundedDetailedVolume object based on the original object's values
-     * myBoundedDetailedVolume.getLeft() // â†’ 500
-     * myBoundedDetailedVolume = myBoundedDetailedVolume.getPassengerCarEquivalent(0.05, 0.10, 0.15);
-     * myBoundedDetailedVolume.getLeft() // â†’ 525
-     */
-    getPassengerCarEquivalent(left_truck_per, through_truck_per, right_truck_per) {
-        var new_bdetvol = new BoundedDetailedVolume(this._direction, (this._left + (this._left * left_truck_per)), (this._through * (this._through * through_truck_per)), (this._right * (this._right * right_truck_per)));
-        new_bdetvol.enablePCE();
-        return new_bdetvol;
-    }
-    
-    /**
-     * Manually set the PCE state to a passed boolean value.
-     * @param {boolean} state <tt>true</tt> for enabled; <tt>false</tt> for disabled
-     */
-    setPCEState(state) {
-        this._pce_enabled = state;
-    }
-
-    /**
-     * Set the PCE-Enabled state to on, or true.
-     */
-    enablePCE() {
-        this.setPCEState(true);
-    }
-
-    /**
-     * Set the PCE-Enabled state to off, or false.
-     */
-    disablePCE() {
-        this.setPCEState(false);
-    }
-
-    /**
-     * Return if Passenger Car Equivalence is on or off.
-     * @returns {boolean} <tt>true</tt> if PCE is enabled; </tt>false</tt> if PCE is disabled
-     */
-    isPCEEnabled() {
-        return this._pce_enabled;
-    }
-}
-
-class DetailedPercentage {
-    constructor(direction, left_perc, through_perc, right_perc) {
-        this._direction = direction;
-        this._left_perc = left_perc;
-        this._through_perc = through_perc;
-        this._right_perc = right_perc;
-    }
-
-    getLeft() {
-        return this._left_perc;
-    }
-
-    getThrough() {
-        return this._through_perc;
-    }
-
-    getRight() {
-        return this._right_perc;
-    }
-}
-
-
-class UserVolumeDefinitions {
-    /**
-     * A class to store and organize the user-defined data pulled from the initial volume table. Supports the storage of Fratar data alongside
-     * user data.
-     * @param {DetailedVolume} north_detvol A DetailedVolume object containing volumes for movements north of the intersection
-     * @param {DetailedVolume} east_detvol A DetailedVolume object containing volumes for movements east of the intersection
-     * @param {DetailedVolume} south_detvol A DetailedVolume object containing volumes for movements south of the intersection
-     * @param {DetailedVolume} west_detvol A DetailedVolume object containing volumes for movements west of the intersection.
-     * @param {double} north_truckperc A number between 0 and 1 representing the percentage of trucks for all movements north of the intersection
-     * @param {double} east_truckperc A number between 0 and 1 representing the percentage of trucks for all movements east of the intersection
-     * @param {double} south_truckperc A number between 0 and 1 representing the percentage of trucks for all omvements south of the intersection
-     * @param {double} west_truckperc A number between 0 and 1 representing the percentage of trucks for all movements west of the intersection
-     */
-    constructor(north_detvol, east_detvol, south_detvol, west_detvol, north_truckperc, east_truckperc, south_truckperc, west_truckperc) {
-        this._user_defined_north_volumes = north_detvol;
-        this._user_defined_east_volumes  = east_detvol;
-        this._user_defined_south_volumes = south_detvol;
-        this._user_defined_west_volumes  = west_detvol;
-
-        this._user_defined_general_north_truck_perc = north_truckperc;
-        this._user_defined_general_east_truck_perc  = east_truckperc;
-        this._user_defined_general_south_truck_perc = south_truckperc;
-        this._user_defined_general_west_truck_perc  = west_truckperc;
-
-        // A flag that, when true, signifies that Fratar volumes should be provided when getting object data. This is set to true whenever
-        // Fratar volumes are defined.
-        this._using_fratar = false;
-        // A flag that, when true, signifies that DetailedPercentage objects have been provided, either from the user or from Fratar. This
-        // dictates whether detailed or general percentages should be provided. This is set to true whenever specific volumes, from the user
-        // or from Fratar, are defined.
-        this._specific_truck_percs_defined = false;
-    }
-
-    /**
-     * Add to this object variables storing user-defined per-lane truck percentages. This will also enable the flag for specific percentages.
-     * @param {DetailedPercentage} north_detperc The DetailedPercentage object containing percentages for movements north of the intersection
-     * @param {DetailedPercentage} east_detperc The DetailedPercentage object containing percentages for movements east of the intersection
-     * @param {DetailedPercentage} south_detperc The DetailedPercentage object containing percentages for movements south of the intersection
-     * @param {DetailedPercetnage} west_detperc The DetailedPercentage object containing percentages for movements west of the intersection
-     */
-    defineUserSpecificTruckPercentages(north_detperc, east_detperc, south_detperc, west_detperc) {
-        this._user_defined_specific_north_truck_perc = north_detperc;
-        this._user_defined_specific_east_truck_perc  = east_detperc;
-        this._user_defined_specific_south_truck_perc = south_detperc;
-        this._user_defined_specific_west_truck_perc  = west_detperc;
-        
-        this._specific_truck_percs_defined = true;
-    }
-
-    /**
-     * Add to this object variables storing Fratar-defined per-lane truck percentages. This will also enable the flag for specific percentages.
-     * @param {DetailedPercentage} north_detperc The DetailedPercentage object containing percentages for movements north of the intersection
-     * @param {DetailedPercentage} east_detperc The DetailedPercentage object containing percentages for movements east of the intersection
-     * @param {DetailedPercentage} south_detperc The DetailedPercentage object containing percentages for movements south of the intersection
-     * @param {DetailedPercetnage} west_detperc The DetailedPercentage object containing percentages for movements west of the intersection
-     */
-    defineFratarSpecificTruckPercentages(north_detperc, east_detperc, south_detperc, west_detperc) {
-        this._fratar_defined_specific_north_truck_perc = north_detperc;
-        this._fratar_defined_specific_east_truck_perc  = east_detperc;
-        this._fratar_defined_specific_south_truck_perc = south_detperc;
-        this._fratar_defined_specific_west_truck_perc  = west_detperc;
-        
-        this._specific_truck_percs_defined = true;
-    }
-
-    /**
-     * Return the percentage of trucks to this object's most specific knowledge. If specific values have been defined, those will
-     * be returned. If not, the general percentages will
-     *
-     */
-    getTruckPercentages() {
-        if(this.isUsingFratar()) {
-            if(this.isSpecificTruckPercsDefined()) {
-                // return fratar-defined specific truck percentages
-                return [this._fratar_defined_specific_north_truck_perc,
-                        this._fratar_defined_specific_east_truck_perc,
-                        this._fratar_defined_specific_south_truck_perc,
-                        this._fratar_defined_specific_west_truck_perc
-                ];
-            }
-            else {
-                // return fratar-defined general truck percentages
-                return [this._fratar_defined_general_north_truck_perc,
-                        this._fratar_defined_general_east_truck_perc,
-                        this._fratar_defined_general_south_truck_perc,
-                        this._fratar_defined_general_west_truck_perc
-                ];
-            }
-        }
-        else {
-            if(this.isSpecificTruckPercsDefined()) {
-                // return user-defined specific truck percentages
-                return [this._user_defined_specific_north_truck_perc,
-                        this._user_defined_specific_east_truck_perc,
-                        this._user_defined_specific_south_truck_perc,
-                        this._user_defined_specific_west_truck_perc
-                ];
-            }
-            else {
-                // return user-defined general truck percentages
-                return [this._user_defined_general_north_truck_perc,
-                        this._user_defined_general_east_truck_perc,
-                        this._user_defined_general_south_truck_perc,
-                        this._user_defined_general_west_truck_perc
-                ];
-            }
-        }
-    }
-
-    /**
-     * Enable or disable the use of Fratar volumes.
-     * @param {boolean} state <tt>true</tt> for using Fratar volumes; <tt>false</tt> for using user-defined volumes
-     * Note: This function currently does not have any support for undefined variable error control. If no Fratar volumes have been defined
-     * and this is set to true, this object will attempt to return an undefined variable. Error control needs to be added!
-     */
-    setUsingFratarVolumes(state) {
-        this._using_fratar = state;
-    }
-
-    /**
-     *
-     *
-     */
-    setFratarParameters(north_detvol, east_detvol, south_detvol, west_detvol, north_truckperc, east_truckperc, south_truckperc, west_truckperc) {
-        this._fratar_defined_north_volumes = north_detvol;
-        this._fratar_defined_east_volumes  = east_detvol;
-        this._fratar_defined_south_volumes = south_detvol;
-        this._fratar_defined_west_volumes  = west_detvol;
-
-        this._fratar_defined_general_north_truck_perc = north_truckperc;
-        this._fratar_defined_general_east_truck_perc  = east_truckperc;
-        this._fratar_defined_general_south_truck_perc = south_truckperc;
-        this._fratar_defined_general_west_truck_perc  = west_truckperc;
-    }
-
-    /**
-     * Return a state value stating if Fratar values are the current focus of the 
-     *
-     */
-    isUsingFratar() {
-        return this._using_fratar;
-    }
-
-    isSpecificTruckPercsDefined() {
-        return this._specific_truck_percs_defined;
-    }
-}
-
-
-
-class VolumetricIntersection {
-    /**
-     * This is a class to organize and contain VolumeTool output data. It accepts DetailedVolume or BoundedDetailedVolume objects and
-     * extends the given form to form a record of both. In other words, only DetailedVolume objects or only BoundedDetailedVolume objects
-     * may be passed in, but either may be retreived once the object has been instantiated. It is very important that the <tt>bounded</tt>
-     * flag is specified and specified correctly.
-     * @param {DetailedVolume|BoundedDetailedVolume} north_carvol A DetailedVolume or BoundedDetailedVolume for car volumes north or southbound of the intersection
-     * @param {DetailedVolume|BoundedDetailedVolume} east_carvol A DetailedVolume or BoundedDetailedVolume for car volumes east or westbound of the intersection
-     * @param {DetailedVolume|BoundedDetailedVolume} south_carvol A DetailedVolume or BoundedDetailedVolume for car volumes south or northbound of the intersection
-     * @param {DetailedVolume|BoundedDetailedVolume} west_carvol A DetailedVolume or BoundedDetailedVolume for car volumes west or eastbound of the intersection
-     * @param {DetailedVolume|BoundedDetailedVolume} north_truckvol A DetailedVolume or BoundedDetailedVolume for truck volumes north or soutbound of the intersection
-     * @param {DetailedVolume|BoundedDetailedVolume} east_truckvol A DetailedVolume or BoundedDetailedVolume for truck volumes east or westbound of the intersection
-     * @param {DetailedVolume|BoundedDetailedVolume} south_truckvol A DetailedVolume or BoundedDetailedVolume for truck volumes south or northbound of the intersection
-     * @param {DetailedVolume|BoundedDetailedVolume} west_truckvol A DetailedVolume or BoundedDetailedVolume for truck volumes west or eastbound of the intersection
-     * @param {boolean} bounded A flag specifying if the given volume objects are BoundedDetailedVolume objects
-     * @constructor
-     */
-    constructor(north_carvol, east_carvol, south_carvol, west_carvol, north_truckvol, east_truckvol, south_truckvol, west_truckvol, bounded) {
-        if(bounded) {
-            this._north_carvol_bounded   = north_carvol;
-            this._east_carvol_bounded    = east_carvol;
-            this._south_carvol_bounded   = south_carvol;
-            this._west_carvol_bounded    = west_carvol;
-            this._north_truckvol_bounded = north_truckvol;
-            this._east_truckvol_bounded  = east_truckvol;
-            this._south_truckvol_bounded = south_truckvol;
-            this._west_truckvol_bounded  = west_truckvol;
-        
-            this._north_carvol   = new DetailedVolume("north", this._south_carvol_bounded.getLeft(), this._south_carvol_bounded.getThrough(), this._south_carvol_bounded.getRight());
-            this._east_carvol    = new DetailedVolume("east" , this._west_carvol_bounded.getLeft(), this._west_carvol_bounded.getThrough(), this._west_carvol_bounded.getRight());
-            this._south_carvol   = new DetailedVolume("south", this._north_carvol_bounded.getLeft(), this._north_carvol_bounded.getThrough(), this._north_carvol_bounded.getRight());
-            this._west_carvol    = new DetailedVolume("west" , this._east_carvol_bounded.getLeft(), this._east_carvol_bounded.getThrough(), this._east_carvol_bounded.getRight());
-            this._north_truckvol = new DetailedVolume("north", this._south_truckvol_bounded.getLeft(), this._south_truckvol_bounded.getThrough(), this._south_truckvol_bounded.getRight());
-            this._east_truckvol  = new DetailedVolume("east" , this._west_truckvol_bounded.getLeft(), this._west_truckvol_bounded.getThrough(), this._west_truckvol_bounded.getRight());
-            this._south_truckvol = new DetailedVolume("south", this._north_truckvol_bounded.getLeft(), this._north_truckvol_bounded.getThrough(), this._north_truckvol_bounded.getRight());
-            this._west_truckvol  = new DetailedVolume("west" , this._east_truckvol_bounded.getLeft(), this._east_truckvol_bounded.getThrough(), this._east_truckvol_bounded.getRight());
-        }
-        else {
-            this._north_carvol   = north_carvol;
-            this._east_carvol    = east_carvol;
-            this._west_carvol    = west_carvol;
-            this._south_carvol   = south_carvol;
-            this._north_truckvol = north_truckvol;
-            this._east_truckvol  = east_truckvol;
-            this._south_truckvol = south_truckvol;
-            this._west_truckvol  = west_truckvol;
-
-            this._north_carvol_bounded   = new BoundedDetailedVolume("northbound", this._south_carvol.getLeft(), this._south_carvol.getThrough(), this._south_carvol.getRight());
-            this._east_carvol_bounded    = new BoundedDetailedVolume("eastbound",  this._west_carvol.getLeft(), this._west_carvol.getThrough(), this._west_carvol.getRight());
-            this._south_carvol_bounded   = new BoundedDetailedVolume("southbound", this._north_carvol.getLeft(), this._north_carvol.getThrough(), this._north_carvol.getRight());
-            this._west_carvol_bounded    = new BoundedDetailedVolume("westbound",  this._east_carvol.getLeft(), this._east_carvol.getThrough(), this._east_carvol.getRight());;
-            this._north_truckvol_bounded = new BoundedDetailedVolume("northbound", this._south_truckvol.getLeft(), this._south_truckvol.getThrough(), this._south_truckvol.getRight());
-            this._east_truckvol_bounded  = new BoundedDetailedVolume("eastbound",  this._west_truckvol.getLeft(), this._west_truckvol.getThrough(), this._west_truckvol.getRight());
-            this._south_truckvol_bounded = new BoundedDetailedVolume("southbound", this._north_truckvol.getLeft(), this._north_truckvol.getThrough(), this._north_truckvol.getRight());
-            this._west_truckvol_bounded  = new BoundedDetailedVolume("westbound",  this._east_truckvol.getLeft(), this._east_truckvol.getThrough(), this._east_truckvol.getRight());
-        }
-    }
-
-    /**
-     * Return detailed volumes (volume objects including information about movement volumes) about car volumes for each branch of the intersection in an unbounded format.
-     * @returns {DetailedVolume[]} An array of car DetailedVolume objects in the order north, east, south, west
-     */
-    getUnboundedCarVolumes() {
-        return [this._north_carvol, this._east_carvol, this._south_carvol, this._west_carvol];
-    }
-
-    /**
-     * Return detailed volumes (volume objects including information about movement volumes) about truck volumes for each branch of the intersection in an unbounded format.
-     * @returns {DetailedVolume[]} An array of truck DetailedVolume objects in the order north, east, south, west
-     */
-    getUnboundedTruckVolumes() {
-        return [this._north_truckvol, this._east_truckvol, this._south_truckvol, this._west_truckvol];
-    }
-
-    /**
-     * Return bounded detailed volumes (volume objects including information about movement volumes) about car volumes for each branch of the intersection by their
-     * bounded movement (e.g. "northbound").
-     * @returns {BoundedDetailedVolume[]} An array of car BoundedDetailedVolume objects in the order north, east, south, west
-     */
-    getBoundedCarVolumes() {
-        return [his._south_carvol_bounded, this._west_carvol_bounded, this._north_carvol_bounded, this._east_carvol_bounded];
-    }
-
-    /**
-     * Return bounded detailed volumes (volume objects including information about movement volumes) about truck volumes for each branch of the intersection by their
-     * bounded movement (e.g. "northbound").
-     * @returns {BoundedDetailedVolume[]} An array of truck BoundedDetailedVolume objects in the order north, east, south, west
-     */
-    getBoundedTruckVolumes() {
-        return [this._south_truckvol_bounded, this._west_truckvol_bounded, this._north_truckvol_bounded, this._east_truckvol_bounded];
-    }
-
-    /**
-     * Calculate and return the percentage of trucks for each direction using the general volume from said direction. The general volume
-     * is equal to the sum of the left, through, and right volumes. The returned array contains percentages in the order north, east, south
-     * and west. Note that the percentages correspond to unbounded directions, meaning southbound traffic contains the percentage of trucks
-     * equal to the first (north) value returned from this function.
-     * @returns {double[]} An array of decimal numbers between 0 and 1 representing percentages
-     */
-    getGeneralTruckPercentages() {
-        var carvols = this.getUnboundedCarVolumes();
-        var truckvols = this.getUnboundedTruckVolumes();
-
-        var north_genperc = (truckvols[0].getLeft() + truckvols[0].getThrough() + truckvols[0].getRight()) / (truckvols[0].getLeft() + truckvols[0].getThrough() + truckvols[0].getRight() +
-                                                                                                              carvols[0].getLeft() + carvols[0].getThrough() + carvols[0].getRight());
-
-        var east_genperc = (truckvols[1].getLeft() + truckvols[1].getThrough() + truckvols[1].getRight()) / (truckvols[1].getLeft() + truckvols[1].getThrough() + truckvols[1].getRight() +
-                                                                                                              carvols[1].getLeft() + carvols[1].getThrough() + carvols[1].getRight());
-        
-        var south_genperc = (truckvols[2].getLeft() + truckvols[2].getThrough() + truckvols[2].getRight()) / (truckvols[2].getLeft() + truckvols[2].getThrough() + truckvols[2].getRight() +
-                                                                                                              carvols[2].getLeft() + carvols[2].getThrough() + carvols[2].getRight());
-        
-        var west_genperc = (truckvols[3].getLeft() + truckvols[3].getThrough() + truckvols[3].getRight()) / (truckvols[3].getLeft() + truckvols[3].getThrough() + truckvols[3].getRight() +
-                                                                                                              carvols[3].getLeft() + carvols[3].getThrough() + carvols[3].getRight());
-
-        return [north_genperc, east_genperc, south_genperc, west_genperc];
-    }
-
-    /**
-     * Calculate and return the percentage of trucks for each movement for each direction. This will return a two dimensional array
-     * where the first row is truck percentages for the movements left, through, and right (in that order) north of the intersection.
-     * The second row corresponds to eastern movements, the third to southern movements, and the fourth to western movements.
-     * @returns {double[][]} A two-dimensional array of decimal numbers between 0 and 1 representing percentages
-     *
-     */
-    getSpecificTruckPercentages() {
-        var carvols = this.getUnboundedCarVolumes();
-        var truckvols = this.getUnboundedTruckVolumes();
-
-        var north_specperc_left = (truckvols[0].getLeft()) / (truckvols[0].getLeft() + carvols[0].getLeft());
-        var north_specperc_through = (truckvols[0].getThrough()) / (truckvols[0].getThrough() + carvols[0].getThrough());
-        var north_specperc_right = (truckvols[0].getRight()) / (truckvols[0].getRight() + carvols[0].getRight());
-
-        var east_specperc_left = (truckvols[1].getLeft()) / (truckvols[1].getLeft() + carvols[1].getLeft());
-        var east_specperc_through = (truckvols[1].getThrough()) / (truckvols[1].getThrough() + carvols[1].getThrough());
-        var east_specperc_right = (truckvols[1].getRight()) / (truckvols[1].getRight() + carvols[1].getRight());
-
-        var south_specperc_left = (truckvols[2].getLeft()) / (truckvols[2].getLeft() + carvols[2].getLeft());
-        var south_specperc_through = (truckvols[2].getThrough()) / (truckvols[2].getThrough() + carvols[2].getThrough());
-        var south_specperc_right = (truckvols[2].getRight()) / (truckvols[2].getRight() + carvols[2].getRight());
-        
-        var west_specperc_left = (truckvols[3].getLeft()) / (truckvols[3].getLeft() + carvols[3].getLeft());
-        var west_specperc_through = (truckvols[3].getThrough()) / (truckvols[3].getThrough() + carvols[3].getThrough());
-        var west_specperc_right = (truckvols[3].getRight()) / (truckvols[3].getRight() + carvols[3].getRight());
-    
-        return [
-            [north_specperc_left, north_specperc_through, north_specperc_right],
-            [east_specperc_left, east_specperc_through, east_specperc_right],
-            [south_specperc_left, south_specperc_through, south_specperc_right],
-            [west_specperc_left, west_specperc_through, west_specperc_right]
-        ];
-    
-    }
-
-    /**
-     * Calculate and return the percentage of trucks for each direction using the general volume from said direction. The general volume
-     * is equal to the sum of the left, through, and right volumes. The returned array contains percentages in the order north, east, south
-     * and west. Note that the percentages correspond to unbounded directions, meaning southbound traffic contains the percentage of trucks
-     * equal to the first (north) value returned from this function.
-     * @returns {double[]} An array of decimal numbers between 0 and 1 representing percentages
-     */
-    getGeneralTruckPercentages() {
-        var carvols = this.getUnboundedCarVolumes();
-        var truckvols = this.getUnboundedTruckVolumes();
-
-        var north_genperc = (truckvols[0].getLeft() + truckvols[0].getThrough() + truckvols[0].getRight()) / (truckvols[0].getLeft() + truckvols[0].getThrough() + truckvols[0].getRight() +
-                                                                                                              carvols[0].getLeft() + carvols[0].getThrough() + carvols[0].getRight());
-
-        var east_genperc = (truckvols[1].getLeft() + truckvols[1].getThrough() + truckvols[1].getRight()) / (truckvols[1].getLeft() + truckvols[1].getThrough() + truckvols[1].getRight() +
-                                                                                                              carvols[1].getLeft() + carvols[1].getThrough() + carvols[1].getRight());
-        
-        var south_genperc = (truckvols[2].getLeft() + truckvols[2].getThrough() + truckvols[2].getRight()) / (truckvols[2].getLeft() + truckvols[2].getThrough() + truckvols[2].getRight() +
-                                                                                                              carvols[2].getLeft() + carvols[2].getThrough() + carvols[2].getRight());
-        
-        var west_genperc = (truckvols[3].getLeft() + truckvols[3].getThrough() + truckvols[3].getRight()) / (truckvols[3].getLeft() + truckvols[3].getThrough() + truckvols[3].getRight() +
-                                                                                                              carvols[3].getLeft() + carvols[3].getThrough() + carvols[3].getRight());
-
-        return [north_genperc, east_genperc, south_genperc, west_genperc];
-    }
-
-    /**
-     * Calculate and return the percentage of trucks for each movement for each direction. This will return a two dimensional array
-     * where the first row is truck percentages for the movements left, through, and right (in that order) north of the intersection.
-     * The second row corresponds to eastern movements, the third to southern movements, and the fourth to western movements.
-     * @returns {double[][]} A two-dimensional array of decimal numbers between 0 and 1 representing percentages
-     *
-     */
-    getSpecificTruckPercentages() {
-        var carvols = this.getUnboundedCarVolumes();
-        var truckvols = this.getUnboundedTruckVolumes();
-
-        var north_specperc_left = (truckvols[0].getLeft()) / (truckvols[0].getLeft() + carvols[0].getLeft());
-        var north_specperc_through = (truckvols[0].getThrough()) / (truckvols[0].getThrough() + carvols[0].getThrough());
-        var north_specperc_right = (truckvols[0].getRight()) / (truckvols[0].getRight() + carvols[0].getRight());
-
-        var east_specperc_left = (truckvols[1].getLeft()) / (truckvols[1].getLeft() + carvols[1].getLeft());
-        var east_specperc_through = (truckvols[1].getThrough()) / (truckvols[1].getThrough() + carvols[1].getThrough());
-        var east_specperc_right = (truckvols[1].getRight()) / (truckvols[1].getRight() + carvols[1].getRight());
-
-        var south_specperc_left = (truckvols[2].getLeft()) / (truckvols[2].getLeft() + carvols[2].getLeft());
-        var south_specperc_through = (truckvols[2].getThrough()) / (truckvols[2].getThrough() + carvols[2].getThrough());
-        var south_specperc_right = (truckvols[2].getRight()) / (truckvols[2].getRight() + carvols[2].getRight());
-        
-        var west_specperc_left = (truckvols[3].getLeft()) / (truckvols[3].getLeft() + carvols[3].getLeft());
-        var west_specperc_through = (truckvols[3].getThrough()) / (truckvols[3].getThrough() + carvols[3].getThrough());
-        var west_specperc_right = (truckvols[3].getRight()) / (truckvols[3].getRight() + carvols[3].getRight());
-    
-        return [
-            [north_specperc_left, north_specperc_through, north_specperc_right],
-            [east_specperc_left, east_specperc_through, east_specperc_right],
-            [south_specperc_left, south_specperc_through, south_specperc_right],
-            [west_specperc_left, west_specperc_through, west_specperc_right]
-        ];
-    
-    }
-}
-
-class VolumeTool {
-    /**
-     * This class is a tool for organizing data for its use in Fratar calculations of synthetic turning movement volumes.
-     * @constructor
-     * @param {GeneralVolume} north_genvol The GeneralVolume object for the zone north of the intersection
-     * @param {GeneralVolume} east_genvol The GeneralVolume object for the zone east of the intersection
-     * @param {GeneralVolume} south_genvol The GeneralVolume object for the zone south of the intersection
-     * @param {GeneralVolume} west_genvol The GeneralVolume object for the zone west of the intersection
-     */
-    constructor(north_genvol, east_genvol, south_genvol, west_genvol) {
-        this._north_genvol = north_genvol;
-        this._east_genvol  = east_genvol;
-        this._south_genvol = south_genvol;
-        this._west_genvol  = west_genvol;
-
-        this._car_in_array  = [this._north_genvol.getVolumeCarsIn(), this._east_genvol.getVolumeCarsIn(), this._south_genvol.getVolumeCarsIn(), this._west_genvol.getVolumeCarsIn()];
-        this._car_out_array  = [this._north_genvol.getVolumeCarsOut(), this._east_genvol.getVolumeCarsOut(), this._south_genvol.getVolumeCarsOut(), this._west_genvol.getVolumeCarsOut()];
-
-        this._truck_in_array  = [this._north_genvol.getVolumeTrucksIn(), this._east_genvol.getVolumeTrucksIn(), this._south_genvol.getVolumeTrucksIn(), this._west_genvol.getVolumeTrucksIn()];
-        this._truck_out_array  = [this._north_genvol.getVolumeTrucksOut(), this._east_genvol.getVolumeTrucksOut(), this._south_genvol.getVolumeTrucksOut(), this._west_genvol.getVolumeTrucksOut()];
-
-        this._carvol_table = [
-                        [0, 1, 1, 1],
-                        [1, 0, 1, 1],
-                        [1, 1, 0, 1],
-                        [1, 1, 1, 0]
-                      ];
-
-        this._truckvol_table = [
-                        [0, 1, 1, 1],
-                        [1, 0, 1, 1],
-                        [1, 1, 0, 1],
-                        [1, 1, 1, 0]
-                      ];
-    }
-
-    /**
-     * Given a table, calculate the totals of each row and report them.
-     * @param {int[][]} table A table of integers
-     * @returns {int[]} An array of totals for each row such that each column in the
-     * array corresponds to its index-equivalent row in the table
-     */
-    getRowTotals(table) {
-        var count = 0;
-        var rowTotals = [];
-        for(var rowCount = 0; rowCount < table.length; rowCount++) {
-            count = 0;
-            for(var i = table[rowCount].length; i--;)
-                count += table[rowCount][i];
-            rowTotals.push(count);
-        }
-        return rowTotals;
-    }
-
-    /**
-     * Given a table, calculate the totals of each column and report them.
-     * @param {int[][]} table A table of integers
-     * @returns {int[]} An array of totals for each column such that each column in the
-     * array corresponds to its index-equivalent column in the table
-     */
-    getColumnTotals(table) {
-        var count = 0;
-        var colTotals = [];
-        for(var colCount = 0; colCount < table[0].length; colCount++) {
-            count = 0;
-            for(var i = table.length; i--;)
-                count += table[i][colCount];
-            colTotals.push(count);
-        }
-        return colTotals;
-    }
-   
-    /**
-     * Uses the inputted (assuming converged) table to create DetailedVolume objects for
-     * the north, east, south, and west volume zones. Returns an array of these new
-     * DetailedVolume objects.
-     * @param {int[][]} table A table that has been corverged
-     * @returns {int[]} An array of DetailedVolume objects such that the first element is north, the second
-     * is east, the third is south, and the fourth is west
-     */
-    getDetailedVolumes(table) {
-        var north = new DetailedVolume("north", table[0][1], table[0][2], table[0][3]);
-        var east  = new DetailedVolume("east" , table[1][2], table[1][3], table[1][0]);
-        var south = new DetailedVolume("south", table[2][3], table[2][0], table[2][1]);
-        var west  = new DetailedVolume("west" , table[3][0], table[3][1], table[3][2]);
-
-        return [north, east, south, west];
-    }
-
-    /**
-     * This performs the actual Fratar convergence on the car and truck tables using their respective volume inputs.
-     * Used by <tt>calculateSyntheticValues()</tt>
-     * @see calculateSyntheticValues
-     * @param {int[][]} table A square matrix filled with ones with zeros along the diagonal
-     * @param {int[]} in_array An array of four input volumes such that the first element is north, second is east, third
-     * is south, and fourth is west
-     * @param {int[][]} out_array An array of four output volumes such that the first element is north, second is east, third
-     * is south, and fourth is west
-     * @returns {int[][]} A square (4x4) matrix containing the converged values, not sorted nor organized
-     */
-    convergeTable(table, in_array, out_array) {
-
-        for(var i = 0; i < 1; i++) {
-            var rowTotals = this.getRowTotals(table);
-            var colTotals = this.getColumnTotals(table);
-            var sym_row = 0;
-            var sym_col = 0;
-
-
-                for(var row = 0; row < table.length; row++) {
-                    for(var col = 0; col < table[0].length; col++) {            
-                        sym_row = in_array[row] / rowTotals[row];
-                        sym_col = out_array[col] / colTotals[col];
-                        table[row][col] = Math.round(table[row][col] * ((sym_row + sym_col) / 2));
-                    }
-                }
-
-        }
-
-        return table;
-    }
-
-    /**
-     * Perform Fratar balancing using the car and truck volumes stored in this object and return a VolumetricIntersection object
-     * containing the bounded and unbounded turn volumes for all four zones around the intersection.
-     * @returns {VolumetricIntersection} A VolumetricIntersection object containing the synthetic turn volumes for cars and trucks
-     * in the bounded and unbounded cases
-     */
-    calculateSyntheticVolumes() {
-        var car_detvols   = this.getDetailedVolumes(this.convergeTable(this._carvol_table, this._car_in_array, this._car_out_array));
-        var truck_detvols = this.getDetailedVolumes(this.convergeTable(this._truckvol_table, this._truck_in_array, this._truck_out_array));
-        
-        return (new VolumetricIntersection(car_detvols[0], car_detvols[1], car_detvols[2], car_detvols[3], truck_detvols[0], truck_detvols[1], truck_detvols[2], truck_detvols[3], false));
-    }
-
-}
-
 // [END] ////////// [CLASSES] ////////////////////

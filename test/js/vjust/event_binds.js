@@ -11,7 +11,7 @@ var view = new View();
 
 
 // Add content to the Application Settings menu now that it is hidden.
-view.prependToView("#appSettMenu", 
+view.prependToElement("#appSettMenu",  
 "<div class='ui item'> "+
 "    <div class='ui slider checkbox'> "+
 "        <input id='tooltipsToggleswitch' type='checkbox' name='tooltipsToggle'> "+
@@ -145,7 +145,7 @@ view.createListener("#restore_from_cookies", "click", function() {
  * When a child of the Add Tab tab is clicked, identify the child clicked and open a new tab
  * with content corresponding to the clicked child.
  */
-view.createListener($(".appPane div[data-tab='add_tab']").children(), "click", function() {
+view.createListener($(".appPane div[data-tab='add_tab'] div"), "click", function() {
     view.createNewTab($(this).attr("data-intersection-type"));
 });
 
@@ -179,32 +179,70 @@ view.createListener([".appPane .secondary", "a"], "click", function() {
  * =============================================================================================== */
 view.createListener(".input.tab.content.table input", "input", function() {
     var input_id = $(this).attr("name").split("-");
-    var val      = $(this).val();
-   
-    if(input_id[3] === undefined)
+    var val      = $(this).val().charAt( $(this).val().length - 1 ) == "%" ? $(this).val().substring(0, $(this).val().length - 1) : $(this).val();
+
+    if(input_id[3] === undefined) {
         //project.getUserVolumeDefinitions().updateComponentValueViaVerbal(input_id[1], input_id[2], val);
         console.log("Trying to write " + val + " to the " + input_id[1] + " " + input_id[2] + " volume");
-    else
+        $(".input.tab.content.intersection.internal.volume-container input[name='view-" + input_id[1] + "-" + input_id[2] + "']")
+            .val($(this).val());
+    }
+    else {
         //project.getUserVolumeDefinitions().updateComponentValueViaVerbal(input_id[1], input_id[2], val);
         console.log("Trying to write " + val + " to the " + input_id[1] + " " + input_id[2] + " truck percentage");
+    }
 });
+
+view.createListener(".input.tab.content.intersection.internal.volume-container input", "input", function() {
+    var input_id = $(this).attr("name").split("-");
+    
+    $(".input.tab.content.table input[name='usertable-" + input_id[1] + "-" + input_id[2] + "']")
+        .val($(this).val());
+
+});
+
+view.createListener(".input.tab.content.table input", "change", function() {
+   if($(this).hasClass("perc-input") && $(this).val().charAt($(this).val().length - 1) != "%")
+        view.setInputValue(this, $(this).val() + "%");
+});
+
 
 /* *********************************************************************************************** */
 
 
+/* Add Tab Fading
+ * =============================================================================================== */
 
 
 
 /* Initial Setup
  * =============================================================================================== */
-var freewall = new Freewall(".appPane div[data-tab='add_tab']");
-freewall.fitWidth();
+//var freewall = new Freewall(".appPane div[data-tab='add_tab']");
+//freewall.fitWidth();
 
 $(".tab.segment.active").bind("elementsVisible", function() {
+    console.log("Triggering elements visible!");
+
     var southbound_approach = new ArrowLayout($(".input.tab.content.intersection.internal.approach.southbound"), "input-tab-viewer-southbound");
     var westbound_approach  = new ArrowLayout($(".input.tab.content.intersection.internal.approach.westbound"), "input-tab-viewer-westbound");
     var northbound_approach = new ArrowLayout($(".input.tab.content.intersection.internal.approach.northbound"), "input-tab-viewer-northbound");
     var eastbound_approach  = new ArrowLayout($(".input.tab.content.intersection.internal.approach.eastbound"), "input-tab-viewer-eastbound");
+
+    southbound_approach.clickLeft("exclusive");
+    southbound_approach.clickThrough("exclusive");
+    southbound_approach.clickRight("exclusive");
+
+    westbound_approach.clickLeft("exclusive");
+    westbound_approach.clickThrough("exclusive");
+    westbound_approach.clickRight("exclusive");
+
+    northbound_approach.clickLeft("exclusive");
+    northbound_approach.clickThrough("exclusive");
+    northbound_approach.clickRight("exclusive");
+
+    eastbound_approach.clickLeft("exclusive");
+    eastbound_approach.clickThrough("exclusive");
+    eastbound_approach.clickRight("exclusive");
 
     $(".tab.segment.active").unbind("elementsVisible");
 });

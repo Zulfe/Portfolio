@@ -356,6 +356,8 @@ class ArrowLayout {
     /********************************************************/
 
     clickLeft(type) {
+        console.log("Clicking left!");
+
         var _this = "#" + this._UID + " .left.container";
         
         if(!this.isAdditionPermitted("left", type))

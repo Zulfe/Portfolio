@@ -74,7 +74,7 @@ var acquireResources = function(){
 
     var def = $.Deferred();
 
-    resources["images_intersection"].push(getImageData("http://i.imgur.com/KUuRtTc.jpg"));
+    //resources["images_intersection"].push(getImageData("http://i.imgur.com/KUuRtTc.jpg"));
   
     if(testMode)
         setTimeout(function(){
@@ -114,10 +114,13 @@ var awakenContent = function() {
 
     $("#init_loader").children().slice(1).transition({
         animation  : "fade",
-        duration   : "1700ms",
-        onComplete : function() {
-            def.resolve();
-        }});
+        duration   : "1000ms",
+    });
+
+    setTimeout(function() {
+        console.log("Waking up content...");
+        def.resolve();
+    }, 20);
 
     return def.promise();
 }

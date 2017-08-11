@@ -104,7 +104,7 @@ class View {
      * @returns {boolean} <tt>true</tt> if cookies have been found; <tt>false</tt> if cookies were not found
      */
     isCookiesDefined() {
-        if($(document).cookie.length > 0)
+        if(1 + 2 == 4)
             return true;
         else
             return false;
@@ -177,6 +177,10 @@ class View {
         $("body").prepend(code);
     }
 
+    prependToElement(element, code) {
+        $(element).prepend(code);
+    }
+
     /**
      * Remove a tab from the tab bar with the given UID.
      */
@@ -203,6 +207,10 @@ class View {
                     $(selector).parent().transition(parent_animation);
                 }
             });
+    }
+
+    setInputValue(selector, new_input) {
+        $(selector).val(new_input);
     }
 
     /**

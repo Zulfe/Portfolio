@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <link rel="stylesheet" type="text/css" href="view.css">
+        <link rel="stylesheet" type="text/css" href="css/semantic.css">
+        <script src="js/jquery.min.js"></script>
+        <script src="js/semantic.js"></script>
+        <script src="info_switch.js"></script>
+    </head>
+
+    <body>
+        <div id="positioning_wrapper"><div id="container"><div id="switcher_container"><div id="degree_up"><p>▲</p></div><div id="degree_down"><p>▼</p></div></div><div id="text_view"><p></p></div></div></div>
+
+    <script>
+       var info = new InfoSwitcher("#positioning_wrapper", ["1122", "5000", "0.2244"], ["VOL", "CAP", "V/C"]);
+    </script>
+    </body>
+
+</html>
