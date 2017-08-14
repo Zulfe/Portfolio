@@ -257,8 +257,9 @@ class ArrowLayout {
     }
 
     /**
-     *
-     *
+     * Fit the left, through, and right type containers snug around the arrows they currently contain. In the case that
+     * a left and right arrow are present but a through arrow is not, insert spacing between them to make clear they're
+     * two independent exclusive turns.
      */
     adjustAllContainerWidths() {
         if(this._NUM_EXCLUSIVE_LEFT != 0)
@@ -293,13 +294,16 @@ class ArrowLayout {
     }
 
     /**
-     *
-     *
+     * Given the aspect ratio of the element to be added and the group in which the intended addition is part of, scale down all existing images such that the addition of the new
+     * arrow still allows all arrows to fit.
+     * @param {float} add_ar The aspect ratio of the image to be added
+     * @param {string} group The group that the arrow to be added is part of
      */
     scaleImages(add_ar, group) {
-        console.log("[SCALING] Detected ", this._NUM_EXCLUSIVE_LEFT, " lefts, ", this._NUM_EXCLUSIVE_RIGHT, " rights, ", this._NUM_EXCLUSIVE_THROUGH, " throughs, ",
-                    this._NUM_SHARED_THROUGH_LEFT, " through-lefts, ", this._NUM_SHARED_THROUGH_RIGHT, " through-rights ", this._NUM_SHARED_THROUGH_LEFT_RIGHT, " through-left-rights, ",
-                    this._NUM_SHARED_LEFT_RIGHT, " left-rights, ", this._NUM_CHANNELIZED_RIGHT, " channelized rights.");
+        //console.log("[SCALING] Detected ", this._NUM_EXCLUSIVE_LEFT, " lefts, ", this._NUM_EXCLUSIVE_RIGHT, " rights, ", this._NUM_EXCLUSIVE_THROUGH, " throughs, ",
+        //            this._NUM_SHARED_THROUGH_LEFT, " through-lefts, ", this._NUM_SHARED_THROUGH_RIGHT, " through-rights ", this._NUM_SHARED_THROUGH_LEFT_RIGHT, " through-left-rights, ",
+        //            this._NUM_SHARED_LEFT_RIGHT, " left-rights, ", this._NUM_CHANNELIZED_RIGHT, " channelized rights.");
+        
         // Starting at 100% scale (of the current image dimensions), iterate down one percent at a time until all of the existing elements and the future element, when
         // multiplied by the current scale factor, are narrow enough to fit inside the approach container. Store this scale factor in this._height_scale for use in scaling all
         // existing images and allowing future images to be of the same size.
@@ -321,7 +325,8 @@ class ArrowLayout {
                 + ((this._ARROW_HEIGHT * scaler) / add_ar); // scaling would be more optimized for maximum possible display size if this was also scaled by scaler, but this would require an AR to work off of, which
                              // means every call to scaleImages would need to be updated to pass AR's instead of widths
             
-            console.log("[SCALING] Contents width is", contents_width);
+            // If the width of the intended contents scaled to the current value of scaler is less than the width of the allocated layout space, accept scaler as
+            // the new scale value and leave the loop.
             if(contents_width < this._APPROACH_WIDTH)
             {
                 this._height_scale = scaler;
@@ -329,16 +334,21 @@ class ArrowLayout {
             }
         }
         
+        // Update the height of all existing arrows using the newly found optimized scale value.
         $("#" + this._UID + " .arrow").css("height", (this._height_scale * this._ARROW_HEIGHT));
+        // Update the global width values using the new scale value.
         this.updateWidths();
 
-        console.log("[SCALING] Exclusive arrow inward margin is now", this._EXCLUSIVE_ARROW_INWARD_MARGIN);
+        // Update the margins for exclusive turns using the newly found optimized scale value.
         $("#" + this._UID + " .exclusive.left.arrow:not(:first-child)").css("margin-right", -1 * this._EXCLUSIVE_ARROW_INWARD_MARGIN);
         $("#" + this._UID + " .exclusive.right.arrow:not(:first-child)").css("margin-left", -1 * this._EXCLUSIVE_ARROW_INWARD_MARGIN);
 
         this.adjustAllContainerWidths();
     }
 
+    /**
+     * Recalculate the widths of all arrow types using the global aspect ratio, the global arrow height value, and the global height scale value.
+     */
     updateWidths() {
         this._EXCLUSIVE_TURN_ARROW_WIDTH            = (this._ARROW_HEIGHT * this._height_scale) * (1 / this._EXCLUSIVE_TURN_AR);
         this._EXCLUSIVE_THROUGH_ARROW_WIDTH         = (this._ARROW_HEIGHT * this._height_scale) * (1 / this._EXCLUSIVE_THROUGH_AR);
@@ -355,6 +365,10 @@ class ArrowLayout {
     /*                     LEFT                             */
     /********************************************************/
 
+    /**
+     * Handles the addition of arrows from the left group to the left container.
+     * @param {string} type The type of left arrow to be added (exclusive)
+     */
     clickLeft(type) {
         console.log("Clicking left!");
 
@@ -379,6 +393,8 @@ class ArrowLayout {
         this._NUM_EXCLUSIVE_LEFT++;
         this._NUM_ALL_LEFT++;
         this.adjustAllContainerWidths();
+
+        EventBus.dispatch("module_announce", this, this._UID + "-0", [this._NUM_EXCLUSIVE_LEFT]);
     }
 
     /********************************************************/
@@ -515,6 +531,14 @@ class ArrowLayout {
 
         // Fit all of the containers snuggly around the content inside of them.
         this.adjustAllContainerWidths();
+
+        EventBus.dispatch("module_announce", this, this._UID + "-1",
+                [this._NUM_EXCLUSIVE_THROUGH,
+                 this._NUM_SHARED_THROUGH_LEFT,
+                 this._NUM_SHARED_THROUGH_RIGHT,
+                 this._NUM_SHARED_THROUGH_LEFT_RIGHT,
+                 this._NUM_SHARED_LEFT_RIGHT
+                ]);
     }
 
     /********************************************************/
@@ -537,9 +561,8 @@ class ArrowLayout {
     }
 
     /**
-     *
-     *
-     *
+     * Handles the addition of arrows from the right group to the right container.
+     * @param {string} type The type of right arrow to be added (exclusive, channelized)
      */
     clickRight(type) {
         var _this = "#" + this._UID + " .right.container";
@@ -586,14 +609,21 @@ class ArrowLayout {
         this._NUM_ALL_RIGHT++;
         this.adjustAllContainerWidths();
 
+        EventBus.dispatch("module_announce", this, this._UID + "-2",
+                [this._NUM_EXCLUSIVE_RIGHT,
+                 this._NUM_CHANNELIZED_RIGHT,
+                ]);
+
+
         $("#" + this._UID + " .exclusive.right.arrow:not(:first-child)").css("margin-left", -1 * this._EXCLUSIVE_ARROW_INWARD_MARGIN);
     }
 
-
-
-
-
-
-
-
 }
+
+
+
+
+
+
+// END OF FILE // END OF FILE // END OF FILE // END OF FILE // END OF FILE // END OF FILE // END OF FILE // END OF FILE // END OF FILE //
+

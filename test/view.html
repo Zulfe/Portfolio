@@ -9,7 +9,9 @@
         <script type="text/javascript" src="js/semantic.js"></script>
         <script src="js/vjust/functions.js"></script>
         <script src="js/vjust/classes.js"></script>
+        <script src="js/vjust/EventBus.js"></script>
         <script src="js/vjust/globals.js"></script>
+        <script src="js/vjust/routes.js"></script>
         <script src="js/contextMenu.js"></script>
         <script src="js/vjust/arrow_layout.js"></script>
         <script src="js/jquery.csv.js"></script>
@@ -162,6 +164,7 @@
 
         project = new Project("Test Project", "Damon", "Broad and 14th", "Broad", "14th", "Broad", "14th", "Hospital", "VDOT", "Gas Station", "VACU");
 
+
         // Hide all of the page's contents.
         $("#init_loader").children().slice(1).hide();
         // Hide the sidebar menus so they aren't open when the page loads.
@@ -195,7 +198,7 @@
     </script>
 
     <script src="js/vjust/view.js"></script>
-    <script src="js/vjust/event_binds.js"></script>
+    <script src="js/vjust/controller.js"></script>
 
 
 </html>

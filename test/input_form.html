@@ -1,10 +1,18 @@
 <style>
-    .input.tab.content.container {
+    .input.tab.content.master.container {
         height: 100%;
         width: 100%;
         position: relative;
     }
-    .input.tab.content.table {
+
+    /*
+     * Styling for specific user input content.
+     * Styling for specific user input content.
+     * Styling for specific user input content.
+     * Styling for specific user input content.
+     * Styling for specific user input content.
+     */
+    .input.tab.content.specific.table {
         height: 40%;
         width: 40%;
 
@@ -16,36 +24,36 @@
 
         font-size: 1.15vw;
     }
-    .input.tab.content.table table, .input.tab.content.table-extended table {
+    .input.tab.content.specific.table table, .input.tab.content.specific.table-extended table {
         background-color: #DDDDDD;
         height: 100%;
         width: 100%;
         text-align: center;
     }
 
-    .input.tab.content.table > table,
-    .input.tab.content.table-extended > table
+    .input.tab.content.specific.table > table,
+    .input.tab.content.specific.table-extended > table
     {
         border: 2px solid #005DAA;
     }
 
-    .input.tab.content.table th {
+    .input.tab.content.specific.table th {
         text-align: center;
     }
 
-    .input.tab.content.table td:not(:last-child),
-    .input.tab.content.table-extended td:not(:last-child)
+    .input.tab.content.specific.table td:not(:last-child),
+    .input.tab.content.specific.table-extended td:not(:last-child)
     {
         border-right: 1px solid black;
     }
 
-    .input.tab.content.table tr:not(:last-child),
-    .input.tab.content.table-extended tr:not(:last-child)
+    .input.tab.content.specific.table tr:not(:last-child),
+    .input.tab.content.specific.table-extended tr:not(:last-child)
     {
         border-bottom: 1px solid black;
     }
 
-    .input.tab.content.table input {
+    .input.tab.content.specific.table input {
         height: 100%;
         width: 100%;
 
@@ -55,12 +63,12 @@
         text-align: center;
     }
 
-    .input.tab.content.table input:focus {
+    .input.tab.content.specific.table input:focus {
         outline: none;
     }
 
-    .input.tab.content.table > table > thead,
-    .input.tab.content.table-extended > table > thead
+    .input.tab.content.specific.table > table > thead,
+    .input.tab.content.specific.table-extended > table > thead
     {
         background-color: #005DAA;
         height: 8%;
@@ -70,32 +78,31 @@
         font-size: 1.15em;
     }
 
-    .input.tab.content.table .perc-input {
+    .input.tab.content.specific.table .perc-input {
         width: 100%;
     }
-
 
     /*
     * Nested Tables
     */
 
-    .input.tab.content.nested-table-container {
+    .input.tab.content.specific.nested-table-container {
         width: 65%;
     }
 
-    .input.tab.content.nested-table > thead {
+    .input.tab.content.specific.nested-table > thead {
         border-bottom: 1px solid black;
     }
 
-    .input.tab.content.nested-table td {
+    .input.tab.content.specific.nested-table td {
         width: 33.3333%;
     }
 
-    .input.tab.content.directional.nested-table td {
+    .input.tab.content.specific.directional.nested-table td {
         height: inherit;
     }
 
-    .input.tab.content.directional.nested-table td img { 
+    .input.tab.content.specific.directional.nested-table td img { 
         height: 5em;
         width: auto;
 
@@ -103,11 +110,11 @@
         margin-bottom: -13%;
     }
 
-    .input.tab.content.directional.nested-table tr:last-child {
+    .input.tab.content.specific.directional.nested-table tr:last-child {
         height: 80%;
     }
 
-    .input.tab.content.directional.nested-table tr:first-child {
+    .input.tab.content.specific.directional.nested-table tr:first-child {
         border-bottom: none !important;
     }
 
@@ -117,7 +124,7 @@
     * Extended Table
     */
 
-    .input.tab.content.intersection.table-extended {
+    .input.tab.content.specific.intersection.table-extended {
         height: 20%;
         width: 40%;
 
@@ -129,19 +136,19 @@
         font-size: 1.15vw;
     }
 
-    .input.tab.content.intersection.table-extended table td:not(:first-child):not(:last-child) {
+    .input.tab.content.specific.intersection.table-extended table td:not(:first-child):not(:last-child) {
         width: 21.6667%;
     }
 
-    .input.tab.content.intersection.table-extended > table td:last-child {
+    .input.tab.content.specific.intersection.table-extended > table td:last-child {
         width: 13%;
     }
 
-    .input.tab.content.nested-table-extended td {
+    .input.tab.content.specific.nested-table-extended td {
         width: 50% !important;
     }
 
-    .input.tab.content.intersection.table-extended input {
+    .input.tab.content.specific.intersection.table-extended input {
         height: 100%;
         width: 100%;
 
@@ -151,7 +158,7 @@
         text-align: center;
     }
 
-    .input.tab.content.intersection.table-extended input:focus {
+    .input.tab.content.specific.intersection.table-extended input:focus {
         outline: none;
     }
 
@@ -159,12 +166,12 @@
     * Button Panel
     */
 
-    .input.tab.content.intersection.button.panel {
+    .input.tab.content.specific.intersection.button.panel {
         background-color: #005DAA;
         
         position: absolute;
 
-        height: 16.5%;
+        height: 20%;
         width: 40%;
 
         top: 67.5%;
@@ -173,24 +180,32 @@
         font-size: 1.65vw;
     }
 
-    .input.tab.content.intersection.button.fratar {
+    .input.tab.content.specific.intersection.button.fratar {
         background-color: orange;
 
-        height: 46.25%;
+        height: 42%;
         width: 95%;
 
         margin: auto;
-        margin-top: 2.5%;
+        margin-top: 1.65%;
     }
 
-    .input.tab.content.intersection.button.movements {
+    .input.tab.content.specific.intersection.button.movements {
         background-color: orange;
 
-        height: 46.25%;
+        height: 42%;
         width: 95%;
 
         margin: auto;
-        margin-top: 2.5%;
+        margin-top: 1.5%;
+    }
+
+    .input.tab.content.specific.intersection.button.fratar:hover {
+        background-color: #FFC55A;
+    }
+
+    .input.tab.content.specific.intersection.button.movements:hover {
+        background-color: #FFC55A;
     }
 
 
@@ -198,7 +213,7 @@
     * Intersection View
     */
 
-    .input.tab.content.intersection.view {
+    .input.tab.content.specific.intersection.view {
         height: auto;
         width: 55%;
 
@@ -210,7 +225,7 @@
         position: absolute;
     }
 
-    .input.tab.content.intersection.internal.container {
+    .input.tab.content.specific.intersection.internal.wrapper {
         height: 100%;
         width: 100%;
 
@@ -221,12 +236,12 @@
         position: relative;
     }
 
-    .input.tab.content.intersection.internal.background {
+    .input.tab.content.specific.intersection.internal.background {
         height: 100%;
         width: 100%;
     }
 
-    .input.tab.content.intersection.internal.context-point-one {
+    .input.tab.content.specific.intersection.internal.context-point-one {
         position: absolute;
         top: 0.4%;
         left: 0.8%;
@@ -235,7 +250,7 @@
         width: 32.5%;
     }
 
-    .input.tab.content.intersection.internal.context-point-two {
+    .input.tab.content.specific.intersection.internal.context-point-two {
         position: absolute;
         top: 0.4%;
         right: 0.7%;
@@ -244,7 +259,7 @@
         width: 32.5%;
     }
 
-    .input.tab.content.intersection.internal.context-point-three {
+    .input.tab.content.specific.intersection.internal.context-point-three {
         position: absolute;
         bottom: 5.2%;
         left: 0.7%;
@@ -253,7 +268,7 @@
         width: 32.8%;
     }
 
-    .input.tab.content.intersection.internal.context-point-four {
+    .input.tab.content.specific.intersection.internal.context-point-four {
         position: absolute;
         bottom: 5.2%;
         right: 0.7%;
@@ -262,14 +277,14 @@
         width: 32.5%;
     }
 
-    .input.tab.content.intersection.internal.roadway {
+    .input.tab.content.specific.intersection.internal.roadway {
         background-color: #009900;
         outline: 2px solid white;
         border-radius: 3px;
         
     }
 
-    .input.tab.content.intersection.internal.roadway.southbound {
+    .input.tab.content.specific.intersection.internal.roadway.southbound {
         position: absolute;
 
         top: 15%;
@@ -280,7 +295,7 @@
         transform: rotate(90deg);
     }
 
-    .input.tab.content.intersection.internal.roadway.westbound {
+    .input.tab.content.specific.intersection.internal.roadway.westbound {
         position: absolute;
 
         top: 34.5%;
@@ -290,7 +305,7 @@
         width: 25%;
     }
 
-    .input.tab.content.intersection.internal.roadway.northbound {
+    .input.tab.content.specific.intersection.internal.roadway.northbound {
         position: absolute;
 
         bottom: 14%;
@@ -301,11 +316,11 @@
         transform: rotate(90deg);
     }
 
-    .input.tab.content.intersection.internal.roadway.northbound text {
+    .input.tab.content.specific.intersection.internal.roadway.northbound text {
         transform: rotate(90deg);
     }
 
-    .input.tab.content.intersection.internal.roadway.eastbound {
+    .input.tab.content.specific.intersection.internal.roadway.eastbound {
         position: absolute;
 
         top: 34.5%;
@@ -317,14 +332,14 @@
         text-align: center;
     }
 
-    .input.tab.content.intersection.internal.roadway.southbound p {
+    .input.tab.content.specific.intersection.internal.roadway.southbound p {
         transform: rotate(90deg);
     }
 
-    .input.tab.content.intersection.internal.roadway.southbound p,
-    .input.tab.content.intersection.internal.roadway.westbound  p,
-    .input.tab.content.intersection.internal.roadway.northbound p,
-    .input.tab.content.intersection.internal.roadway.eastbound  p {
+    .input.tab.content.specific.intersection.internal.roadway.southbound p,
+    .input.tab.content.specific.intersection.internal.roadway.westbound  p,
+    .input.tab.content.specific.intersection.internal.roadway.northbound p,
+    .input.tab.content.specific.intersection.internal.roadway.eastbound  p {
         position: absolute;
         top: 50%;
         left: 50%;
@@ -338,13 +353,13 @@
     }
     
 
-    .input.tab.content.intersection.internal.vertflex {
+    .input.tab.content.specific.intersection.internal.vertflex {
         position: relative;
         height: 100%;
         width: 100%;
     }
 
-    .input.tab.content.intersection.internal.vertflex span {
+    .input.tab.content.specific.intersection.internal.vertflex span {
         position: absolute;
         top: 50%;
         left: 50%;
@@ -356,12 +371,12 @@
     /*
     * Approach Containers
     */
-    .input.tab.content.intersection.internal.approach .center.wrapper {
+    .input.tab.content.specific.intersection.internal.approach .center.wrapper {
         float: none !important;
         margin: auto !important;
     }
 
-    .input.tab.content.intersection.internal.approach.southbound {
+    .input.tab.content.specific.intersection.internal.approach.southbound {
         position: absolute;
         transform: rotate(180deg);
         
@@ -372,7 +387,7 @@
         width: 20%;
     }
 
-    .input.tab.content.intersection.internal.approach.westbound {
+    .input.tab.content.specific.intersection.internal.approach.westbound {
         position: absolute;
         transform: rotate(-90deg);
 
@@ -383,7 +398,7 @@
         width: 18%;
     }
 
-    .input.tab.content.intersection.internal.approach.northbound {
+    .input.tab.content.specific.intersection.internal.approach.northbound {
         position: absolute;
 
         bottom: 14%;
@@ -393,7 +408,7 @@
         width: 20%;
     }
 
-    .input.tab.content.intersection.internal.approach.eastbound {
+    .input.tab.content.specific.intersection.internal.approach.eastbound {
         position: absolute;
         transform: rotate(90deg);
 
@@ -404,26 +419,26 @@
         width: 18%;
     }
 
-    .input.tab.content.intersection.internal.volume-container {
+    .input.tab.content.specific.intersection.internal.volume-container {
         position: absolute;
         width: 8%;
     }
 
-    .input.tab.content.intersection.internal.volume {
+    .input.tab.content.specific.intersection.internal.volume {
         display: inline-block;
 
         width: 100%;
     }
 
-    .input.tab.content.intersection.internal.volume:first-child {
+    .input.tab.content.specific.intersection.internal.volume:first-child {
         padding-bottom: 20%;
     }
 
-    .input.tab.content.intersection.internal.volume:last-child {
+    .input.tab.content.specific.intersection.internal.volume:last-child {
         padding-top: 20%;
     }
 
-    .input.tab.content.intersection.internal.volume input {
+    .input.tab.content.specific.intersection.internal.volume input {
         width: 100%;
 
         text-align: center;
@@ -431,32 +446,48 @@
         background-color: #EFEFEF;
     }
 
-    .input.tab.content.intersection.internal.volume-container.southbound {
+    .input.tab.content.specific.intersection.internal.volume-container.southbound {
         transform: rotate(90deg);
         top: 0%;
         left: 46%;
     }
 
-    .input.tab.content.intersection.internal.volume-container.westbound {
+    .input.tab.content.specific.intersection.internal.volume-container.westbound {
         top: 43%;
         right: 10.5%;
     }
 
-    .input.tab.content.intersection.internal.volume-container.northbound {
+    .input.tab.content.specific.intersection.internal.volume-container.northbound {
         transform: rotate(90deg);
         bottom: 0%;
         left: 46%;
     }
 
-    .input.tab.content.intersection.internal.volume-container.eastbound {
+    .input.tab.content.specific.intersection.internal.volume-container.eastbound {
         top: 43%;
         left: 10%;
     }
 
+
+
+
+
+
+
+
+    /*
+     * Styling for general user input content.
+     * Styling for general user input content.
+     * Styling for general user input content.
+     * Styling for general user input content.
+     * Styling for general user input content.
+     */
+
+
+
 </style>
 
-<div class="input tab content container">
-
+<div class="input tab content master container">
 
     <script>
         function isValidVolumeCharacter(event, element) {
@@ -470,8 +501,6 @@
             
             return false;
         }
-
-
 
         function isValidPercentageCharacter(event, element) {
             if($(element).val().charAt($(element).val().length - 1) == "%")
@@ -489,325 +518,349 @@
         }
     </script>
 
-
-
-    <div class="input tab content table">
-        <table>
-            <thead>
-                <tr>
-                    <th colspan="3">Traffic Volume Demand</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <td>Direction</td>
-                    <td class="input tab content nested-table-container">
-                        <table class="input tab content directional nested-table">
-                            <thead>
+    <div class="input tab content specific container">
+        <div class="input tab content specific table">
+            <table>
+                <thead>
+                    <tr>
+                        <th colspan="3">Traffic Volume Demand</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Direction</td>
+                        <td class="input tab content specific nested-table-container">
+                            <table class="input tab content specific directional nested-table">
+                                <thead>
+                                    <tr>
+                                        <th colspan="3">Volume (vehicles per hour)</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>Left</td>
+                                        <td>Through</td>
+                                        <td>Right</td>
+                                    </tr>
+                                    <tr>
+                                        <td><img src="assets/arrows/arrow_left.svg"></td>
+                                        <td><img src="assets/arrows/arrow_through.svg"</td>
+                                        <td><img src="assets/arrows/arrow_right.svg"</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </td>
+                        <td class="input tab content specific nested-table-container">
+                            <table class="input tab content specific directional nested-table">
+                                <thead>
+                                    <tr>
+                                        <th colspan="3">Truck Percent (%)</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>Left</td>
+                                        <td>Through</td>
+                                        <td>Right</td>
+                                    </tr>
+                                    <tr>
+                                        <td><img src="assets/arrows/arrow_left.svg"></td>
+                                        <td><img src="assets/arrows/arrow_through.svg"</td>
+                                        <td><img src="assets/arrows/arrow_right.svg"</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>Eastbound</td>
+                        <td class="input tab content specific nested-table-container">
+                            <table class="input tab content specific nested-table">
                                 <tr>
-                                    <th colspan="3">Volume (vehicles per hour)</th>
+                                    <td><input class="vol-input" type="text" placeholder="0" onkeypress='return isValidVolumeCharacter(event, this)' name="usertable-eastbound-left"></td>
+                                    <td><input class="vol-input" type="text" placeholder="0" onkeypress='return isValidVolumeCharacter(event, this)' name="usertable-eastbound-through"></td>
+                                    <td><input class="vol-input" type="text" placeholder="0" onkeypress='return isValidVolumeCharacter(event, this)' name="usertable-eastbound-right"></td>
                                 </tr>
-                            </thead>
-                            <tbody>
+                            </table>
+                        </td>
+                        <td class="input tab content specific nested-table-container">
+                            <table class="input tab content specific nested-table">
                                 <tr>
-                                    <td>Left</td>
-                                    <td>Through</td>
-                                    <td>Right</td>
+                                    <td><input class="perc-input" type="text" placeholder="0" onkeypress='return isValidPercentageCharacter(event, this)' name="usertable-eastbound-left-truckperc"></td>
+                                    <td><input class="perc-input" type="text" placeholder="0" onkeypress='return isValidPercentageCharacter(event, this)' name="usertable-eastbound-through-truckperc"></td>
+                                    <td><input class="perc-input" type="text" placeholder="0" onkeypress='return isValidPercentageCharacter(event, this)' name="usertable-eastbound-right-truckperc"></td>
                                 </tr>
+                            </table>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>Westbound</td>
+                        <td class="input tab content specific nested-table-container">
+                            <table class="input tab content specific nested-table">
                                 <tr>
-                                    <td><img src="assets/arrows/arrow_left.svg"></td>
-                                    <td><img src="assets/arrows/arrow_through.svg"</td>
-                                    <td><img src="assets/arrows/arrow_right.svg"</td>
+                                    <td><input class="vol-input" type="text" placeholder="0" onkeypress='return isValidVolumeCharacter(event, this)' name="usertable-westbound-left"></td>
+                                    <td><input class="vol-input" type="text" placeholder="0" onkeypress='return isValidVolumeCharacter(event, this)' name="usertable-westbound-through"></td>
+                                    <td><input class="vol-input" type="text" placeholder="0" onkeypress='return isValidVolumeCharacter(event, this)' name="usertable-westbound-right"></td>
                                 </tr>
-                            </tbody>
-                        </table>
-                    </td>
-                    <td class="input tab content nested-table-container">
-                        <table class="input tab content directional nested-table">
-                            <thead>
+                            </table>
+                        </td>
+                        <td class="input tab content specific nested-table-container">
+                            <table class="input tab content specific nested-table">
                                 <tr>
-                                    <th colspan="3">Truck Percent (%)</th>
+                                    <td><input class="perc-input" type="text" placeholder="0" onkeypress='return isValidPercentageCharacter(event, this)' name="usertable-westbound-left-truckperc"></td>
+                                    <td><input class="perc-input" type="text" placeholder="0" onkeypress='return isValidPercentageCharacter(event, this)' name="usertable-westbound-through-truckperc"></td>
+                                    <td><input class="perc-input" type="text" placeholder="0" onkeypress='return isValidPercentageCharacter(event, this)' name="usertable-westbound-right-truckperc"></td>
                                 </tr>
-                            </thead>
-                            <tbody>
+                            </table>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>Southbound</td>
+                        <td class="input tab content specific nested-table-container">
+                            <table class="input tab content specific nested-table">
                                 <tr>
-                                    <td>Left</td>
-                                    <td>Through</td>
-                                    <td>Right</td>
+                                    <td><input class="vol-input" type="text" placeholder="0" onkeypress='return isValidVolumeCharacter(event, this)' name="usertable-southbound-left"></td>
+                                    <td><input class="vol-input" type="text" placeholder="0" onkeypress='return isValidVolumeCharacter(event, this)' name="usertable-southbound-through"></td>
+                                    <td><input class="vol-input" type="text" placeholder="0" onkeypress='return isValidVolumeCharacter(event, this)' name="usertable-southbound-right"></td>
                                 </tr>
+                            </table>
+                        </td>
+                        <td class="input tab content specific nested-table-container">
+                            <table class="input tab content specific nested-table">
                                 <tr>
-                                    <td><img src="assets/arrows/arrow_left.svg"></td>
-                                    <td><img src="assets/arrows/arrow_through.svg"</td>
-                                    <td><img src="assets/arrows/arrow_right.svg"</td>
+                                    <td><input class="perc-input" type="text" placeholder="0" onkeypress='return isValidPercentageCharacter(event, this)' name="usertable-southbound-left-truckperc"></td>
+                                    <td><input class="perc-input" type="text" placeholder="0" onkeypress='return isValidPercentageCharacter(event, this)' name="usertable-southbound-through-truckperc"></td>
+                                    <td><input class="perc-input" type="text" placeholder="0" onkeypress='return isValidPercentageCharacter(event, this)' name="usertable-southbound-right-truckperc"></td>
                                 </tr>
-                            </tbody>
-                        </table>
-                    </td>
-                </tr>
-                <tr>
-                    <td>Eastbound</td>
-                    <td class="input tab content nested-table-container">
-                        <table class="input tab content nested-table">
-                            <tr>
-                                <td><input class="vol-input" type="text" placeholder="0" onkeypress='return isValidVolumeCharacter(event, this)' name="usertable-eastbound-left"></td>
-                                <td><input class="vol-input" type="text" placeholder="0" onkeypress='return isValidVolumeCharacter(event, this)' name="usertable-eastbound-through"></td>
-                                <td><input class="vol-input" type="text" placeholder="0" onkeypress='return isValidVolumeCharacter(event, this)' name="usertable-eastbound-right"></td>
-                            </tr>
-                        </table>
-                    </td>
-                    <td class="input tab content nested-table-container">
-                        <table class="input tab content nested-table">
-                            <tr>
-                                <td><input class="perc-input" type="text" placeholder="0" onkeypress='return isValidPercentageCharacter(event, this)' name="usertable-eastbound-left-truckperc"></td>
-                                <td><input class="perc-input" type="text" placeholder="0" onkeypress='return isValidPercentageCharacter(event, this)' name="usertable-eastbound-through-truckperc"></td>
-                                <td><input class="perc-input" type="text" placeholder="0" onkeypress='return isValidPercentageCharacter(event, this)' name="usertable-eastbound-right-truckperc"></td>
-                            </tr>
-                        </table>
-                    </td>
-                </tr>
-                <tr>
-                    <td>Westbound</td>
-                    <td class="input tab content nested-table-container">
-                        <table class="input tab content nested-table">
-                            <tr>
-                                <td><input class="vol-input" type="text" placeholder="0" onkeypress='return isValidVolumeCharacter(event, this)' name="usertable-westbound-left"></td>
-                                <td><input class="vol-input" type="text" placeholder="0" onkeypress='return isValidVolumeCharacter(event, this)' name="usertable-westbound-through"></td>
-                                <td><input class="vol-input" type="text" placeholder="0" onkeypress='return isValidVolumeCharacter(event, this)' name="usertable-westbound-right"></td>
-                            </tr>
-                        </table>
-                    </td>
-                    <td class="input tab content nested-table-container">
-                        <table class="input tab content nested-table">
-                            <tr>
-                                <td><input class="perc-input" type="text" placeholder="0" onkeypress='return isValidPercentageCharacter(event, this)' name="usertable-westbound-left-truckperc"></td>
-                                <td><input class="perc-input" type="text" placeholder="0" onkeypress='return isValidPercentageCharacter(event, this)' name="usertable-westbound-through-truckperc"></td>
-                                <td><input class="perc-input" type="text" placeholder="0" onkeypress='return isValidPercentageCharacter(event, this)' name="usertable-westbound-right-truckperc"></td>
-                            </tr>
-                        </table>
-                    </td>
-                </tr>
-                <tr>
-                    <td>Southbound</td>
-                    <td class="input tab content nested-table-container">
-                        <table class="input tab content nested-table">
-                            <tr>
-                                <td><input class="vol-input" type="text" placeholder="0" onkeypress='return isValidVolumeCharacter(event, this)' name="usertable-southbound-left"></td>
-                                <td><input class="vol-input" type="text" placeholder="0" onkeypress='return isValidVolumeCharacter(event, this)' name="usertable-southbound-through"></td>
-                                <td><input class="vol-input" type="text" placeholder="0" onkeypress='return isValidVolumeCharacter(event, this)' name="usertable-southbound-right"></td>
-                            </tr>
-                        </table>
-                    </td>
-                    <td class="input tab content nested-table-container">
-                        <table class="input tab content nested-table">
-                            <tr>
-                                <td><input class="perc-input" type="text" placeholder="0" onkeypress='return isValidPercentageCharacter(event, this)' name="usertable-southbound-left-truckperc"></td>
-                                <td><input class="perc-input" type="text" placeholder="0" onkeypress='return isValidPercentageCharacter(event, this)' name="usertable-southbound-through-truckperc"></td>
-                                <td><input class="perc-input" type="text" placeholder="0" onkeypress='return isValidPercentageCharacter(event, this)' name="usertable-southbound-right-truckperc"></td>
-                            </tr>
-                        </table>
-                    </td>
-                </tr>
-                <tr>
-                    <td>Northbound</td>
-                    <td class="input tab content nested-table-container">
-                        <table class="input tab content nested-table">
-                            <tr>
-                                <td><input class="vol-input" type="text" placeholder="0" onkeypress='return isValidVolumeCharacter(event, this)' name="usertable-northbound-left"></td>
-                                <td><input class="vol-input" type="text" placeholder="0" onkeypress='return isValidVolumeCharacter(event, this)' name="usertable-northbound-through"></td>
-                                <td><input class="vol-input" type="text" placeholder="0" onkeypress='return isValidVolumeCharacter(event, this)' name="usertable-northbound-right"></td>
-                            </tr>
-                        </table>
-                    </td>
-                    <td class="input tab content nested-table-container">
-                        <table class="input tab content nested-table">
-                            <tr>
-                                <td><input class="perc-input" onkeypress='return isValidPercentageCharacter(event, this)' type="text" placeholder="0" name="usertable-northbound-left-truckperc"></td>
-                                <td><input class="perc-input" onkeypress='return isValidPercentageCharacter(event, this)' type="text" placeholder="0" name="usertable-northbound-through-truckperc"></td>
-                                <td><input class="perc-input" onkeypress='return isValidPercentageCharacter(event, this)' type="text" placeholder="0" name="usertable-northbound-right-truckperc"></td>
-                            </tr>
-                        </table>
-                    </td>
-                </tr>
-            </tbody>
-        </table>
+                            </table>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>Northbound</td>
+                        <td class="input tab content specific nested-table-container">
+                            <table class="input tab content specific nested-table">
+                                <tr>
+                                    <td><input class="vol-input" type="text" placeholder="0" onkeypress='return isValidVolumeCharacter(event, this)' name="usertable-northbound-left"></td>
+                                    <td><input class="vol-input" type="text" placeholder="0" onkeypress='return isValidVolumeCharacter(event, this)' name="usertable-northbound-through"></td>
+                                    <td><input class="vol-input" type="text" placeholder="0" onkeypress='return isValidVolumeCharacter(event, this)' name="usertable-northbound-right"></td>
+                                </tr>
+                            </table>
+                        </td>
+                        <td class="input tab content specific nested-table-container">
+                            <table class="input tab content specific nested-table">
+                                <tr>
+                                    <td><input class="perc-input" onkeypress='return isValidPercentageCharacter(event, this)' type="text" placeholder="0" name="usertable-northbound-left-truckperc"></td>
+                                    <td><input class="perc-input" onkeypress='return isValidPercentageCharacter(event, this)' type="text" placeholder="0" name="usertable-northbound-through-truckperc"></td>
+                                    <td><input class="perc-input" onkeypress='return isValidPercentageCharacter(event, this)' type="text" placeholder="0" name="usertable-northbound-right-truckperc"></td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
 
-    </div>
-
-    <div class="input tab content intersection table-extended">
-        <table>
-            <thead>
-                <tr>
-                    <th colspan="5">Extended Details</th>
-                </tr>
-            </thead>
-
-            <tbody>
-                <tr>
-                    <td>Adjustment Factor (%)</td>
-                    <td>
-                        <table class="input tab content nested-table-extended">
-                            <tr>
-                                <td><input type="text" placeholder="85" onkeypress='return isValidPercentageCharacter(event, this)' name="userextendedtable-uturn-factor"></td>
-                                <td><input type="text" placeholder="95" onkeypress='return isValidPercentageCharacter(event, this)' name="userextendedtable-left-factor"></td>
-                            </tr>
-                        </table>
-                    </td>
-                    <td style="background-color: #BBBBBB"></td>
-                    <td><input type="text" placeholder="85" onkeypress='return isValidPercentageCharacter(event, this)' name="userextendedtable-right-factor"></td>
-                    <td style="background-color: #BBBBBB"></td>
-                </tr>
-                <tr>
-                    <td colspan="2">Truck to PCE Factor</td>
-                    <td colspan="3"><input type="text" placeholder="2.00" onkeypress='return event.charCode >= 48 && event.charCode <= 57' name="userextendedtable-truckpce-factor"></td>
-                </tr>
-                <tr>
-                    <td colspan="2">Critical Lane Volume</td>
-                    <td colspan="3">1600</td>
-                </tr>
-            </tbody>
-        </table>
-    </div>
-
-    <div class="input tab content intersection button panel">
-        <div class="input tab content intersection button fratar">
-            <i>"I don't have these!"</i>
-            <br>
-            <p>Use per-entry volumes instead...</p>
         </div>
 
-        <div class="input tab content intersection button movements">
-            <p>Configure Movements</p>
+        <div class="input tab content specific intersection table-extended">
+            <table>
+                <thead>
+                    <tr>
+                        <th colspan="5">Extended Details</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    <tr>
+                        <td>Adjustment Factor (%)</td>
+                        <td>
+                            <table class="input tab content specific nested-table-extended">
+                                <tr>
+                                    <td><input type="text" placeholder="85" onkeypress='return isValidPercentageCharacter(event, this)' name="userextendedtable-uturn-factor"></td>
+                                    <td><input type="text" placeholder="95" onkeypress='return isValidPercentageCharacter(event, this)' name="userextendedtable-left-factor"></td>
+                                </tr>
+                            </table>
+                        </td>
+                        <td style="background-color: #BBBBBB"></td>
+                        <td><input type="text" placeholder="85" onkeypress='return isValidPercentageCharacter(event, this)' name="userextendedtable-right-factor"></td>
+                        <td style="background-color: #BBBBBB"></td>
+                    </tr>
+                    <tr>
+                        <td colspan="2">Truck to PCE Factor</td>
+                        <td colspan="3"><input type="text" placeholder="2.00" onkeypress='return event.charCode >= 48 && event.charCode <= 57' name="userextendedtable-truckpce-factor"></td>
+                    </tr>
+                    <tr>
+                        <td colspan="2">Critical Lane Volume</td>
+                        <td colspan="3">1600</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="input tab content specific intersection button panel">
+            <div class="input tab content specific intersection button fratar">
+                <i>"I don't have these!"</i>
+                <br>
+                <p>Use per-entry volumes instead...</p>
+            </div>
+
+            <div class="input tab content specific intersection button movements">
+                <p>Configure Movements</p>
+            </div>
+        </div>
+
+        <div class="input tab content specific intersection view">
+            <div class="input tab content specific intersection internal wrapper">
+                <img class="input tab content specific intersection internal background" src="assets/intersections/aerial_basic.svg" >
+                
+                <div class="input tab content specific intersection internal context-point-one">
+                    <div class="input tab content specific intersection internal vertflex">
+                        <span>VCU Hospital</span>
+                    </div>
+                </div>
+
+                <div class="input tab content specific intersection internal context-point-two">
+                    <div class="input tab content specific intersection internal vertflex">
+                        <span></span>
+                    </div>
+                </div>
+
+                <div class="input tab content specific intersection internal context-point-three">
+                    <div class="input tab content specific intersection internal vertflex">
+                        <span>COV Annex</span>
+                    </div>
+                </div>
+
+                <div class="input tab content specific intersection internal context-point-four">
+                    <div class="input tab content specific intersection internal vertflex">
+                        <span>Monroe Building</span>
+                    </div>
+                </div>
+
+                <div class="input tab content specific intersection internal roadway southbound">
+                    <p>Southbound Road</p>
+                </div>
+
+                <div class="input tab content specific intersection internal roadway westbound">
+                    <p>Westbound Road</p>
+                </div>
+
+                <div class="input tab content specific intersection internal roadway northbound">
+                    <p>Northbound Road</p>
+                </div>
+                
+                <div class="input tab content specific intersection internal roadway eastbound">
+                    <p>Road Name</p>
+                </div>
+
+
+                <div class="input tab content specific intersection internal approach southbound">
+
+                </div>
+
+                <div class="input tab content specific intersection internal approach westbound">
+
+                </div>
+
+                <div class="input tab content specific intersection internal approach northbound">
+
+                </div>
+
+                <div class="input tab content specific intersection internal approach eastbound">
+
+                </div>
+
+                <div class="input tab content specific intersection internal volume-container southbound">
+                    <div class="input tab content specific intersection internal volume southbound left">
+                        <input type="text" placeholder="0" onkeypress="return isValidVolumeCharacter(event, this)" name="view-southbound-left">
+                    </div>
+
+                    <div class="input tab content specific intersection internal volume southbound through">
+                        <input type="text" placeholder="0" onkeypress="return isValidVolumeCharacter(event, this)" name="view-southbound-through">
+                    </div>
+
+                    <div class="input tab content specific intersection internal volume southbound right">
+                        <input type="text" placeholder="0" onkeypress="return isValidVolumeCharacter(event, this)" name="view-southbound-right">
+                    </div>
+                </div>
+               
+                <div class="input tab content specific intersection internal volume-container westbound">
+                    <div class="input tab content specific intersection internal volume westbound left">
+                        <input type="text" placeholder="0" onkeypress="return isValidVolumeCharacter(event, this)" name="view-westbound-left">
+                    </div>
+
+                    <div class="input tab content specific intersection internal volume westbound through">
+                        <input type="text" placeholder="0" onkeypress="return isValidVolumeCharacter(event, this)" name="view-westbound-through">
+                    </div>
+
+                    <div class="input tab content specific intersection internal volume westbound right">
+                        <input type="text" placeholder="0" onkeypress="return isValidVolumeCharacter(event, this)" name="view-westbound-right">
+                    </div>
+                </div>
+               
+                <div class="input tab content specific intersection internal volume-container northbound">
+                    <div class="input tab content specific intersection internal volume northbound left">
+                        <input type="text" placeholder="0" onkeypress="return isValidVolumeCharacter(event, this)" name="view-northbound-left">
+                    </div>
+
+                    <div class="input tab content specific intersection internal volume northbound through">
+                        <input type="text" placeholder="0" onkeypress="return isValidVolumeCharacter(event, this)" name="view-northbound-through">
+                    </div>
+
+                    <div class="input tab content specific intersection internal volume northbound right">
+                        <input type="text" placeholder="0" onkeypress="return isValidVolumeCharacter(event, this)" name="view-northbound-right">
+                    </div>
+                </div>
+
+                <div class="input tab content specific intersection internal volume-container eastbound">
+                    <div class="input tab content specific intersection internal volume eastbound left">
+                        <input type="text" placeholder="0" onkeypress="return isValidVolumeCharacter(event, this)" name="view-eastbound-left">
+                    </div>
+
+                    <div class="input tab content specific intersection internal volume eastbound through">
+                        <input type="text" placeholder="0" onkeypress="return isValidVolumeCharacter(event, this)" name="view-eastbound-through">
+                    </div>
+
+                    <div class="input tab content specific intersection internal volume eastbound right">
+                        <input type="text" placeholder="0" onkeypress="return isValidVolumeCharacter(event, this)" name="view-eastbound-right">
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 
-    <div class="input tab content intersection view">
-        <div class="input tab content intersection internal container">
-            <img class="input tab content intersection internal background" src="assets/intersections/aerial_basic.svg" >
-            
-            <div class="input tab content intersection internal context-point-one">
-                <div class="input tab content intersection internal vertflex">
-                    <span>VCU Hospital</span>
-                </div>
-            </div>
-
-            <div class="input tab content intersection internal context-point-two">
-                <div class="input tab content intersection internal vertflex">
-                    <span></span>
-                </div>
-            </div>
-
-            <div class="input tab content intersection internal context-point-three">
-                <div class="input tab content intersection internal vertflex">
-                    <span>COV Annex</span>
-                </div>
-            </div>
-
-            <div class="input tab content intersection internal context-point-four">
-                <div class="input tab content intersection internal vertflex">
-                    <span>Monroe Building</span>
-                </div>
-            </div>
-
-            <div class="input tab content intersection internal roadway southbound">
-                <p>Southbound Road</p>
-            </div>
-
-            <div class="input tab content intersection internal roadway westbound">
-                <p>Westbound Road</p>
-            </div>
-
-            <div class="input tab content intersection internal roadway northbound">
-                <p>Northbound Road</p>
-            </div>
-            
-            <div class="input tab content intersection internal roadway eastbound">
-                <p>Road Name</p>
-            </div>
 
 
-            <div class="input tab content intersection internal approach southbound">
 
-            </div>
 
-            <div class="input tab content intersection internal approach westbound">
 
-            </div>
 
-            <div class="input tab content intersection internal approach northbound">
 
-            </div>
-
-            <div class="input tab content intersection internal approach eastbound">
-
-            </div>
-
-            <div class="input tab content intersection internal volume-container southbound">
-                <div class="input tab content intersection internal volume southbound left">
-                    <input type="text" placeholder="0" onkeypress="return isValidVolumeCharacter(event, this)" name="view-southbound-left">
-                </div>
-
-                <div class="input tab content intersection internal volume southbound through">
-                    <input type="text" placeholder="0" onkeypress="return isValidVolumeCharacter(event, this)" name="view-southbound-through">
-                </div>
-
-                <div class="input tab content intersection internal volume southbound right">
-                    <input type="text" placeholder="0" onkeypress="return isValidVolumeCharacter(event, this)" name="view-southbound-right">
-                </div>
-            </div>
-           
-            <div class="input tab content intersection internal volume-container westbound">
-                <div class="input tab content intersection internal volume westbound left">
-                    <input type="text" placeholder="0" onkeypress="return isValidVolumeCharacter(event, this)" name="view-westbound-left">
-                </div>
-
-                <div class="input tab content intersection internal volume westbound through">
-                    <input type="text" placeholder="0" onkeypress="return isValidVolumeCharacter(event, this)" name="view-westbound-through">
-                </div>
-
-                <div class="input tab content intersection internal volume westbound right">
-                    <input type="text" placeholder="0" onkeypress="return isValidVolumeCharacter(event, this)" name="view-westbound-right">
-                </div>
-            </div>
-           
-            <div class="input tab content intersection internal volume-container northbound">
-                <div class="input tab content intersection internal volume northbound left">
-                    <input type="text" placeholder="0" onkeypress="return isValidVolumeCharacter(event, this)" name="view-northbound-left">
-                </div>
-
-                <div class="input tab content intersection internal volume northbound through">
-                    <input type="text" placeholder="0" onkeypress="return isValidVolumeCharacter(event, this)" name="view-northbound-through">
-                </div>
-
-                <div class="input tab content intersection internal volume northbound right">
-                    <input type="text" placeholder="0" onkeypress="return isValidVolumeCharacter(event, this)" name="view-northbound-right">
-                </div>
-            </div>
-
-            <div class="input tab content intersection internal volume-container eastbound">
-                <div class="input tab content intersection internal volume eastbound left">
-                    <input type="text" placeholder="0" onkeypress="return isValidVolumeCharacter(event, this)" name="view-eastbound-left">
-                </div>
-
-                <div class="input tab content intersection internal volume eastbound through">
-                    <input type="text" placeholder="0" onkeypress="return isValidVolumeCharacter(event, this)" name="view-eastbound-through">
-                </div>
-
-                <div class="input tab content intersection internal volume eastbound right">
-                    <input type="text" placeholder="0" onkeypress="return isValidVolumeCharacter(event, this)" name="view-eastbound-right">
-                </div>
-            </div>
-
-        
-        </div>
+    <div class="input tab content general container" style="visibility: hidden">
+        <p>Sample text.</p>
     </div>
 
 <script>
-    $(".input.tab.content.intersection.table-extended thead").eq(0).on("click", function() {
-        var content = $(".input.tab.content.intersection.table-extended tbody");
+    $(".input.tab.content.specific.intersection.table-extended thead").eq(0).on("click", function() {
+        var content = $(".input.tab.content.specific.intersection.table-extended tbody");
         if(content.is(":visible"))
             content.transition("scale");
         else
             content.transition("swing down");
+    });
+
+    $(".input.tab.content.specific.intersection.button.fratar").click(function() {
+        console.log($(".input.tab.content.specific.container"));
+        $(".input.tab.content.specific.container").transition({
+            "animation"  : "fade",
+            "duration"   : "800ms",
+            "onComplete" : function() {
+                console.log("Fading");
+                $(".input.tab.content.general.container").transition({
+                   "animation" : "fade",
+                    "duration" : "800ms"
+                });
+            }
+        });
     });
 </script>
 

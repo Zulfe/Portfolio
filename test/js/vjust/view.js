@@ -17,6 +17,35 @@ class View {
             "ewRouteNameHelp",
             "cpOneNameHelp"
         ];
+
+        // Make the View responsible for acknowledging when a module does something important.
+        EventBus.addEventListener("module_announce", this.handleModuleAnnouncement);
+    }
+
+    /**
+     * When a module calls out that it has behaved in a way that is considered important to the scope of this application, and
+     * the View has received it's UID and associated update information, pass the information on to the Controller to handle
+     * getting information from the Model and placing it where it needs to go in the DOM via this View.
+     * @param {Event} event The event information describing where this behavior is coming from
+     * @param {string} UID A unique identifier for the module that announced itself
+     * @param {Array} value An array of update values to be used in updating the Model and potentially the View
+     */
+    handleModuleAnnouncement(event, UID, value) {
+        var mod_det = UID.split("-");
+        // If the announcing module is ArrowLayout...
+        if(mod_det[0] == "AR") {
+            var conf = mod_det[1];
+            var zone = mod_det[2];
+            var dir  = mod_det[3];
+            var mvt  = mod_det[4];
+
+            // Notify the controller of a new value...
+            // controller.updateArrowCount(conf, zone, dir, mvt, value);
+        }
+        // If the announcing module is InfoSwitch...
+        if(mod_det[0] == "IS") {
+
+        }
     }
 
     /**
@@ -177,6 +206,11 @@ class View {
         $("body").prepend(code);
     }
 
+    /**
+     * Add to the beginning of a given element the passed code.
+     * @param {string} element The element(s) in selector form to have code prepended to them
+     * @param {string} code The code to be prepended to the selected elements
+     */
     prependToElement(element, code) {
         $(element).prepend(code);
     }
@@ -209,6 +243,11 @@ class View {
             });
     }
 
+    /**
+     * Set the value of one or multiple input boxes with the given value.
+     * @param {string} selector The element(s) to be modified
+     * @param {string} new_input The value to write inside the input box
+     */
     setInputValue(selector, new_input) {
         $(selector).val(new_input);
     }

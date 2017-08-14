@@ -115,10 +115,10 @@
 <script>
     $(".conventional.tab.content.container").bind("tabLoaded", function() {
         console.log("Conventional intersection has received notification that it's time to load.");
-        var southbound_approach = new ArrowLayout($(".conventional.tab.content.container .intersection .zone.one .southbound.approach"), "conventional-tab-viewer-southbound");
-        var westbound_approach  = new ArrowLayout($(".conventional.tab.content.container .intersection .zone.one .westbound.approach"), "conventional-tab-viewer-westbound");
-        var northbound_approach = new ArrowLayout($(".conventional.tab.content.container .intersection .zone.one .northbound.approach"), "conventional-tab-viewer-northbound");
-        var eastbound_approach  = new ArrowLayout($(".conventional.tab.content.container .intersection .zone.one .eastbound.approach"), "conventional-tab-viewer-eastbound");
+        var southbound_approach = new ArrowLayout($(".conventional.tab.content.container .intersection .zone.one .southbound.approach"), "AR-0-0-0");
+        var westbound_approach  = new ArrowLayout($(".conventional.tab.content.container .intersection .zone.one .westbound.approach"), "AR-0-0-1");
+        var northbound_approach = new ArrowLayout($(".conventional.tab.content.container .intersection .zone.one .northbound.approach"), "AR-0-0-2");
+        var eastbound_approach  = new ArrowLayout($(".conventional.tab.content.container .intersection .zone.one .eastbound.approach"), "AR-0-0-3");
 
         $(".conventional.tab.content.container").unbind("tabLoaded");
     });
