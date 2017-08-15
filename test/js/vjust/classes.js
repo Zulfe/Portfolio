@@ -117,7 +117,11 @@ class Project {
                                        this._west_split_genvol,
                                        ];
     }
-    
+
+    getUserVolumeDefinitions() {
+        return this._user_volume_definitions;
+    }
+
     updateGeneralVolume(cardinal_direction, volume, d_factor, k_factor, truck_percent) {
         /**
          * Receives user input in Fratar general volume table, updates the appropriate GeneralVolume object and re-runs Fratar
@@ -1428,8 +1432,9 @@ class UserVolumeDefinitions {
 	}
     
     setComponentValue(direction, movement, volume) {
-        var dir_int = typeof direction == "number" ? direction : parseInt(objectKeyByValue(DirectionEnum,direction));
-        
+       
+        var dir_int = typeof direction == "number" ? direction : parseInt(objectKeyByValue(UnboundDirectionEnum,direction));
+
         if (typeof movement == "number") {
             this._direction_array[dir_int].getMovementByIndex(movement) = volume;
         } else {

@@ -68,6 +68,10 @@ class ArrowLayout {
         this._MAX_THROUGH = 6;
         this._MAX_RIGHT   = 3;
 
+        this._user_input_enabled = true;
+
+        EventBus.dispatch("module_created", this, UID, this);
+
         this.createApproach();
     }
 
@@ -182,6 +186,12 @@ class ArrowLayout {
             "mouseClick"   : "right",
             "centerAround" : "cursor"
         });
+    }
+
+    disableUserInput() {
+        this._user_input_enabled = false;
+        $("#" + this._UID).contextMenu("destroy");
+        return this;
     }
 
     /**

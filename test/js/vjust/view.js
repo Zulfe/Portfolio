@@ -3,12 +3,12 @@ class View {
      * A class for handling all view-related tasks, such as the adding, displaying, removing, repositioning, and animation of elements visible to the end user.
      * All listeners for on-screen elements are created here using <tt>createListener()</tt>.
      */
-    constructor(controller) {
-        this._controller = controller;
-
+    constructor() {
         this._dynamically_generated_modals = [];
         this._first_visit_input_modals_enabled = true;
         this._latest_active_tab = "";
+
+        this._self = this;
 
         this._first_click_modals = [
             "projNameHelp",
@@ -18,8 +18,248 @@ class View {
             "cpOneNameHelp"
         ];
 
+        this._ARDictionary = {};
+
+        this.initialize();
+
+        // Make the View responsible for acknowledging when a module is created.
+        EventBus.addEventListener("module_created", this.handleModuleCreated, this);
         // Make the View responsible for acknowledging when a module does something important.
         EventBus.addEventListener("module_announce", this.handleModuleAnnouncement);
+
+    }
+
+    initialize() {
+
+        var _this = this;
+
+        this.prependToElement("#appSettMenu",  
+        "<div class='ui item'> "+
+        "    <div class='ui slider checkbox'> "+
+        "        <input id='tooltipsToggleswitch' type='checkbox' name='tooltipsToggle'> "+
+        "        <label>Disable Tooltips</label> "+
+        "    </div> "+
+        "    <div class='ui item'><div id='restore_from_cookies' class='ui button'>Restore From Cookies</div></div>" +
+        "</div>");
+
+        /**
+         * Use the ModalFactory class to create a new modal ID'd cookies_found. It has no image and no
+         * YouTube URL to load a video from.
+         * Ideally all current help modals will be converted into ModalFactory objects that can be
+         * manipulated.
+        */
+        //view.createNewModal("cookies_found", "We found a backup!", "null", "null", "null", "Hooray! We found a backup. We've automatically applied the settings to your current configuration!", "Hooray!");
+
+
+
+
+
+        /* Sidebar Headers
+         * =============================================================================================== */
+        this.createListener("#introItemHeader", "click", function() {
+            _this.animateElement(".introMenu", "slide down");
+        });
+        this.createListener("#projInfoItem", "click", function() {
+            _this.animateElement("#piMenu", "slide down");
+        });
+        this.createListener("#appSettHeader", "click", function() {
+            _this.animateElement("#appSettMenu", "slide down");
+        });
+
+
+
+
+
+        /* Input Box Help Clickables
+         * =============================================================================================== */
+        this.createListener("#projNameHelpClickable",       "click", function() {
+            _this.displayModal("#projNameHelp"); 
+        });
+        this.createListener("#interNameHelpClickable",      "click", function() {
+            _this.displayModal("#interNameHelp"); 
+        });
+        this.createListener("#northRouteNameHelpClickable", "click", function() {
+            _this.displayModal("#nsRouteNameHelp"); 
+        });
+        this.createListener("#southRouteNameHelpClickable", "click", function() {
+            _this.displayModal("#nsRouteNameHelp"); 
+        });
+        this.createListener("#eastRouteNameHelpClickable",  "click", function() {
+            _this.displayModal("#ewRouteNameHelp"); 
+        });
+        this.createListener("#westRouteNameHelpClickable",  "click", function() {
+            _this.displayModal("ewRouteNameHelp"); 
+        });
+        this.createListener("#cpOneNameHelpClickable",      "click", function() {
+            _this.displayModal("#cpOneNameHelp"); 
+        });
+        this.createListener("#cpTwoNameHelpClickable",      "click", function() {
+            _this.displayModal("#cpTwoNameHelp"); 
+        });
+        this.createListener("#cpThreeNameHelpClickable",    "click", function() {
+            _this.displayModal("#cpThreeNameHelp"); 
+        });
+        this.createListener("#cpFourNameHelpClickable",     "click", function() {
+            _this.displayModal("#cpFourNameHelp"); 
+        });
+
+
+
+
+        /* Route Name Input-this._view Synchronization
+         * =============================================================================================== */
+        this.createListener("#nRouteNameInput", "input", function() {
+            var inputValue = _this.getInputValue("#nRouteNameInput");
+            _this.notifyController("set projRouteName", ["north", inputValue]);
+            _this.setElementText(".input.tab.content.intersection.internal.roadway.southbound p", inputValue);
+        });
+
+        this.createListener("#eRouteNameInput", "input", function() {
+            var inputValue = _this.getInputValue("#eRouteNameInput");
+            _this.notifyController("set projRouteName", ["east", inputValue]);
+            _this.setElementText(".input.tab.content.intersection.internal.roadway.westbound p", inputValue);
+        });
+
+        this.createListener("#sRouteNameInput", "input", function() {
+            var inputValue = _this.getInputValue("#sRouteNameInput");
+            _this.notifyController("set projRouteName", ["south", inputValue]);
+            _this.setElementText(".input.tab.content.intersection.internal.roadway.northbound p", inputValue);
+        });
+
+        this.createListener("#wRouteNameInput", "input", function() {
+            var inputValue = _this.getInputValue("#wRouteNameInput");
+            _this.notifyController("set projRouteName", ["west", inputValue]);
+            _this.setElementText(".input.tab.content.intersection.internal.roadway.eastbound p", inputValue);
+        });
+
+
+
+
+
+        /* Context Point Name Input-View Synchronization
+         * =============================================================================================== */
+        this.createListener($("#cpOneNameInput").parent(), "input", function() {
+            _this.setElementText(".input.tab.content.intersection.internal.context-point-one span", _this.getInputValue("#cpOneNameInput"));
+            _this.notifyController("change", "");
+        });
+        this.createListener($("#cpTwoNameInput").parent(), "input", function() {
+            _this.setElementText(".input.tab.content.intersection.internal.context-point-two span", _this.getInputValue("#cpTwoNameInput"));
+        });
+        this.createListener($("#cpThreeNameInput").parent(), "input", function() {
+            _this.setElementText(".input.tab.content.intersection.internal.context-point-three span", _this.getInputValue("#cpThreeNameInput"));
+        });
+        this.createListener($("#cpFourNameInput").parent(), "input", function() {
+            _this.setElementText(".input.tab.content.intersection.internal.context-point-four span", _this.getInputValue("#cpFourNameInput"));
+        });
+
+
+
+
+
+        /* Application Settings Togglers and Buttons
+         * =============================================================================================== */
+        this.createListener("#tooltipsToggleswitch", "click", function() {
+            _this.toggleFirstVisitInputModals($("#tooltipsToggleswitch").prop("checked"));
+        });
+
+
+
+
+
+       /* Tab Creation, Deletion, and Information Collection
+         * =============================================================================================== */
+
+        /**
+         * When a child of the Add Tab tab is clicked, identify the child clicked and open a new tab
+         * with content corresponding to the clicked child.
+         */
+        this.createListener($(".appPane div[data-tab='add_tab'] div"), "click", function() {
+            _this.createNewTab($(this).attr("data-intersection-type"));
+        });
+
+        /**
+         * When the user mouses over any of the tabs, find the tab that is active and store it in
+         * latestActive.
+         * This is done to improve the functionality and fluidity of the tabflow function. If mouseenter is
+         * used instead, rapid mouse movement can result in a failed loggings of the latest active tab.
+         */
+        this.createListener([".appPane .secondary", "a"], "mouseover", function() {
+            _this.logLatestActiveTab(this);
+        });
+
+        this.createListener([".appPane .secondary", "i"], "click", function() {
+            var UID = $(this).parent().attr("data-tab");
+            _this.tabFlow($(this).parent()).click();
+            $(this).parent().remove();
+            $(".appPane div[data-tab='" + UID + "']").remove();
+            $(".appPane .menu .item").tab();
+        });
+
+        this.createListener([".appPane .secondary", "a"], "click", function() {
+            _this.notifyContent(this);
+        });
+
+
+
+
+
+        /* Input Tab Data Collection
+         * =============================================================================================== */
+        this.createListener(".input.tab.content.table input", "input", function() {
+            var input_id = $(this).attr("name").split("-");
+            var val      = $(this).val().charAt( $(this).val().length - 1 ) == "%" ? $(this).val().substring(0, $(this).val().length - 1) : $(this).val();
+
+            if(input_id[3] === undefined) {
+                _this.notifyController("set uvdvol", [input_id[1], input_id[2], val]);
+                $(".input.tab.content.intersection.internal.volume-container input[name='this._view-" + input_id[1] + "-" + input_id[2] + "']").val(val);
+            }
+            else {
+                _this.notifyController("set uvdperc", [input_id[1], input_id[2], val]);
+            }
+        });
+
+        /**
+         * When a volume input in the intersection view is updated, update the corresponding input in the
+         * user input table and notify the controller that the Model needs to have its variable corresponding
+         * to the direction and movement updated.
+         */
+        this.createListener(".input.tab.content.intersection.internal.volume-container input", "input", function() {
+            var input_id = $(this).attr("name").split("-");
+            var val = $(this).val();
+            
+            _this.notifyController("set uvdvol", [input_id[1], input_id[2], val]);
+            $(".input.tab.content.table input[name='usertable-" + input_id[1] + "-" + input_id[2] + "']").val(val);
+        });
+
+        /**
+         * When a user enters a value into a percentage input and navigates to the next input, append a percentage symbol
+         * to the content of the input box they've modified. This aims to clarify to the user that the values they enter
+         * are percentages, thus 0.1 and 10% are not equivalent.
+         */
+        this.createListener(".input.tab.content.table input", "change", function() {
+           if($(this).hasClass("perc-input") && $(this).val().charAt($(this).val().length - 1) != "%")
+                _this.setInputValue(this, $(this).val() + "%");
+        });
+
+    }
+
+    notifyController(command, params) {
+        EventBus.dispatch("view_notify", this, command, params);
+    }
+
+    handleModuleCreated(event, UID, module_object) {
+        var mod_det = UID.split("-");
+
+        if(mod_det[0] == "AR") {
+            var conf = mod_det[1];
+            var zone = mod_det[2];
+            var dir  = mod_det[3];
+
+            var mod_address = conf + "-" + zone + "-" + dir;
+            this._ARDictionary[mod_address] = module_object;
+        }
+
+        console.log(this._ARDictionary);
     }
 
     /**
@@ -38,6 +278,8 @@ class View {
             var zone = mod_det[2];
             var dir  = mod_det[3];
             var mvt  = mod_det[4];
+
+            this.notifyController("set arrow", [conf, zone, dir, mvt]);
 
             // Notify the controller of a new value...
             // controller.updateArrowCount(conf, zone, dir, mvt, value);

@@ -316,10 +316,6 @@
         transform: rotate(90deg);
     }
 
-    .input.tab.content.specific.intersection.internal.roadway.northbound text {
-        transform: rotate(90deg);
-    }
-
     .input.tab.content.specific.intersection.internal.roadway.eastbound {
         position: absolute;
 
@@ -835,8 +831,303 @@
 
 
 
+
+    <style>
+        .input.tab.content.general.container {
+
+        }
+
+        .input.tab.content.general.intersection.view {
+            height: auto;
+            width: 73%;
+
+            position: absolute;
+            display: inline-block;
+
+            top: 2%;
+            right: 1%;
+        }
+
+        .input.tab.content.general.intersection.internal.background {
+            height: 100%;
+            width: 100%;
+        }
+
+        .input.tab.content.general.intersection.internal.context-point-one {
+            position: absolute;
+
+            top: 0.4%;
+            left: 0.6%;
+
+            height: 30.1%;
+            width: 32.8%;
+        }
+
+        .input.tab.content.general.intersection.internal.context-point-two {
+            position: absolute;
+
+            top: 0.3%;
+            right: 0.5%;
+
+            height: 30.1%;
+            width: 32.7%;
+        }
+
+        .input.tab.content.general.intersection.internal.context-point-three {
+            position: absolute;
+
+            bottom: 5.1%;
+            left: 0.8%;
+
+            height: 30.3%;
+            width: 32.6%;
+        }
+
+        .input.tab.content.general.intersection.internal.context-point-four {
+            position: absolute;
+
+            bottom: 5%;
+            right: 0.5%;
+
+            height: 30.3%;
+            width: 32.7%;
+        }
+
+        .input.tab.content.general.intersection.internal.vertflex {
+            position: relative;
+            height: 100%;
+            width: 100%;
+        }
+
+        .input.tab.content.general.intersection.internal.vertflex span {
+            position: absolute;
+
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+
+            font-size: 1.8vw;
+        }
+
+        .input.tab.content.general.intersection.internal.roadway {
+            background-color: #009900;
+            outline: 2px solid white;
+            border-radius: 3px;
+        }
+
+        .input.tab.content.general.intersection.internal.roadway.southbound {
+            position: absolute;
+
+            top: 15%;
+            left: 51.05%;
+
+            height: 3.5%;
+            width: 23%;
+
+            transform: rotate(90deg);
+        }
+
+        .input.tab.content.general.intersection.internal.roadway.westbound {
+            position: absolute;
+
+            top: 34.5%;
+            right: 5.5%;
+
+            height: 3.5%;
+            width: 25%;
+        }
+
+        .input.tab.content.general.intersection.internal.roadway.northbound {
+            position: absolute;
+
+            bottom: 14%;
+            right: 26%;
+
+            height: 3.5%;
+            width: 23%;
+
+
+            transform: rotate(90deg);
+        }
+
+        .input.tab.content.general.intersection.internal.roadway.eastbound {
+            position: absolute;
+
+            top: 34.5%;
+            left: 5.5%;
+
+            height: 3.5%;
+            width: 25%;
+
+            text-align: center;
+        }
+
+        .input.tab.content.general.intersection.internal.roadway.southbound p {
+            transform: rotate(90deg);
+        }
+
+        .input.tab.content.general.intersection.internal.roadway.southbound p,
+        .input.tab.content.general.intersection.internal.roadway.westbound  p,
+        .input.tab.content.general.intersection.internal.roadway.northbound p,
+        .input.tab.content.general.intersection.internal.roadway.eastbound  p {
+            position: absolute;
+            
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+
+            color: white;
+            font-size: 2.3vh;
+
+            white-space: nowrap;
+        }
+
+        .input.tab.content.general.intersection.internal.approach.westbound {
+            border: 1px solid magenta;
+
+            height: 10%;
+            width: 10%;
+        }
+
+
+        /* Configuration Panel
+        ******************************************************************************* */
+        .input.tab.content.config.panel {
+            background-color: #005DAA;
+
+            position: absolute;
+            
+            height: 25%;
+            width: 23%;
+
+            top: 5%;
+            left: 1%;
+
+            font-size: 1.45vw;
+        }
+
+        /* Button Panel
+        ******************************************************************************* */
+        .input.tab.content.general.button.panel {
+            background-color: #005DAA;
+
+            position: absolute;
+
+            height: 20%;
+            width: 23%;
+
+            top: 35%;
+            left: 1%;
+
+            font-size: 1.55vw;
+        }
+
+        .input.tab.content.general.button .to-specific {
+            background-color: orange;
+
+            height: 42%;
+            width: 95%;
+
+            margin: auto;
+            margin-top: 2.5%;
+        }
+
+        .input.tab.content.general.button .to-movements {
+            background-color: orange;
+
+            height: 42%;
+            width: 95%;
+
+            margin: auto;
+            margin-top: 2.7%;
+        }
+    
+        .input.tab.content.general.button .to-specific:hover {
+            background-color: #FFC55A;
+        }
+
+        .input.tab.content.general.button .movements:hover {
+            background-color: #FFC55A;
+        }
+
+
+    </style>
+
+
     <div class="input tab content general container" style="visibility: hidden">
-        <p>Sample text.</p>
+        <div class="input tab content general intersection view">
+            <img class="input tab content general intersection internal background" src="assets/intersections/aerial_basic.svg">
+
+            <div class="input tab content general intersection internal context-point-one">
+                <div class="input tab content general intersection internal vertflex">
+                    <span>VCU Hospital</span>
+                </div>
+            </div>
+
+            <div class="input tab content general intersection internal context-point-two">
+                <div class="input tab content general intersection internal vertflex">
+                    <span>VCU Hospital</span>
+                </div>
+            </div>
+
+            <div class="input tab content general intersection internal context-point-three">
+                <div class="input tab content general intersection internal vertflex">
+                    <span>VCU Hospital</span>
+                </div>
+            </div>
+
+            <div class="input tab content general intersection internal context-point-four">
+                <div class="input tab content general intersection internal vertflex">
+                    <span>VCU Hospital</span>
+                </div>
+            </div>
+
+            <div class="input tab content general intersection internal roadway southbound">
+                <p>Southbound Road</p>
+            </div>
+
+            <div class="input tab content general intersection internal roadway westbound">
+                <p>Westbound Road</p>
+            </div>
+
+            <div class="input tab content general intersection internal roadway northbound">
+                <p>Northbound Road</p>
+            </div>
+
+            <div class="input tab content general intersection internal roadway eastbound">
+                <p>Eastbound Road</p>
+            </div>
+
+            <div class="input tab content general intersection internal approach southbound">
+                
+            </div>
+
+            <div class="input tab content general intersection internal approach westbound">
+                
+            </div>
+
+            <div class="input tab content general intersection internal approach northbound">
+
+            </div>
+
+            <div class="inputt ab content general intersection internal approach eastbound">
+
+            </div>
+        </div>
+
+        <div class="input tab content general intersection config panel">
+        
+        </div>
+
+        <div class="input tab content general button panel">
+            <div class="input tab content general button to-specific">
+                <p>Use per-movement volumes...</p>
+            </div>
+
+            <div class="input tab content general button to-movements">
+                <p>Configure Movements</p>
+            </div>
+        </div>
     </div>
 
 <script>
@@ -849,19 +1140,94 @@
     });
 
     $(".input.tab.content.specific.intersection.button.fratar").click(function() {
-        console.log($(".input.tab.content.specific.container"));
         $(".input.tab.content.specific.container").transition({
             "animation"  : "fade",
-            "duration"   : "800ms",
+            "duration"   : "400ms",
             "onComplete" : function() {
-                console.log("Fading");
                 $(".input.tab.content.general.container").transition({
                    "animation" : "fade",
-                    "duration" : "800ms"
+                    "duration" : "400ms"
                 });
             }
         });
     });
+
+    $(".input.tab.content.specific.intersection.button.movements").click(function() {
+        $(".input.tab.content.specific.container").transition({
+            "animation"  : "fade",
+            "duration"   : "400ms",
+            "onComplete" : function() {
+                $(".input.tab.content.movements.container").transition({
+                   "animation" : "fade",
+                    "duration" : "400ms"
+                });
+            }
+        });
+    });
+
+
+
+    $(".input.tab.content.general.intersection.button.to-specific").click(function() {
+        $(".input.tab.content.general.container").transition({
+            "animation"  : "fade",
+            "duration"   : "400ms",
+            "onComplete" : function() {
+                $(".input.tab.content.specific.container").transition({
+                   "animation" : "fade",
+                    "duration" : "400ms"
+                });
+            }
+        });
+    });
+
+    $(".input.tab.content.general.intersection.button.to-movements").click(function() {
+        $(".input.tab.content.general.container").transition({
+            "animation"  : "fade",
+            "duration"   : "400ms",
+            "onComplete" : function() {
+                $(".input.tab.content.movements.container").transition({
+                   "animation" : "fade",
+                    "duration" : "400ms"
+                });
+            }
+        });
+    });
+
+
+
+    $(".input.tab.content.movements.intersection.button.specific").click(function() {
+        $(".input.tab.content.movements.container").transition({
+            "animation"  : "fade",
+            "duration"   : "400ms",
+            "onComplete" : function() {
+                $(".input.tab.content.specific.container").transition({
+                   "animation" : "fade",
+                    "duration" : "400ms"
+                });
+            }
+        });
+    });
+
+    $(".input.tab.content.movements.intersection.button.general").click(function() {
+        $(".input.tab.content.movements.container").transition({
+            "animation"  : "fade",
+            "duration"   : "400ms",
+            "onComplete" : function() {
+                $(".input.tab.content.general.container").transition({
+                   "animation" : "fade",
+                    "duration" : "400ms"
+                });
+            }
+        });
+    });
+
+
+
+
+
+
+
+
 </script>
 
 </div>

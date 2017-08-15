@@ -158,6 +158,8 @@
     </body>
 
 
+    <script src="js/vjust/view.js"></script>
+    <script src="js/vjust/controller.js"></script>
     <script>
     $(document).ready(function(){
         // [BEGIN] ////////// [I DON'T HAVE A NAME FOR THIS YET] /\/\/\/\/\/\/\
@@ -193,12 +195,13 @@
 
         //if(isFrstTimeUser())
 
+        $(document).bind("contentLoaded", function() {
+            var view = new View();
+            var controller = new Controller(project, view);
+        });
+
         $(".ui.bottom.attached.tab.segment[data-tab='primary-view']").load("input_form.html");
     });
     </script>
-
-    <script src="js/vjust/view.js"></script>
-    <script src="js/vjust/controller.js"></script>
-
 
 </html>
