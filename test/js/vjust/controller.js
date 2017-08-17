@@ -11,8 +11,68 @@ class Controller {
     
         this.initialize();
 
-        EventBus.addEventListener("view_notify", this.handleViewNotify);
+        /**
+         * From Model
+         * ************************************************************************************************ */
+        EventBus.addEventListener("arrowLayoutUpdated", this.handleArrowLayoutUpdated, this);
+        //EventBus.addEventListener("infoSwitcherDataUpdated", this.handleInfoSwitcherDataUpdated, this);
+        EventBus.addEventListener("plsfix", this.handleIntersections, this);
+
+        /**
+         * From View
+         * ************************************************************************************************* */
+        EventBus.addEventListener("updateUserVolumeDefinitionsVolume", this.handleUpdateUserVolumeDefinitionsVolume, this);
+        EventBus.addEventListener("updateUserVolumeDefinitionsPercentage", this.handleUpdateUserVolumeDefinitionsPercentage, this);
+
+        EventBus.addEventListener("updateProjectRouteName", this.handleUpdateProjectRouteName, this);
+        
+        EventBus.addEventListener("updateArrow", this.handleUpdateArrow, this);
     }
+
+
+    /*
+     * View Event Handlers
+     */
+
+    handleUpdateUserVolumeDefinitionsVolume(event, direction, movement, value) {
+        this._model.getUserVolumeDefinitions().setComponentVolumeValue(direction, movement, value);
+    }
+
+    handleUpdateUserVolumeDefinitionsPercentage(event, direction, movement, value) {
+        this._model.getUserVolumeDefinitions().setComponentPercentageValue(direction, movement, value);
+    }
+
+    handleUpdateProjectContextPointName(event, cp_num, name) {
+        this._model.setContextPointName(cp_num, name);
+    }
+
+    handleUpdateProjectRouteName(event, route, name) {
+        this._model.setRouteName(route, name); 
+    }
+
+    handleUpdateArrow(event, config, zone, dir, movement, value) {
+        //this._model.getIntersectionByID(config).getZoneByID(zone).getDirectionByID(dir).setArrowByMovement(movement, value);
+    }
+
+    /*
+     * Model Event Handlers
+     */
+
+    handleArrowLayoutUpdated(event, config, zone, direction, arrow_array) {
+        var address = config + "-" + zone + "-" + direction;
+      
+        this._view.addToArrowChangeQueue(address, arrow_array);
+    }
+
+    handleInfoSwitcherDataUpdated(event, config, zone, direction, movement, data) {
+        var address = config + "-" + zone + "-" + direction + "-" + movement;
+
+
+        if(this._view.isInfoSwitcherObjectActive(address))
+            this._view.updateInfoSwitcherData(address, data);
+        else
+            this._view.addToInfoSwitcherChangeQueue(address, data);
+    } 
 
     initialize() {
         /*
@@ -27,8 +87,6 @@ class Controller {
          * =============================================================================================== */
         //var freewall = new Freewall(".appPane div[data-tab='add_tab']");
         //freewall.fitWidth();
-
-        console.log("Creating arrow layouts!");
 
             var southbound_approach = new ArrowLayout($(".input.tab.content.specific.intersection.internal.approach.southbound"), "input-tab-viewer-southbound");
             var westbound_approach  = new ArrowLayout($(".input.tab.content.specific.intersection.internal.approach.westbound"), "input-tab-viewer-westbound");
@@ -60,37 +118,4 @@ class Controller {
             this._view.toggleFirstVisitInputModals(true);
     }
 
-    handleViewNotify(event, command, params) {
-        console.log("Command is " + command);
-        console.log("Params are " + params);
-
-        var compart = command.split(" ");
-        var action = compart[0];
-        var target = compart[1];
-
-        if(action == "set") {
-            // If we're updating a volume in the UserVolumeDefinitions
-            if(target == "uvdvol") {
-                project.getUserVolumeDefinitions().setComponentValue(params[0], params[1], params[2]);
-            }
-            // If we're updating a percentage in the UserVolumeDefinitions
-            else if(target == "uvdperc") {
-                // Set the percentage...
-                //project.getUserVolumeDefinitions().setComponentValue
-            }
-            else if(target == "projRouteName") {
-                project.setRouteName(params[0], params[1]);
-            }
-            else if(target == "arrow") {
-               project.getIntersectionByID(params[0]).getZoneByID(params[1]).getDirectionByID(params[2]).getMovementByID(params[3]) 
-            }
-        }
-
-
-
-        else if(action == "get") {
-
-        }
-        
-    }
 }

@@ -6,6 +6,8 @@
 class ArrowLayout {
     constructor(container, UID) {
         this._UID = UID;
+        this._config_num = this._UID.split("-")[1];
+
         this._approach_container = container;
 
         // The dimensions of the approach container. These are the dimensions that define how wide of a space
@@ -72,7 +74,33 @@ class ArrowLayout {
 
         EventBus.dispatch("module_created", this, UID, this);
 
+        EventBus.addEventListener("ar_sibling_scaled", this.handleSiblingScaled, this);
+
         this.createApproach();
+    }
+
+    handleSiblingScaled(event, sibling, scale) {
+
+        if(sibling.getUID().split("-")[1] == this._config_num) {
+            console.log(this._UID);
+            console.log("Read object scale as " + this._height_scale);
+            console.log("Read announced scale as " + scale);
+            console.log("Calculated largest scale as " + this.calculateLargestScale());
+            if(this.calculateLargestScale() < scale) {
+                console.log("Announcing largest scale because " + this.calculateLargestScale() + " < " + scale);
+                EventBus.dispatch("ar_sibling_scaled", this, this, this.calculateLargestScale());
+            
+            }
+            else {
+                console.log("Setting the scale to " + scale + " because " + this.calculateLargestScale() + " >= " + scale);
+                this.setScale(scale);
+            }
+            console.log("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
+        }
+    }
+
+    getUID() {
+        return this._UID;
     }
 
     /**
@@ -179,6 +207,10 @@ class ArrowLayout {
                 }
                 ]
             },
+            {
+                name: "Clear",
+                fun: function() { _this.clearArrows(); }
+            }
         ];
 
         $("#" + this._UID).contextMenu(menu_config, {
@@ -192,6 +224,79 @@ class ArrowLayout {
         this._user_input_enabled = false;
         $("#" + this._UID).contextMenu("destroy");
         return this;
+    }
+
+    setArrows(exclusive_left, exclusive_through, shared_left_through, shared_right_through,
+              shared_left_right_through, shared_left_right, exclusive_right, channelized_right) {
+        
+        for(var i = 0; i < exclusive_left; i++)
+            this.clickLeft("exclusive");
+
+        for(var i = 0; i < exclusive_left; i++)
+            this.clickThrough("exclusive");
+
+        for(var i = 0; i < exclusive_left; i++)
+            this.clickThrough("shared through left");
+        
+        for(var i = 0; i < exclusive_left; i++)
+            this.clickLeft("shared through right");
+        
+        for(var i = 0; i < exclusive_left; i++)
+            this.clickLeft("shared through left right");
+        
+        for(var i = 0; i < exclusive_left; i++)
+            this.clickLeft("shared left right");
+        
+        for(var i = 0; i < exclusive_left; i++)
+            this.clickLeft("exclusive");
+        
+        for(var i = 0; i < exclusive_left; i++)
+            this.clickLeft("channelized");
+    }
+
+    clearArrows() {
+        this._EXCLUSIVE_TURN_ARROW_WIDTH            = this._ARROW_HEIGHT * (1 / this._EXCLUSIVE_TURN_AR);
+        this._EXCLUSIVE_THROUGH_ARROW_WIDTH         = this._ARROW_HEIGHT * (1 / this._EXCLUSIVE_THROUGH_AR);
+        this._SHARED_THROUGH_LEFT_ARROW_WIDTH       = this._ARROW_HEIGHT * (1 / this._SHARED_THROUGH_LEFT_AR);
+        this._SHARED_THROUGH_RIGHT_ARROW_WIDTH      = this._ARROW_HEIGHT * (1 / this._SHARED_THROUGH_RIGHT_AR);
+        this._SHARED_THROUGH_LEFT_RIGHT_ARROW_WIDTH = this._ARROW_HEIGHT * (1 / this._SHARED_THROUGH_LEFT_RIGHT_AR);
+        this._SHARED_LEFT_RIGHT_ARROW_WIDTH         = this._ARROW_HEIGHT * (1 / this._SHARED_LEFT_RIGHT_AR);
+        this._CHANNELIZED_RIGHT_ARROW_WIDTH         = this._ARROW_HEIGHT * (1 / this._CHANNELIZED_RIGHT_AR);
+
+        // The negative margin turn arrows should have.
+        // This should only be applied to left turn arrows that are not the rightmost and
+        // right turn arrows that are not the leftmost.
+        this._EXCLUSIVE_ARROW_INWARD_MARGIN = 0.1764 * this._EXCLUSIVE_TURN_ARROW_WIDTH;
+
+        // The scaling factor that all images should use upon creation or modification. This is vital in allowing
+        // all of the added arrows to fit inside the container.
+        this._height_scale = 1.0;
+
+        // Counters for each type of image. This is needed in determining the width of the arrows alone for adjusting
+        // left, through, and right containers to be as snug as possible.
+        this._NUM_EXCLUSIVE_LEFT                  = 0;
+        this._NUM_EXCLUSIVE_RIGHT                 = 0;
+        this._NUM_EXCLUSIVE_THROUGH               = 0;
+        this._NUM_SHARED_THROUGH_LEFT             = 0;
+        this._NUM_SHARED_THROUGH_RIGHT            = 0;
+        this._NUM_SHARED_THROUGH_LEFT_RIGHT       = 0;
+        this._NUM_SHARED_LEFT_RIGHT               = 0;
+        this._NUM_CHANNELIZED_RIGHT               = 0;
+
+        // Counters for the total number of images for each group.
+        this._NUM_ALL_LEFT    = 0;
+        this._NUM_ALL_THROUGH = 0;
+        this._NUM_ALL_RIGHT   = 0;
+
+        $("#" + this._UID + " .left.container").children().remove();
+        $("#" + this._UID + " .through.container").children().remove();
+        $("#" + this._UID + " .right.container").children().remove();
+
+        $("#" + this._UID + " .left.container").css("width", "0px");
+        $("#" + this._UID + " .through.container").css("width", "0px");
+        $("#" + this._UID + " .right.container").css("width", "0px");
+
+        EventBus.dispatch("ar_sibling_scaled", this, this, this._height_scale);
     }
 
     /**
@@ -317,7 +422,7 @@ class ArrowLayout {
         // Starting at 100% scale (of the current image dimensions), iterate down one percent at a time until all of the existing elements and the future element, when
         // multiplied by the current scale factor, are narrow enough to fit inside the approach container. Store this scale factor in this._height_scale for use in scaling all
         // existing images and allowing future images to be of the same size.
-        for(var scaler = 1; scaler > 0; scaler = scaler - 0.01) {
+        for(var scaler = this._height_scale; scaler > 0; scaler = scaler - 0.005) {
             var contents_width = 
                   // Width of the image if it was scaled by scaler            for however many times the image exists       minus any margins that reduce the effective width of the image
                   (((this._ARROW_HEIGHT * scaler) / this._EXCLUSIVE_TURN_AR)            * (this._NUM_EXCLUSIVE_LEFT + this._NUM_EXCLUSIVE_RIGHT))
@@ -332,12 +437,12 @@ class ArrowLayout {
                 + 1 // left container add space
                 + 1 // through container add space
                 + 1 // right container add space
-                + ((this._ARROW_HEIGHT * scaler) / add_ar); // scaling would be more optimized for maximum possible display size if this was also scaled by scaler, but this would require an AR to work off of, which
+               // + ((this._ARROW_HEIGHT * scaler) / add_ar); // scaling would be more optimized for maximum possible display size if this was also scaled by scaler, but this would require an AR to work off of, which
                              // means every call to scaleImages would need to be updated to pass AR's instead of widths
             
             // If the width of the intended contents scaled to the current value of scaler is less than the width of the allocated layout space, accept scaler as
             // the new scale value and leave the loop.
-            if(contents_width < this._APPROACH_WIDTH)
+            if(contents_width < this._APPROACH_WIDTH - 10)
             {
                 this._height_scale = scaler;
                 break;
@@ -354,6 +459,60 @@ class ArrowLayout {
         $("#" + this._UID + " .exclusive.right.arrow:not(:first-child)").css("margin-left", -1 * this._EXCLUSIVE_ARROW_INWARD_MARGIN);
 
         this.adjustAllContainerWidths();
+
+        EventBus.dispatch("ar_sibling_scaled", this, this, this._height_scale);
+    }
+
+    calculateLargestScale() {
+        //console.log("[SCALING] Detected ", this._NUM_EXCLUSIVE_LEFT, " lefts, ", this._NUM_EXCLUSIVE_RIGHT, " rights, ", this._NUM_EXCLUSIVE_THROUGH, " throughs, ",
+        //            this._NUM_SHARED_THROUGH_LEFT, " through-lefts, ", this._NUM_SHARED_THROUGH_RIGHT, " through-rights ", this._NUM_SHARED_THROUGH_LEFT_RIGHT, " through-left-rights, ",
+        //            this._NUM_SHARED_LEFT_RIGHT, " left-rights, ", this._NUM_CHANNELIZED_RIGHT, " channelized rights.");
+
+
+        for(var scaler = 1; scaler > 0; scaler = scaler - 0.005) {
+            var contents_width = 
+                  // Width of the image if it was scaled by scaler            for however many times the image exists       minus any margins that reduce the effective width of the image
+                  (((this._ARROW_HEIGHT * scaler) / this._EXCLUSIVE_TURN_AR)            * (this._NUM_EXCLUSIVE_LEFT + this._NUM_EXCLUSIVE_RIGHT))
+                - ((((this._ARROW_HEIGHT * scaler) / this._EXCLUSIVE_TURN_AR)           * 0.1764) * (this._NUM_EXCLUSIVE_LEFT + this._NUM_EXCLUSIVE_RIGHT - 2))
+                + (((this._ARROW_HEIGHT * scaler) / this._EXCLUSIVE_THROUGH_AR)         * this._NUM_EXCLUSIVE_THROUGH)       // Exclusive Throughs; account for spacing when no throughs are present
+                + (((this._ARROW_HEIGHT * scaler) / this._SHARED_THROUGH_LEFT_AR)       * this._NUM_SHARED_THROUGH_LEFT)   // Through-Left Shares
+                + (((this._ARROW_HEIGHT * scaler) / this._SHARED_THROUGH_RIGHT_AR)      * this._NUM_SHARED_THROUGH_RIGHT) // Through-Right Shares
+                + (((this._ARROW_HEIGHT * scaler) / this._SHARED_THROUGH_LEFT_RIGHT_AR) * this._NUM_SHARED_THROUGH_LEFT_RIGHT)
+                + (((this._ARROW_HEIGHT * scaler) / this._SHARED_LEFT_RIGHT_AR)         * this._NUM_SHARED_LEFT_RIGHT)
+                + (((this._ARROW_HEIGHT * scaler) / this._CHANNELIZED_RIGHT_AR)         * this._NUM_CHANNELIZED_RIGHT)
+                + (((this._ARROW_HEIGHT * scaler) / this._EXCLUSIVE_THROUGH_AR)         * (this._NUM_ALL_THROUGH == 0 ? 1 : 0)) // account for exclusive-wide spacing when no throughs are present
+                + 1 // left container add space
+                + 1 // through container add space
+                + 1 // right container add space
+            
+            // If the width of the intended contents scaled to the current value of scaler is less than the width of the allocated layout space, accept scaler as
+            // the new scale value and leave the loop.
+            if(contents_width < this._APPROACH_WIDTH - 10)
+            {
+                return scaler;
+                break;
+            }
+        }
+    }
+
+    setScale(scale) {
+        console.log("[" + this._UID + "] Setting scale to " + scale);
+        this._height_scale = scale;
+
+        // Update the height of all existing arrows using the newly found optimized scale value.
+        $("#" + this._UID + " .arrow").css("height", (this._height_scale * this._ARROW_HEIGHT));
+        // Update the global width values using the new scale value.
+        this.updateWidths();
+
+        // Update the margins for exclusive turns using the newly found optimized scale value.
+        $("#" + this._UID + " .exclusive.left.arrow:not(:first-child)").css("margin-right", -1 * this._EXCLUSIVE_ARROW_INWARD_MARGIN);
+        $("#" + this._UID + " .exclusive.right.arrow:not(:first-child)").css("margin-left", -1 * this._EXCLUSIVE_ARROW_INWARD_MARGIN);
+
+        this.adjustAllContainerWidths();
+    }
+
+    getScale() {
+        return this._height_scale;
     }
 
     /**
@@ -387,6 +546,14 @@ class ArrowLayout {
         if(!this.isAdditionPermitted("left", type))
             return;
 
+        if(type == "exclusive") {
+            this._NUM_EXCLUSIVE_LEFT++;
+        }
+        else
+            return;
+        
+        this._NUM_ALL_LEFT++;
+
         if(this.getTotalWidth() + ((this._EXCLUSIVE_TURN_ARROW_WIDTH - this._EXCLUSIVE_ARROW_INWARD_MARGIN) + 1) > this._APPROACH_WIDTH) {
             this.scaleImages(this._EXCLUSIVE_TURN_AR, "left");
             this.adjustContainerWidth(_this, this._NUM_EXCLUSIVE_LEFT + 1, this._EXCLUSIVE_TURN_ARROW_WIDTH);
@@ -400,8 +567,6 @@ class ArrowLayout {
         $("#" + this._UID + " .exclusive.left.arrow:not(:first-child)").css("margin-right", (-1 * this._EXCLUSIVE_ARROW_INWARD_MARGIN) + "px");
         $("#" + this._UID + " .exclusive.left.arrow:first-child").css("margin-right", "0px");
 
-        this._NUM_EXCLUSIVE_LEFT++;
-        this._NUM_ALL_LEFT++;
         this.adjustAllContainerWidths();
 
         EventBus.dispatch("module_announce", this, this._UID + "-0", [this._NUM_EXCLUSIVE_LEFT]);
@@ -477,6 +642,7 @@ class ArrowLayout {
             add_ar      = this._EXCLUSIVE_THROUGH_AR;
             num         = this._NUM_EXCLUSIVE_THROUGH;
             html_class  = "exclusive through arrow";
+            this._NUM_EXCLUSIVE_THROUGH++;
         }
         else if(type == "shared through left") {
             asset       = "assets/arrows/arrow_shared_through_left.svg";
@@ -485,6 +651,7 @@ class ArrowLayout {
             add_ar      = this._SHARED_THROUGH_LEFT_AR;
             num         = this._NUM_SHARED_THROUGH_LEFT;
             html_class  = "shared through left arrow";
+            this._NUM_SHARED_THROUGH_LEFT++;
         }
         else if(type == "shared through right") {
             asset       = "assets/arrows/arrow_shared_through_right.svg";
@@ -493,6 +660,7 @@ class ArrowLayout {
             add_ar      = this._SHARED_THROUGH_RIGHT_AR;
             num         = this._NUM_SHARED_THROUGH_RIGHT;
             html_class  = "shared through right arrow";
+            this._NUM_SHARED_THROUGH_RIGHT++;
         }
         else if(type == "shared through left right") {
             asset       = "assets/arrows/arrow_shared_through_left_right.svg";
@@ -501,6 +669,7 @@ class ArrowLayout {
             add_ar      = this._SHARED_THROUGH_LEFT_RIGHT_AR;
             num         = this._NUM_SHARED_THROUGH_LEFT_RIGHT;
             html_class  = "shared through right left arrow";
+            this._NUM_SHARED_THROUGH_LEFT_RIGHT++;
         }
         else if(type == "shared left right") {
             asset       = "assets/arrows/arrow_shared_left_right.svg";
@@ -509,7 +678,12 @@ class ArrowLayout {
             add_ar      = this._SHARED_LEFT_RIGHT_AR;
             num         = this._NUM_SHARED_LEFT_RIGHT;
             html_class  = "shared left right arrow";
+            this._NUM_SHARED_LEFT_RIGHT++;
         }
+        else
+            return;
+        
+        this._NUM_ALL_THROUGH++;
 
         // If the addition of this movement makes the combined width of all arrows (including this hypothetical arrow)
         // greater than the alloted width of the approach container...
@@ -529,15 +703,6 @@ class ArrowLayout {
 
         // Insert this HTML code into the through container based on a rule set of existing movements.
         this.insertThrough(type, _this, html_insert);
-
-        // Increment by one the known number of existing movements of the type passed.
-        if(type == "exclusive")                      this._NUM_EXCLUSIVE_THROUGH++;
-        else if(type == "shared through left")       this._NUM_SHARED_THROUGH_LEFT++;
-        else if(type == "shared through right")      this._NUM_SHARED_THROUGH_RIGHT++;
-        else if(type == "shared through left right") this._NUM_SHARED_THROUGH_LEFT_RIGHT++;
-        else if(type == "shared left right")         this._NUM_SHARED_LEFT_RIGHT++;
-        // Increement by one the known number of all through movements.
-        this._NUM_ALL_THROUGH++;
 
         // Fit all of the containers snuggly around the content inside of them.
         this.adjustAllContainerWidths();
@@ -593,6 +758,7 @@ class ArrowLayout {
             add_ar      = this._EXCLUSIVE_TURN_AR;
             num         = this._NUM_EXCLUSIVE_RIGHT;
             html_class  = "exclusive right arrow";
+            this._NUM_EXCLUSIVE_RIGHT++;
         }
         else if(type == "channelized") {
             asset       = "assets/arrows/arrow_right_chan.svg";
@@ -601,7 +767,12 @@ class ArrowLayout {
             add_ar      = this._CHANNELIZED_RIGHT_AR;
             num         = this._NUM_CHANNELIZED_RIGHT;
             html_class  = "channelized exclusive right arrow";
+            this._NUM_CHANNELIZED_RIGHT++;
         }
+        else
+            return;
+
+        this._NUM_ALL_RIGHT++;
 
         if(this.getTotalWidth() + img_width + width_mod > this._APPROACH_WIDTH) {
             this.scaleImages(add_ar, "right");
@@ -610,13 +781,8 @@ class ArrowLayout {
         } else this.adjustContainerWidth(_this, num + 1, img_width + width_mod);
 
         var html_insert = "<img class='" + html_class + "' style='height: " + (this._ARROW_HEIGHT * this._height_scale) + "px;' src='" + asset +"'>";
-
         this.insertRight(type, _this, html_insert);
 
-        if(type == "exclusive")         this._NUM_EXCLUSIVE_RIGHT++;
-        else if(type == "channelized")  this._NUM_CHANNELIZED_RIGHT++;
-        
-        this._NUM_ALL_RIGHT++;
         this.adjustAllContainerWidths();
 
         EventBus.dispatch("module_announce", this, this._UID + "-2",

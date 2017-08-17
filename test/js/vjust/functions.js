@@ -169,6 +169,63 @@ var toggleLoader = function(flag, message) {
     }
 }
 
+/**
+ * Calculates the initial laneage for a zone based on strict rules
+ */
+var calculateLanesByRules = function(left, through, right, opp_left, opp_through, adj_left, base_through, base_left, base_right) {
+    
+    var left_lanes, through_lanes, right_lanes, left_shared, right_shared, channelized_right;
+    
+    left_lanes = 0;
+    left_shared = 0;
+    if (left >= 800)
+        left_lanes = 2;
+    else if (left >= 400) 
+        left_lanes = 1;
+    left_lanes = Math.max(left_lanes, base_left);
+    
+    right_lanes = 0;
+    right_shared = 0;
+    if (right >= 400)
+        right_lanes = 1;
+    right_lanes = Math.max(right_lanes, base_right);    
+    
+    through_lanes = 0;
+    through_lanes = Math.ceil( (through + 1) / 800);
+   
+    if ( Math.max((Math.max(left, 0) - (left_lanes * 400),0) + Math.max(through, 0) + Math.max(Math.max(right, 0) - (right_lanes * 400), 0) ) / through_lanes <= 800) {
+        left_shared  = left_lanes < 2 && left > 400 ? 1 : 0;
+        right_shared = right > 400 ? 1 : 0;
+    }
+    
+    if (left_lanes === 0 && left != -1) {
+        if (through !== -1 || right !== -1)
+            left_shared = 1;
+        else
+            left_lanes = 1;
+    } 
+    
+    if (right_lanes == 1 && through == -1 && left_lanes > 1) {
+        right_shared = 0;
+    } 
+    
+    var through_equivalents = Math.max(0, through)
+                            + Math.max(0, right - right_lanes * 400) / 0.85
+                            + Math.max(0, left - left_lanes * 400) / 0.95 * 2;
+    
+    if (through_lanes !== 0) 
+        through_lanes = Math.min(base_through + 2, Math.ceil(through_equivalents / 800));
+        
+    if (right_lanes + right_shared === 0 && right != -1) {
+        if (through_equivalents - (800 * (through_lanes - 1) ) < 800 - right)
+            right_shared = 1;
+        else
+            right_lanes = 1;
+    } 
+    
+    return [left_lanes, through_lanes, right_lanes, left_shared, right_shared, 0];
+}
+
 // Credit to StackOverflow's Pawel
 var objectKeyByValue = function(obj, val) {
       return Object.entries(obj).find(i => i[1] === val)[0];

@@ -19,13 +19,17 @@ class View {
         ];
 
         this._ARDictionary = {};
+        this._ISDictionary = {};
+
+        this._infoChangeQueue = [];
+        this._arrowChangeQueue = [];
 
         this.initialize();
 
         // Make the View responsible for acknowledging when a module is created.
         EventBus.addEventListener("module_created", this.handleModuleCreated, this);
         // Make the View responsible for acknowledging when a module does something important.
-        EventBus.addEventListener("module_announce", this.handleModuleAnnouncement);
+        EventBus.addEventListener("module_announce", this.handleModuleAnnouncement, this);
 
     }
 
@@ -106,32 +110,31 @@ class View {
 
 
 
-        /* Route Name Input-this._view Synchronization
+        /* Route Name Input-View Synchronization
          * =============================================================================================== */
         this.createListener("#nRouteNameInput", "input", function() {
             var inputValue = _this.getInputValue("#nRouteNameInput");
-            _this.notifyController("set projRouteName", ["north", inputValue]);
             _this.setElementText(".input.tab.content.intersection.internal.roadway.southbound p", inputValue);
+            EventBus.dispatch("updateProjectRouteName", "north", inputValue);
         });
 
         this.createListener("#eRouteNameInput", "input", function() {
             var inputValue = _this.getInputValue("#eRouteNameInput");
-            _this.notifyController("set projRouteName", ["east", inputValue]);
             _this.setElementText(".input.tab.content.intersection.internal.roadway.westbound p", inputValue);
+            EventBus.dispatch("updateProjectRouteName", "east", inputValue);
         });
 
         this.createListener("#sRouteNameInput", "input", function() {
             var inputValue = _this.getInputValue("#sRouteNameInput");
-            _this.notifyController("set projRouteName", ["south", inputValue]);
             _this.setElementText(".input.tab.content.intersection.internal.roadway.northbound p", inputValue);
+            EventBus.dispatch("updateProjectRouteName", "south", inputValue);
         });
 
         this.createListener("#wRouteNameInput", "input", function() {
             var inputValue = _this.getInputValue("#wRouteNameInput");
-            _this.notifyController("set projRouteName", ["west", inputValue]);
             _this.setElementText(".input.tab.content.intersection.internal.roadway.eastbound p", inputValue);
+            EventBus.dispatch("updateProjectRouteName", "west", inputValue);
         });
-
 
 
 
@@ -139,17 +142,24 @@ class View {
         /* Context Point Name Input-View Synchronization
          * =============================================================================================== */
         this.createListener($("#cpOneNameInput").parent(), "input", function() {
-            _this.setElementText(".input.tab.content.intersection.internal.context-point-one span", _this.getInputValue("#cpOneNameInput"));
-            _this.notifyController("change", "");
+            var name = _this.getInputValue("#cpOneNameInput");
+            _this.setElementText(".input.tab.content.intersection.internal.context-point-one span", name);
+            EventBus.dispatch("updateProjectContextPointName", 1, name);
         });
         this.createListener($("#cpTwoNameInput").parent(), "input", function() {
-            _this.setElementText(".input.tab.content.intersection.internal.context-point-two span", _this.getInputValue("#cpTwoNameInput"));
+            var name = _this.getInputValue("#cpTwoNameInput");
+            _this.setElementText(".input.tab.content.intersection.internal.context-point-two span", name);
+            EventBus.dispatch("updateProjectContextPointName", 2, name);
         });
         this.createListener($("#cpThreeNameInput").parent(), "input", function() {
-            _this.setElementText(".input.tab.content.intersection.internal.context-point-three span", _this.getInputValue("#cpThreeNameInput"));
+            var name = _this.getInputValue("#cpThreeNameInput");
+            _this.setElementText(".input.tab.content.intersection.internal.context-point-three span", name);
+            EventBus.dispatch("updateProjectContextPointName", 3, name);
         });
         this.createListener($("#cpFourNameInput").parent(), "input", function() {
-            _this.setElementText(".input.tab.content.intersection.internal.context-point-four span", _this.getInputValue("#cpFourNameInput"));
+            var name = _this.getInputValue("#cpFourNameInput");
+            _this.setElementText(".input.tab.content.intersection.internal.context-point-four span", name);
+            EventBus.dispatch("updateProjectContextPointName", 4, name);
         });
 
 
@@ -165,6 +175,11 @@ class View {
 
 
 
+        this.createListener($(".appPane a[data-tab='add_tab']"), "click", function() {
+            console.log("Clicked add tab!");
+            EventBus.dispatch("fix", this);
+        });
+
 
        /* Tab Creation, Deletion, and Information Collection
          * =============================================================================================== */
@@ -174,7 +189,13 @@ class View {
          * with content corresponding to the clicked child.
          */
         this.createListener($(".appPane div[data-tab='add_tab'] div"), "click", function() {
+
             _this.createNewTab($(this).attr("data-intersection-type"));
+            
+            var _t_his = this;
+            setTimeout(function() {
+                $(".appPane .secondary a[data-tab='" + $(_t_his).attr("data-intersection-type") + "']").click();
+            }, 100);
         });
 
         /**
@@ -191,7 +212,7 @@ class View {
             var UID = $(this).parent().attr("data-tab");
             _this.tabFlow($(this).parent()).click();
             $(this).parent().remove();
-            $(".appPane div[data-tab='" + UID + "']").remove();
+            //$(".appPane div[data-tab='" + UID + "']").remove();
             $(".appPane .menu .item").tab();
         });
 
@@ -210,11 +231,11 @@ class View {
             var val      = $(this).val().charAt( $(this).val().length - 1 ) == "%" ? $(this).val().substring(0, $(this).val().length - 1) : $(this).val();
 
             if(input_id[3] === undefined) {
-                _this.notifyController("set uvdvol", [input_id[1], input_id[2], val]);
-                $(".input.tab.content.intersection.internal.volume-container input[name='this._view-" + input_id[1] + "-" + input_id[2] + "']").val(val);
+                EventBus.dispatch("updateUserVolumeDefinitionsVolume", input_id[1], input_id[2], val);
+                $(".input.tab.content.intersection.internal.volume-container input[name='view-" + input_id[1] + "-" + input_id[2] + "']").val(val);
             }
             else {
-                _this.notifyController("set uvdperc", [input_id[1], input_id[2], val]);
+                EventBus.dispatch("updateUserVolumeDefinitionsPercentage", input_id[1], input_id[2], val);
             }
         });
 
@@ -227,7 +248,7 @@ class View {
             var input_id = $(this).attr("name").split("-");
             var val = $(this).val();
             
-            _this.notifyController("set uvdvol", [input_id[1], input_id[2], val]);
+            EventBus.dispatch("updateUserVolumeDefinitionsVolume", input_id[1], input_id[2], val);
             $(".input.tab.content.table input[name='usertable-" + input_id[1] + "-" + input_id[2] + "']").val(val);
         });
 
@@ -243,11 +264,11 @@ class View {
 
     }
 
-    notifyController(command, params) {
-        EventBus.dispatch("view_notify", this, command, params);
-    }
-
     handleModuleCreated(event, UID, module_object) {
+        //console.log("[NEW MOD] Got UID " + UID);
+        //console.log("[NEW MOD] Got object " + module_object);
+
+
         var mod_det = UID.split("-");
 
         if(mod_det[0] == "AR") {
@@ -259,8 +280,41 @@ class View {
             this._ARDictionary[mod_address] = module_object;
         }
 
+        if(mod_det[0] == "IS") {
+            var conf = mod_det[1];
+            var zone = mod_det[2];
+            var dir  = mod_det[3];
+            var mvt  = mod_det[4];
+
+            var mod_address = conf + "-" + zone + "-" + dir + "-" + mvt;
+            this._ISDictionary[mod_address] = module_object;
+        }
+
         console.log(this._ARDictionary);
     }
+
+
+
+
+    addToArrowChangeQueue(address, arrows) {
+        console.log("Added arrow update for AR-" + address);
+        this._arrowChangeQueue.push([address, arrows]); 
+    }
+
+    clearArrowLayout(address) {
+        console.log("Attempting to read " + address + " from the list of ArrowLayouts");
+        this._ARDictionary[address].clearArrows();
+    }
+
+    updateArrowLayout(address, group, type, amount) {
+        if(group == "left")
+            for(var i = 0; i < amount; i++) this._ARDictionary[address].clickLeft(type);
+        else if(group == "through")
+            for(var i = 0; i < amount; i++) this._ARDictionary[address].clickThrough(type);
+        else if(group == "right")
+            for(var i = 0; i < amount; i++) this._ARDictionary[address].clickRight(type);
+    }
+
 
     /**
      * When a module calls out that it has behaved in a way that is considered important to the scope of this application, and
@@ -279,15 +333,23 @@ class View {
             var dir  = mod_det[3];
             var mvt  = mod_det[4];
 
-            this.notifyController("set arrow", [conf, zone, dir, mvt]);
-
-            // Notify the controller of a new value...
-            // controller.updateArrowCount(conf, zone, dir, mvt, value);
+            EventBus.dispatch("updateArrow", conf, zone, dir, mvt, value); 
         }
         // If the announcing module is InfoSwitch...
         if(mod_det[0] == "IS") {
 
         }
+    } 
+
+    addToInfoSwitcherChangeQueue(address, data) {
+       this._infoChangeQueue.push([address, data]); 
+    }
+
+    isInfoSwitcherObjectActive(address) {
+        if(this._ISDictionary[address] == undefined)
+            return false;
+        else
+            return true;
     }
 
     /**
@@ -344,8 +406,12 @@ class View {
         var UID = int_type.toLowerCase().replace(/\b[a-z]/g, function(letter) { return letter.toUpperCase(); });
 
         $(".appPane .secondary a:last-of-type").before("<a class='item' data-tab='" + int_type + "'>" + UID + "<i class='medium close icon'></i></a>");
-        $(".appPane .tab:last").before("<div class='ui bottom attached tab segment' data-tab='" + int_type + "'></div>");
-        this.loadIntoElement(".appPane .tab.segment[data-tab='" + int_type + "']", int_type + ".html");
+
+        if($(".appPane .tab[data-tab='" + int_type + "']").length == 0) {
+            $(".appPane .tab:last").before("<div class='ui bottom attached tab segment' data-tab='" + int_type + "'></div>");
+            this.loadIntoElement(".appPane .tab.segment[data-tab='" + int_type + "']", int_type + ".html");
+        }
+
         $(".appPane .menu .item").tab();
     }
 
@@ -438,6 +504,34 @@ class View {
         if(tab_id == "add_tab" || false) return;
 
         $(".appPane .tab.segment[data-tab='" + tab_id + "'] .container").trigger("tabLoaded");
+
+        var _this = this;
+        this._arrowChangeQueue.forEach(function(array, index) {
+            var address = array[0];
+            var arrows = array[1];
+
+            _this.clearArrowLayout(address);
+            _this.updateArrowLayout(address, "left",    "exclusive",                 arrows[0]);
+            _this.updateArrowLayout(address, "through", "exclusive",                 arrows[1]);
+            _this.updateArrowLayout(address, "through", "shared through left",       arrows[2]);
+            _this.updateArrowLayout(address, "through", "shared through right",      arrows[3]);
+            _this.updateArrowLayout(address, "through", "shared through left right", arrows[4]);
+            _this.updateArrowLayout(address, "through", "shared left right",         arrows[5]);
+            _this.updateArrowLayout(address, "right",   "exclusive",                 arrows[6]);
+            _this.updateArrowLayout(address, "right",   "channelized",               arrows[7]);
+        });
+
+        this._infoChangeQueue.forEach(function(array, index) {
+            var address = array[0];
+            var data = array[1];
+
+            this._view.updateInfoSwitcherData(address, data);
+        });
+        
+    }
+
+    updateInfoSwitcherData(address, data) {
+        
     }
 
     /**

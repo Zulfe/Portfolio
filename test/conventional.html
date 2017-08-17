@@ -33,7 +33,7 @@
         width: 100%;
     }
 
-    .conventional.tab.content.container .zone.one .southbound.approach {
+    .conventional.tab.content.container .zone.one .southbound.container {
         position: absolute;
 
         height: 25%;
@@ -45,7 +45,7 @@
         transform: rotate(180deg);
     }
 
-    .conventional.tab.content.container .zone.one .westbound.approach  {
+    .conventional.tab.content.container .zone.one .westbound.container  {
         position: absolute;
 
         transform: rotate(-90deg);
@@ -57,17 +57,17 @@
         right: 3%;
     }
 
-    .conventional.tab.content.container .zone.one .northbound.approach {
+    .conventional.tab.content.container .zone.one .northbound.container {
         position: absolute;
 
-        height: 24%;
+        height: 19%;
         width: 18%;
 
-        bottom: 0%;
+        bottom: 5%;
         left: 47%;
     }
 
-    .conventional.tab.content.container .zone.one .eastbound.approach  {
+    .conventional.tab.content.container .zone.one .eastbound.container  {
         position: absolute;
 
         transform: rotate(90deg);
@@ -75,7 +75,7 @@
         height: 24%;
         width: 18%;
 
-        bottom: 33%;
+        bottom: 33.2%;
         left: 3%;
     }
 
@@ -83,6 +83,147 @@
         float: none !important;
         margin: auto !important;
     }
+
+    .conventional.tab.content.container .southbound.container .infoswitch.wrapper {
+        height: 35%;
+        width: 100%;
+        margin-top: 15%;
+    }
+
+    .conventional.tab.content.container .southbound.container .southbound.approach {
+        height: 65%;
+        width: 100%;
+    }
+
+    .conventional.tab.content.container .southbound.container .infoswitch.wrapper .verticalizer.wrapper {
+        transform: rotate(270deg);
+        height: 100%;
+        width: 70%;
+        margin: auto;
+
+        /* counter interior spacing */
+        margin-left: -7.5%;
+    }
+
+    .conventional.tab.content.container .infoswitch.wrapper .verticalizer.wrapper .left,
+    .conventional.tab.content.container .infoswitch.wrapper .verticalizer.wrapper .through,
+    .conventional.tab.content.container .infoswitch.wrapper .verticalizer.wrapper .right {
+        height: 40%;
+
+        width: 100%;
+
+        border: 1px solid orange;
+    }
+
+    .conventional.tab.content.container .infoswitch.wrapper .verticalizer.wrapper .through {
+        margin-top: 25%;
+        margin-bottom: 25%;
+    }
+
+    .conventional.tab.content.container .eastbound.container .infoswitch.wrapper {
+        width: 35%;
+        height: 100%;
+    }
+
+    .conventional.tab.content.container .eastbound.container .eastbound.approach {
+        width: 100%;
+        height: 100%;
+    }
+
+    .conventional.tab.content.container .eastbound.container .infoswitch.wrapper .left,
+    .conventional.tab.content.container .eastbound.container .infoswitch.wrapper .through,
+    .conventional.tab.content.container .eastbound.container .infoswitch.wrapper .right {
+        height: 40%;
+        width: 80%;
+
+        border: 1px solid orange;
+    }
+
+    .conventional.tab.content.container .westbound.infoswitch.wrapper {
+        position: absolute;
+        
+        height: 17%;
+        width: 12.7%;
+
+        top: 37%;
+        right: -13.2%;
+    }
+
+    .conventional.tab.content.container .westbound.infoswitch.wrapper .left,
+    .conventional.tab.content.container .westbound.infoswitch.wrapper .through,
+    .conventional.tab.content.container .westbound.infoswitch.wrapper .right {
+        height: 25%;
+        width: 100%;
+
+        border: 1px solid orange;
+    }
+
+    .conventional.tab.content.container .westbound.infoswitch.wrapper .through {
+        margin-top: 12.5%;
+        margin-bottom: 12.5%;
+    }
+
+    .conventional.tab.content.container .eastbound.infoswitch.wrapper {
+        position: absolute;
+        
+        height: 17%;
+        width: 12.7%;
+
+        top: 46%;
+        left: -13.2%;
+    }
+
+    .conventional.tab.content.container .eastbound.infoswitch.wrapper .left,
+    .conventional.tab.content.container .eastbound.infoswitch.wrapper .through,
+    .conventional.tab.content.container .eastbound.infoswitch.wrapper .right {
+        height: 25%;
+        width: 100%;
+
+        border: 1px solid orange;
+    }
+
+    .conventional.tab.content.container .eastbound.infoswitch.wrapper .through {
+        margin-top: 12.5%;
+        margin-bottom: 12.5%;
+    }
+
+    
+
+
+
+    .conventional.tab.content.container .northbound.infoswitch.wrapper {
+        position: absolute;
+        
+        transform: rotate(90deg);
+
+        height: 17%;
+        width: 12.7%;
+
+        bottom: -10%;
+        left: 49%;
+    }
+
+    .conventional.tab.content.container .northbound.infoswitch.wrapper .left,
+    .conventional.tab.content.container .northbound.infoswitch.wrapper .through,
+    .conventional.tab.content.container .northbound.infoswitch.wrapper .right {
+        height: 25%;
+        width: 100%;
+
+        border: 1px solid orange;
+    }
+
+    .conventional.tab.content.container .northbound.infoswitch.wrapper .through {
+        margin-top: 12.5%;
+        margin-bottom: 12.5%;
+    }
+
+    .conventional.tab.content.container .westbound.container .westbound.approach,
+    .conventional.tab.content.container .northbound.container .northbound.approach {
+        height: 100%;
+        width: 100%;
+    }
+
+
 
 </style>
 
@@ -92,21 +233,103 @@
 
         <div class="zone one" data-zone="0">
             <div class="approach container">
-                <div class="southbound approach" data-dir="0">
+
+                <div class="southbound container">
+                    <div class="southbound approach" data-dir="0">
+
+
+                    </div>
+
+                    <div class="southbound infoswitch wrapper">
+                        <div class="verticalizer wrapper">
+                            <div class="southbound infoswitch left">
+
+                            </div>
+
+                            <div class="southbound infoswitch through">
+
+                            </div>
+
+                            <div class="southbound infoswitch right">
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="westbound container">
+                    <div class="westbound approach" data-dir="0">
+
+
+                    </div>
 
                 </div>
 
-                <div class="westbound approach"  data-dir="1">
+                <div class="westbound infoswitch wrapper">
+                    <div class="westbound infoswitch left">
+
+                    </div>
+
+                    <div class="westbound infoswitch through">
+
+                    </div>
+
+                    <div class="westbound infoswitch right">
+
+                    </div>
+                </div>
+
+
+                <div class="northbound container">
+                    <div class="northbound approach" data-dir="0">
+
+
+                    </div>
 
                 </div>
 
-                <div class="northbound approach" data-dir="2">
+                <div class="northbound infoswitch wrapper">
+                    <div class="northbound infoswitch left">
+
+                    </div>
+
+                    <div class="northbound infoswitch through">
+
+                    </div>
+
+                    <div class="northbound infoswitch right">
+
+                    </div>
+                </div>
+
+
+                <div class="eastbound container">
+                    <div class="eastbound approach" data-dir="0">
+
+
+                    </div>
 
                 </div>
 
-                <div class="eastbound approach"  data-dir"3">
+                <div class="eastbound infoswitch horizontal wrapper">
+                    <div class="eastbound infoswitch left">
 
+                    </div>
+
+                    <div class="eastbound infoswitch through">
+
+                    </div>
+
+                    <div class="eastbound infoswitch right">
+
+                    </div>
                 </div>
+
+
+
+
+
+
             </div>
         </div>
     </div>
@@ -119,6 +342,27 @@
         var westbound_approach  = new ArrowLayout($(".conventional.tab.content.container .intersection .zone.one .westbound.approach"), "AR-0-0-1");
         var northbound_approach = new ArrowLayout($(".conventional.tab.content.container .intersection .zone.one .northbound.approach"), "AR-0-0-2");
         var eastbound_approach  = new ArrowLayout($(".conventional.tab.content.container .intersection .zone.one .eastbound.approach"), "AR-0-0-3");
+
+        var is_string_builder = function(approach, movement) {
+            return ".conventional.tab.content.container ." + approach + ".container .infoswitch." + movement;
+        }
+
+        var southbound_left_is  = new InfoSwitcher($(is_string_builder("southbound", "left")), "IS-0-0-0-0", [1022, 844, 1.22], ["VOL", "CAP", "V/C"]);
+        var southbound_thru_is  = new InfoSwitcher($(is_string_builder("southbound", "through")), "IS-0-0-0-1", [4421, 5663, 0.833], ["VOL", "CAP", "V/C"]);
+        var southbound_right_is = new InfoSwitcher($(is_string_builder("southbound", "right")), "IS-0-0-0-2", [2343, 3021, 0.69], ["VOL", "CAP", "V/C"]);
+
+        var westbound_left_is   = new InfoSwitcher($(".conventional.tab.content.container .westbound.infoswitch.wrapper .left"),      "IS-0-0-1-0", [1, 2, 3], ["1", "2", "3"]);
+        var westbound_thru_is   = new InfoSwitcher($(".conventional.tab.content.container .westbound.infoswitch.wrapper .through"),   "IS-0-0-1-1", [1, 2, 3], ["1", "2", "3"]);
+        var westbound_right_is   = new InfoSwitcher($(".conventional.tab.content.container .westbound.infoswitch.wrapper .right"),    "IS-0-0-1-2", [1, 2, 3], ["1", "2", "3"]);
+
+        var eastbound_left_is   = new InfoSwitcher($(".conventional.tab.content.container .eastbound.infoswitch.wrapper .left"),      "IS-0-0-3-0", [1, 2, 3], ["1", "2", "3"]);
+        var eastbound_thru_is   = new InfoSwitcher($(".conventional.tab.content.container .eastbound.infoswitch.wrapper .through"),   "IS-0-0-3-1", [1, 2, 3], ["1", "2", "3"]);
+        var eastbound_right_is   = new InfoSwitcher($(".conventional.tab.content.container .eastbound.infoswitch.wrapper .right"),    "IS-0-0-3-2", [1, 2, 3], ["1", "2", "3"]);
+
+        var northbound_left_is   = new InfoSwitcher($(".conventional.tab.content.container .northbound.infoswitch.wrapper .left"),    "IS-0-0-2-0", [1, 2, 3], ["1", "2", "3"]);
+        var northbound_thru_is   = new InfoSwitcher($(".conventional.tab.content.container .northbound.infoswitch.wrapper .through"), "IS-0-0-2-1", [1, 2, 3], ["1", "2", "3"]);
+        var northbound_right_is   = new InfoSwitcher($(".conventional.tab.content.container .northbound.infoswitch.wrapper .right"),  "IS-0-0-2-2", [1, 2, 3], ["1", "2", "3"]);
+
 
         $(".conventional.tab.content.container").unbind("tabLoaded");
     });

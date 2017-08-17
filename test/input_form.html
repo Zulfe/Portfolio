@@ -982,13 +982,52 @@
             white-space: nowrap;
         }
 
+        .input.tab.content.general.intersection.internal.approach.southbound {
+            border: 1px solid magenta;
+
+            position: absolute;
+
+            top: 7%;
+            left: 39.7%;
+
+            height: 29;
+            width: 20%;
+
+            transform: rotate(180deg);
+        }
+
         .input.tab.content.general.intersection.internal.approach.westbound {
             border: 1px solid magenta;
+            position: absolute;
+
+            top: 39.5%;
+            right: 6%;
+
+            height: 23%;
+            width: 28%;
+        }
+
+        .input.tab.content.general.intersection.internal.approach.northbound {
+            border: 1px solid magenta;
+            position: absolute;
+
+            top: 7%;
+            left: 39.7%;
+
+            height: 29%;
+            width: 20%;
+        }
+
+        .input.tab.content.general.intersection.internal.approach.eastbound {
+            border: 1px solid magenta;
+            position: absolute;
+
+            top: 10%;
+            left: 10%;
 
             height: 10%;
             width: 10%;
         }
-
 
         /* Configuration Panel
         ******************************************************************************* */
@@ -1046,7 +1085,7 @@
             background-color: #FFC55A;
         }
 
-        .input.tab.content.general.button .movements:hover {
+        .input.tab.content.general.button .to-movements:hover {
             background-color: #FFC55A;
         }
 
@@ -1099,18 +1138,18 @@
             </div>
 
             <div class="input tab content general intersection internal approach southbound">
-                
-            </div>
 
+            </div>
+            
             <div class="input tab content general intersection internal approach westbound">
-                
+
             </div>
 
             <div class="input tab content general intersection internal approach northbound">
 
             </div>
 
-            <div class="inputt ab content general intersection internal approach eastbound">
+            <div class="input tab content general intersection internal approach eastbound">
 
             </div>
         </div>
@@ -1167,20 +1206,20 @@
 
 
 
-    $(".input.tab.content.general.intersection.button.to-specific").click(function() {
+    $(".input.tab.content.general.button .to-specific").click(function() {
         $(".input.tab.content.general.container").transition({
             "animation"  : "fade",
-            "duration"   : "400ms",
+            "duration"   : "300ms",
             "onComplete" : function() {
                 $(".input.tab.content.specific.container").transition({
                    "animation" : "fade",
-                    "duration" : "400ms"
+                    "duration" : "300ms"
                 });
             }
         });
     });
 
-    $(".input.tab.content.general.intersection.button.to-movements").click(function() {
+    $(".input.tab.content.general.button .to-movements").click(function() {
         $(".input.tab.content.general.container").transition({
             "animation"  : "fade",
             "duration"   : "400ms",
@@ -1192,8 +1231,6 @@
             }
         });
     });
-
-
 
     $(".input.tab.content.movements.intersection.button.specific").click(function() {
         $(".input.tab.content.movements.container").transition({
