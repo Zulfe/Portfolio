@@ -231,11 +231,11 @@ class View {
             var val      = $(this).val().charAt( $(this).val().length - 1 ) == "%" ? $(this).val().substring(0, $(this).val().length - 1) : $(this).val();
 
             if(input_id[3] === undefined) {
-                EventBus.dispatch("updateUserVolumeDefinitionsVolume", input_id[1], input_id[2], val);
                 $(".input.tab.content.intersection.internal.volume-container input[name='view-" + input_id[1] + "-" + input_id[2] + "']").val(val);
+                EventBus.dispatch("updateUserVolumeDefinitionsVolume", this, input_id[1], input_id[2], val);
             }
             else {
-                EventBus.dispatch("updateUserVolumeDefinitionsPercentage", input_id[1], input_id[2], val);
+                EventBus.dispatch("updateUserVolumeDefinitionsPercentage", this, input_id[1], input_id[2], val);
             }
         });
 

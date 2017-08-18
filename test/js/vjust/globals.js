@@ -8,8 +8,7 @@
 /**
  * Initialization of a project variable on startup. Everything should have access to the data this object organizes.
  */
-var project;
-
+var PROJECT;
 var importFiles;
 
 /**
@@ -56,6 +55,8 @@ var UNIVERSAL_LEFT_TURN_ADJUSTMENT_FACTOR  = 0.95;
 
 
 
+
+
 var IntersectionEnum = {
     "0"  : "Conventional1",
     "1"  : "Conventional2",
@@ -92,25 +93,20 @@ var IntersectionEnum = {
 }
 
 var DirectionEnum = {
-    "0" : "North",
-    "1" : "South",
-    "2" : "East",
-    "3" : "West"
+    "0" : "southbound",
+    "1" : "westbound",
+    "2" : "northbound",
+    "3" : "eastbound"
 };
 
-
-
-
-jQuery.fn.shake = function(intShakes, intDistance, intDuration) {
-    this.each(function() {
-        $(this).css("position","relative"); 
-        for (var x=1; x<=intShakes; x++) {
-        $(this).animate({left:(intDistance*-1)}, (((intDuration/intShakes)/4)))
-    .animate({left:intDistance}, ((intDuration/intShakes)/2))
-    .animate({left:0}, (((intDuration/intShakes)/4)));
-    }
-  });
-return this;
+var UnboundDirectionEnum = {
+    "0" : "north",
+    "1" : "east",
+    "2" : "south",
+    "3" : "west"
 };
+
+var MASTERPCETABLE;
+var USERVOLUMEDEFINITIONS;
 
 // [END] ////////// [GLOBAL VARIABLES] ////////////////////

@@ -442,7 +442,8 @@ class UserVolumeDefinitions {
 	}
     
     setComponentVolumeValue(direction, movement, volume) {
-        var dir_int = typeof direction == "number" ? direction : parseInt(objectKeyByValue(DirectionEnum,direction));
+        var dir_int = typeof direction == "number" ? direction : parseInt(objectKeyByValue(DirectionEnum, direction));
+        console.log("Input volume: " + volume);
         if (typeof movement == "number") {
             this._direction_array[dir_int].setMovementByIndex(movement, volume);
         } else {

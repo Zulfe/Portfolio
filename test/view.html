@@ -7,11 +7,11 @@
         <link rel="stylesheet" type="text/css" href="css/view.css" /> 
         <script src="js/jquery.min.js"></script>
         <script type="text/javascript" src="js/semantic.js"></script>
+        <script src="js/vjust/globals.js"></script>
         <script src="js/vjust/functions.js"></script>
         <script src="js/vjust/data_structure.js"></script>
         <script src="js/vjust/classes.js"></script>
         <script src="js/vjust/EventBus.js"></script>
-        <script src="js/vjust/globals.js"></script>
         <script src="js/vjust/routes.js"></script>
         <script src="js/contextMenu.js"></script>
         <script src="js/vjust/arrow_layout.js"></script>
@@ -166,7 +166,7 @@
     $(document).ready(function(){
         // [BEGIN] ////////// [I DON'T HAVE A NAME FOR THIS YET] /\/\/\/\/\/\/\
 
-        project = new Project("Test Project", "Damon", "Broad and 14th", "Broad", "14th", "Broad", "14th", "Hospital", "VDOT", "Gas Station", "VACU");
+        PROJECT = new Project("Test Project", "Damon", "Broad and 14th", "Broad", "14th", "Broad", "14th", "Hospital", "VDOT", "Gas Station", "VACU");
 
 
         // Hide all of the page's contents.
@@ -199,7 +199,7 @@
 
         $(document).bind("contentLoaded", function() {
             var view = new View();
-            var controller = new Controller(project, view);
+            var controller = new Controller(PROJECT, view);
         });
 
         $(".ui.bottom.attached.tab.segment[data-tab='primary-view']").load("input_form.html");

@@ -16,7 +16,6 @@ class Controller {
          * ************************************************************************************************ */
         EventBus.addEventListener("arrowLayoutUpdated", this.handleArrowLayoutUpdated, this);
         //EventBus.addEventListener("infoSwitcherDataUpdated", this.handleInfoSwitcherDataUpdated, this);
-        EventBus.addEventListener("plsfix", this.handleIntersections, this);
 
         /**
          * From View

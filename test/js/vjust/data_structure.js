@@ -49,8 +49,13 @@ class Project {
     }
 
     initializeIntersections() {
-       
+      
+        console.log(this._intersections_created);
+        if(this._intersections_created)
+            return;
+
         console.log("INITIALIZING INTERSECTIONS");
+        console.log(PROJECT);
         for(var interNum = 0; interNum < NUM_INTERSECTION_CONFIGS; interNum++)
             this._intersections.push(new Intersection(interNum));
           
@@ -122,7 +127,8 @@ class Project {
         this._general_volumes = [this._north_genvol,
                                  this._east_genvol,
                                  this._south_genvol,
-                                 this._west_genvol]
+                                 this._west_genvol
+                                ];
         
         this._north_split_genvol = new GeneralVolumeSplitDirection("north", 0, 0, 0.1, 0.1, 0, 0);
         this._east_split_genvol  = new GeneralVolumeSplitDirection("east", 0, 0, 0.1, 0.1, 0, 0);
@@ -502,7 +508,7 @@ class Intersection {
             this._enabled_zones[zone_num] = 0;
         
         for (var record = 0; record < this._config_arr.length; record++) {
-			var enabled_zone = this._config_arr[record][1] - 1;
+	    var enabled_zone = this._config_arr[record][1] - 1;
             if (enabled_zone >= 0)
                 this._enabled_zones[enabled_zone] = 1;
         }
@@ -526,7 +532,7 @@ class Intersection {
         for (var subjectZone = 0; subjectZone < 6; subjectZone++) {
             if (this.getZoneByIndex(subjectZone).isEnabled()) {
                 this.getZoneByIndex(subjectZone).createDirections();
-                this.setEffectiveZones(1 + this.getEffectiveZones() );
+                this.setEffectiveZones(1 + this.getEffectiveZones());
             }
         }
     }
@@ -536,14 +542,14 @@ class Intersection {
      * -1s indicate an invalid approach; if no entry for a given approach exists in the config routing table, the -1 will not be overwritten
      */
     updateZonePCEs() {
-		for (var zone = MIN_EFFECTIVE_ZONE; zone < NUM_ZONES; zone++) {
-			for (var direction = 0; direction < 4; direction++) {
-                var subjectZone = this.getZoneByIndex(zone);
-                if (subjectZone.isEnabled())
-				    subjectZone.getZonePCEs().getDirectionByIndex(direction).setMovementArray([-1,-1,-1]);
-			}
-		}
-		this.setZonePCEs();
+            for (var zone = MIN_EFFECTIVE_ZONE; zone < NUM_ZONES; zone++) {
+                    for (var direction = 0; direction < 4; direction++) {
+                        var subjectZone = this.getZoneByIndex(zone);
+                        if (subjectZone.isEnabled())
+                            subjectZone.getZonePCEs().getDirectionByIndex(direction).setMovementArray([-1,-1,-1]);
+                    }
+            }
+            this.setZonePCEs();
     }
 
      /**
@@ -552,24 +558,24 @@ class Intersection {
      */
     setZonePCEs() {
 			
-		for (var record = 0; record < this._config_arr.length; record++) {
-			var route = this._config_arr[record][0];
-			if (this._config_arr[record][1] == 0) {
-				var masterDirection = this._config_arr[record][2];
-				var masterMovement = this._config_arr[record][3];
-				var volume = PROJECT.getMasterPCETable().getDirectionByIndex(masterDirection).getMovementByIndex(masterMovement);
-			}
-			else if (this._config_arr[record][1] == -1) {
-				1 == 1;
-			}
-			else {
-				var subjectZone = this._config_arr[record][1];
-				var subjectDirection = this._config_arr[record][2];
-				var subjectMovement = this._config_arr[record][3];
-				this.getZoneByIndex(subjectZone - 1).addPCEtoZone(volume, subjectDirection, subjectMovement);
-                //this.getZoneByIndex(subjectZone - 1).setEnabled(true);
-			}
-		}
+        for (var record = 0; record < this._config_arr.length; record++) {
+                var route = this._config_arr[record][0];
+                if (this._config_arr[record][1] == 0) {
+                        var masterDirection = this._config_arr[record][2];
+                        var masterMovement = this._config_arr[record][3];
+                        var volume = PROJECT.getMasterPCETable().getDirectionByIndex(masterDirection).getMovementByIndex(masterMovement);
+                }
+                else if (this._config_arr[record][1] == -1) {
+                        1 == 1;
+                }
+                else {
+                        var subjectZone = this._config_arr[record][1];
+                        var subjectDirection = this._config_arr[record][2];
+                        var subjectMovement = this._config_arr[record][3];
+                        this.getZoneByIndex(subjectZone - 1).addPCEtoZone(volume, subjectDirection, subjectMovement);
+        //this.getZoneByIndex(subjectZone - 1).setEnabled(true);
+                }
+        }
         if (!this._constructing) {
             for (var zone = 0; zone < 6; zone++) {
                 if (this.getZoneByIndex(zone).isEnabled()) {
@@ -1341,7 +1347,7 @@ class TCUTable {
             
             console.log(this);
         } 
-        calculateCapacities();
+        this.calculateCapacities();
     }
     calculateCapacities() {
         for (var dir = 0; dir < 1; dir++) {
