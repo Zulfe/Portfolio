@@ -20,11 +20,12 @@ class BoundedCapacity {
         this._through         = through;
         this._right           = right;
 		
-		this._movement_array = [
-			this._left,
-			this._through,
-			this._right
-		];
+        this._movement_array  = 
+        [
+            this._left,
+            this._through,
+            this._right
+        ];
     }
 	
     /** 
@@ -32,32 +33,32 @@ class BoundedCapacity {
      * @param {int} index The index to the subject movement (0=left, 1=through, 2=right)
      * @param {int} new_value The new capacity value for the subject movement
      */
-	setMovementByIndex(index, new_value) {
-		this._movement_array[index] = new_value;
-		this.sync();
-	}
+    setMovementByIndex(index, new_value) {
+            this._movement_array[index] = new_value;
+            this.sync();
+    }
 	
     /**
      * Replaces all three values in the movement array simultaneously
      * @param {int[]} new_array An array of integers representing the capacity for each turning movement
      */
-	setMovementArray(new_array) {
-		this._movement_array = new_array;
-		this.sync();
-	}
+    setMovementArray(new_array) {
+            this._movement_array = new_array;
+            this.sync();
+    }
 
     /**
      * If the movement array has changed, run this function to implement the changes in the individual class variables.
      * By default this function runs automatically when an movement capacity or the entire movement array has been changed using
      * <tt>setMovementByIndex(index, new_value)</tt> or <tt>setMovementArray(new_array)</tt>.
      */ 
-	sync() {
-		this._left    = this._movement_array[0];
-		this._through = this._movement_array[1];
-		this._right   = this._movement_array[2];
-	}
+    sync() {
+            this._left    = this._movement_array[0];
+            this._through = this._movement_array[1];
+            this._right   = this._movement_array[2];
+    }
     
-	/**
+    /**
      * Sets the capacity of movement in the left lane.
      * @param {int} left lane capacity
      */
@@ -81,13 +82,13 @@ class BoundedCapacity {
         this._right = capacity;
     }
     
-	/**
-	 * Gets each movement capacity by index (0 for Left, 1 for Through, 2 for Right)
-	 * @param {int} capacity index
-	 */
-	getMovementByIndex(index) {
-		return this._movement_array[index];	
-	}
+    /**
+     * Gets each movement capacity by index (0 for Left, 1 for Through, 2 for Right)
+     * @param {int} capacity index
+     */
+    getMovementByIndex(index) {
+        return this._movement_array[index];	
+    }
 	
     /**
      * Returns the capacity of movement in the left lane.
@@ -124,22 +125,23 @@ class PCETable {
 	 * @param {object} eastbound_PCEs A PCE-enabled BoundedDetailedVolume object containing eastbound PCEs
 	 */
 	constructor (southbound_PCEs, westbound_PCEs, northbound_PCEs, eastbound_PCEs) {
-		this._southbound_PCEs = southbound_PCEs;
-		this._westbound_PCEs = westbound_PCEs;
-		this._northbound_PCEs = northbound_PCEs;
-		this._eastbound_PCEs = eastbound_PCEs;
-		
-		this._southbound_PCEs.setPCEState(true);
-		this._westbound_PCEs.setPCEState(true);
-		this._northbound_PCEs.setPCEState(true);
-		this._eastbound_PCEs.setPCEState(true);
-		
-		this._PCE_array = [
-			this._southbound_PCEs,
-			this._westbound_PCEs, 
-			this._northbound_PCEs,
-			this._eastbound_PCEs 
-		];
+            this._southbound_PCEs = southbound_PCEs;
+            this._westbound_PCEs = westbound_PCEs;
+            this._northbound_PCEs = northbound_PCEs;
+            this._eastbound_PCEs = eastbound_PCEs;
+            
+            this._southbound_PCEs.setPCEState(true);
+            this._westbound_PCEs.setPCEState(true);
+            this._northbound_PCEs.setPCEState(true);
+            this._eastbound_PCEs.setPCEState(true);
+            
+            this._PCE_array = 
+            [
+                    this._southbound_PCEs,
+                    this._westbound_PCEs, 
+                    this._northbound_PCEs,
+                    this._eastbound_PCEs 
+            ];
 	}
 	
     /**
@@ -155,9 +157,9 @@ class PCETable {
      * @param {int} index The location of the subject direction in the PCE array
      * @return {object} A PCE-enabled BoundedDetailedVolume object
      */
-	getDirectionByIndex(index) {
-		return this._PCE_array[index];
-	}
+    getDirectionByIndex(index) {
+        return this._PCE_array[index];
+    }
 	
     /**
      * Replace one PCE-enabled BoundedDetailedVolume object by its index in the PCE array of PCE-enabled BoundedDetailedVolume objects
@@ -443,7 +445,6 @@ class UserVolumeDefinitions {
     
     setComponentVolumeValue(direction, movement, volume) {
         var dir_int = typeof direction == "number" ? direction : parseInt(objectKeyByValue(DirectionEnum, direction));
-        console.log("Input volume: " + volume);
         if (typeof movement == "number") {
             this._direction_array[dir_int].setMovementByIndex(movement, volume);
         } else {
@@ -464,19 +465,26 @@ class UserVolumeDefinitions {
 
     setComponentPercentageValue(direction, movement, percent) {
         var dir_int = typeof direction == "number" ? direction : parseInt(objectKeyByValue(DirectionEnum,direction));
-        
+        var update_percent = percent;
+
+        if(percent.length == 0)
+            update_percent = 0;
+
+        update_percent = update_percent / 100;
+
         if (typeof movement == "number") {
-            this._direction_array[dir_int].setMovementByIndex(movement, volume);
-        } else {
+            this._direction_array[dir_int].setMovementByIndex(movement, update_percent);
+        }
+        else {
             switch(movement) {
                 case "left":
-                    this._percent_array[dir_int].setMovementByIndex(0, volume);
+                    this._percent_array[dir_int].setMovementByIndex(0, update_percent);
                     break;
                 case "through":
-                    this._percent_array[dir_int].setMovementByIndex(1, volume);
+                    this._percent_array[dir_int].setMovementByIndex(1, update_percent);
                     break;
                 case "right":
-                    this._percent_array[dir_int].setMovementByIndex(2, volume);
+                    this._percent_array[dir_int].setMovementByIndex(2, update_percent);
                     break;
             }
         }
@@ -965,22 +973,32 @@ class BoundedDetailedVolume {
 
 class DetailedPercentage {
     constructor(direction, left_perc, through_perc, right_perc) {
-        this._direction = direction;
-        this._left_perc = left_perc;
-        this._through_perc = through_perc;
-        this._right_perc = right_perc;
+        this._direction      = direction;
+        this._left_perc      = left_perc;
+        this._through_perc   = through_perc;
+        this._right_perc     = right_perc;
         
-        this._movement_array = [
+        this._movement_array = 
+        [
             this._left_perc,
             this._through_perc,
             this._right_perc,
         ];
     }
 
-	setMovementByIndex(index, new_value) {
-		this._movement_array[index] = new_value;
-		this.sync();
-	}
+    setMovementByIndex(index, new_value) {
+            this._movement_array[index] = new_value;
+            this.sync();
+    }
+
+    sync() {
+        this._movement_array =
+        [
+            this._left_perc,
+            this._through_perc,
+            this._right_perc
+        ];
+    }
     
     getLeft() {
         return this._left_perc;

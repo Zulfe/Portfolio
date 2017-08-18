@@ -539,8 +539,6 @@ class ArrowLayout {
      * @param {string} type The type of left arrow to be added (exclusive)
      */
     clickLeft(type) {
-        console.log("Clicking left!");
-
         var _this = "#" + this._UID + " .left.container";
         
         if(!this.isAdditionPermitted("left", type))

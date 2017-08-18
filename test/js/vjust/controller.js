@@ -60,6 +60,8 @@ class Controller {
     handleArrowLayoutUpdated(event, config, zone, direction, arrow_array) {
         var address = config + "-" + zone + "-" + direction;
       
+
+        console.log("Adding an arrow layout update to the queue for " + address);
         this._view.addToArrowChangeQueue(address, arrow_array);
     }
 

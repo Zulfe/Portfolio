@@ -278,6 +278,8 @@ class View {
 
             var mod_address = conf + "-" + zone + "-" + dir;
             this._ARDictionary[mod_address] = module_object;
+
+            console.log(this._ARDictionary);
         }
 
         if(mod_det[0] == "IS") {
@@ -288,9 +290,9 @@ class View {
 
             var mod_address = conf + "-" + zone + "-" + dir + "-" + mvt;
             this._ISDictionary[mod_address] = module_object;
-        }
 
-        console.log(this._ARDictionary);
+            console.log(this._ISDictionary);
+        }
     }
 
 

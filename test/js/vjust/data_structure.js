@@ -896,7 +896,7 @@ class Direction {
                                                 user_volumes.getDirectionByIndex( (direction_id + 3) % 3 ).getLeft(),
                                                 1,
                                                 0,
-                                                0,                                            
+                                                0                                         
                                                );
         
         this.syncEntries();
@@ -953,9 +953,11 @@ class Direction {
         if (this._shared_left && this._shared_right && this._through == 1) {
             this._arrow_all_share  = 1;
             this._arrow_through    = 0;
-        } else if (this._shared_left && this._shared_right && !this._through) {
+        }
+        else if (this._shared_left && this._shared_right && !this._through) {
             this._arrow_left_right = 1;
-        } else {
+        }
+        else {
             if (this._shared_left)
                 this._arrow_through_left  = 1;
             if (this._shared_right)
@@ -971,6 +973,7 @@ class Direction {
     syncArrowArray() {
         this._arrow_array = [this._arrow_left, this._arrow_through, this._arrow_through_left, this._arrow_through_right, this._arrow_all_share, this._arrow_left_right, this._arrow_right, this._arrow_chan_right];  
         if (!this._constructing) {
+            console.log("[MODEL] Dispatching an arrow layout update.");
             EventBus.dispatch("arrowLayoutUpdated", 0, this._intersection_ID, this._zone_ID, this._direction_ID, this._arrow_array);
             PROJECT.getIntersectionByID(this._intersection_ID).updateZonePCEs();
         }
@@ -997,8 +1000,10 @@ class Direction {
     setArrowsByMovement(movement, arrows) {
         if(movement == 0)
             setLeftArrows(arrows);
+
         else if(movement == 1)
             setThroughArrows(arrows);
+
         else if(movement == 2)
             setRightArrows(arrows);
     }
