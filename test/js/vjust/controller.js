@@ -15,7 +15,7 @@ class Controller {
          * From Model
          * ************************************************************************************************ */
         EventBus.addEventListener("arrowLayoutUpdated", this.handleArrowLayoutUpdated, this);
-        //EventBus.addEventListener("infoSwitcherDataUpdated", this.handleInfoSwitcherDataUpdated, this);
+        EventBus.addEventListener("infoSwitcherDataUpdated", this.handleInfoSwitcherDataUpdated, this);
 
         /**
          * From View
@@ -32,7 +32,6 @@ class Controller {
     /*
      * View Event Handlers
      */
-
     handleUpdateUserVolumeDefinitionsVolume(event, direction, movement, value) {
         this._model.getUserVolumeDefinitions().setComponentVolumeValue(direction, movement, value);
     }
@@ -67,7 +66,7 @@ class Controller {
 
     handleInfoSwitcherDataUpdated(event, config, zone, direction, movement, data) {
         var address = config + "-" + zone + "-" + direction + "-" + movement;
-
+        console.log("[CONTROLLER] Attempting to switch InfoSwitcher data at " + address);
 
         if(this._view.isInfoSwitcherObjectActive(address))
             this._view.updateInfoSwitcherData(address, data);

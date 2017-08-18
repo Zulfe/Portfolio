@@ -82,20 +82,13 @@ class ArrowLayout {
     handleSiblingScaled(event, sibling, scale) {
 
         if(sibling.getUID().split("-")[1] == this._config_num) {
-            console.log(this._UID);
-            console.log("Read object scale as " + this._height_scale);
-            console.log("Read announced scale as " + scale);
-            console.log("Calculated largest scale as " + this.calculateLargestScale());
             if(this.calculateLargestScale() < scale) {
-                console.log("Announcing largest scale because " + this.calculateLargestScale() + " < " + scale);
                 EventBus.dispatch("ar_sibling_scaled", this, this, this.calculateLargestScale());
             
             }
             else {
-                console.log("Setting the scale to " + scale + " because " + this.calculateLargestScale() + " >= " + scale);
                 this.setScale(scale);
             }
-            console.log("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
         }
     }
 
@@ -496,7 +489,6 @@ class ArrowLayout {
     }
 
     setScale(scale) {
-        console.log("[" + this._UID + "] Setting scale to " + scale);
         this._height_scale = scale;
 
         // Update the height of all existing arrows using the newly found optimized scale value.

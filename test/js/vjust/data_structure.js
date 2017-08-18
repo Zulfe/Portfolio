@@ -60,6 +60,12 @@ class Project {
             this._intersections.push(new Intersection(interNum));
           
         this._intersections_created = true;
+    
+        this._intersections.forEach(function(curInt, index) {
+            curInt.updateInfoSwitcherData();
+        });
+    
+    
     }
     
     /**
@@ -505,7 +511,7 @@ class Intersection {
         this._enabled_zones = new Array();
         
         for (var zone_num = 0; zone_num < this._effective_zones; zone_num++)
-            this._enabled_zones[zone_num] = 0;
+            this._enabled_zones[zone_num] = 1;
         
         for (var record = 0; record < this._config_arr.length; record++) {
 	    var enabled_zone = this._config_arr[record][1] - 1;
@@ -527,6 +533,7 @@ class Intersection {
     }
     
     initializeZonePCEs() {
+        console.log("y33t");
         this.updateZonePCEs();
         this.setEffectiveZones(0);
         for (var subjectZone = 0; subjectZone < 6; subjectZone++) {
@@ -577,36 +584,44 @@ class Intersection {
                 }
         }
         if (!this._constructing) {
-            for (var zone = 0; zone < 6; zone++) {
-                if (this.getZoneByIndex(zone).isEnabled()) {
-                    this.getZoneByIndex(zone).getZoneTCUs().updateTCUs();
-                
-                    for (var dir = 0; dir < 4; dir++) 
-                        var left = [
-                            this.getZoneByIndex(zone).getZonePCEs().getDirectionByIndex(dir).getLeft(),
-                            this.getZoneByIndex(zone).getZoneTCUs().getCapacityByIndex(dir).getLeft(),
-                            this.getZoneByIndex(zone).getZonePCEs().getDirectionByIndex(dir).getLeft() / 
-                            this.getZoneByIndex(zone).getZoneTCUs().getCapacityByIndex(dir).getLeft()
-                        ]
-                        var thru = [
-                            this.getZoneByIndex(zone).getZonePCEs().getDirectionByIndex(dir).getLeft(),
-                            this.getZoneByIndex(zone).getZoneTCUs().getCapacityByIndex(dir).getLeft(),
-                            this.getZoneByIndex(zone).getZonePCEs().getDirectionByIndex(dir).getLeft() / 
-                            this.getZoneByIndex(zone).getZoneTCUs().getCapacityByIndex(dir).getLeft()
-                        ]
-                        var rite = [
-                            this.getZoneByIndex(zone).getZonePCEs().getDirectionByIndex(dir).getLeft(),
-                            this.getZoneByIndex(zone).getZoneTCUs().getCapacityByIndex(dir).getLeft(),
-                            this.getZoneByIndex(zone).getZonePCEs().getDirectionByIndex(dir).getLeft() / 
-                            this.getZoneByIndex(zone).getZoneTCUs().getCapacityByIndex(dir).getLeft()
-                        ]
-                        EventBus.dispatch("infoSwitcherDataUpdated", 0, this._intersection_ID, zone, dir, 0, left);
-                        EventBus.dispatch("infoSwitcherDataUpdated", 0, this._intersection_ID, zone, dir, 1, thru);
-                        EventBus.dispatch("infoSwitcherDataUpdated", 0, this._intersection_ID, zone, dir, 2, rite);
-                }
+            updateInfoSwitcherData();
+        }
+    }
+
+    updateInfoSwitcherData() {
+        for (var zone = 0; zone < 6; zone++) {
+            if (this.getZoneByIndex(zone).isEnabled()) {
+                this.getZoneByIndex(zone).getZoneTCUs().updateTCUs();
+            
+                for (var dir = 0; dir < 4; dir++) 
+                    var left = [
+                        this.getZoneByIndex(zone).getZonePCEs().getDirectionByIndex(dir).getLeft(),
+                        this.getZoneByIndex(zone).getZoneTCUs().getCapacityByIndex(dir).getLeft(),
+                        this.getZoneByIndex(zone).getZonePCEs().getDirectionByIndex(dir).getLeft() / 
+                        this.getZoneByIndex(zone).getZoneTCUs().getCapacityByIndex(dir).getLeft()
+                    ];
+                    console.log(left);
+                    console.log(this.getZoneByIndex(zone).getZonePCEs());
+                    var thru = [
+                        this.getZoneByIndex(zone).getZonePCEs().getDirectionByIndex(dir).getThrough(),
+                        this.getZoneByIndex(zone).getZoneTCUs().getCapacityByIndex(dir).getThrough(),
+                        this.getZoneByIndex(zone).getZonePCEs().getDirectionByIndex(dir).getThrough() / 
+                        this.getZoneByIndex(zone).getZoneTCUs().getCapacityByIndex(dir).getThrough()
+                    ];
+                    var rite = [
+                        this.getZoneByIndex(zone).getZonePCEs().getDirectionByIndex(dir).getRight(),
+                        this.getZoneByIndex(zone).getZoneTCUs().getCapacityByIndex(dir).getRight(),
+                        this.getZoneByIndex(zone).getZonePCEs().getDirectionByIndex(dir).getRight() / 
+                        this.getZoneByIndex(zone).getZoneTCUs().getCapacityByIndex(dir).getRight()
+                    ];
+                    EventBus.dispatch("infoSwitcherDataUpdated", 0, this._intersection_ID, zone, dir, 0, left);
+                    EventBus.dispatch("infoSwitcherDataUpdated", 0, this._intersection_ID, zone, dir, 1, thru);
+                    EventBus.dispatch("infoSwitcherDataUpdated", 0, this._intersection_ID, zone, dir, 2, rite);
             }
         }
     }
+
+
 
     /**
      * Change the value of this object's stored number of effective zones.
@@ -938,7 +953,7 @@ class Direction {
     }
     
     calculateArrowsFromEntries() {
-        
+        console.log("[MODEL] Calculating the arrows from entries!"); 
         this._arrow_array = [0, 0, 0, 0, 0, 0, 0, 0];
         this.syncArrows();
         
@@ -973,10 +988,9 @@ class Direction {
     syncArrowArray() {
         this._arrow_array = [this._arrow_left, this._arrow_through, this._arrow_through_left, this._arrow_through_right, this._arrow_all_share, this._arrow_left_right, this._arrow_right, this._arrow_chan_right];  
         if (!this._constructing) {
-            console.log("[MODEL] Dispatching an arrow layout update.");
-            EventBus.dispatch("arrowLayoutUpdated", 0, this._intersection_ID, this._zone_ID, this._direction_ID, this._arrow_array);
             PROJECT.getIntersectionByID(this._intersection_ID).updateZonePCEs();
         }
+        EventBus.dispatch("arrowLayoutUpdated", 0, this._intersection_ID, this._zone_ID - 1, this._direction_ID, this._arrow_array);
     }
     
     getArrowArray() {
